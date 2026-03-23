@@ -1,0 +1,78 @@
+configuration {
+    show-icons: false;
+    hover-select: true;
+    me-select-entry: "";
+    me-accept-entry: "MousePrimary";
+}
+
+* {
+    font: "JetBrainsMono Nerd Font 13";
+    bg: #282828;
+    fg: #EBDBB2;
+    accent: #8EC07C;
+    header-bg: #282828;
+}
+
+window {
+    width: 350px; /* Λίγο πιο μαζεμένο πλάτος */
+    background-color: @bg;
+    border: 2px;
+    border-color: @accent;
+    border-radius: 12px;
+    location: center;
+    anchor: center;
+    /* Αφαιρούμε το σταθερό height αν υπήρχε */
+}
+
+mainbox {
+    background-color: transparent;
+    padding: 0px;
+    children: [ inputbar, listview ];
+}
+
+inputbar {
+    background-color: @header-bg;
+    padding: 15px 20px;
+    border: 0px 0px 2px 0px;
+    border-color: @accent;
+    children: [ prompt ];
+}
+
+prompt {
+    background-color: transparent;
+    text-color: @accent;
+    font: "JetBrainsMono Nerd Font Bold 13";
+}
+
+listview {
+    background-color: transparent;
+    columns: 1;
+    /* ΕΔΩ ΕΙΝΑΙ Η ΔΙΟΡΘΩΣΗ: */
+    fixed-height: false;
+    dynamic: true;
+    scrollbar: false;
+    lines: 5; /* Προσαρμόζεται αυτόματα αν οι επιλογές είναι λιγότερες */
+    spacing: 0px;
+    padding: 5px 0px 5px 0px; /* Μικρό padding πάνω-κάτω */
+}
+
+element {
+    background-color: transparent;
+    text-color: @fg;
+    padding: 12px 25px;
+    spacing: 20px;
+    border-radius: 0px; /* Context menu style */
+}
+
+element-text {
+    background-color: inherit;
+    text-color: inherit;
+    vertical-align: 0.5;
+}
+
+element selected {
+    background-color: @accent;
+    text-color: @bg;
+}
+
+entry { enabled: false; }

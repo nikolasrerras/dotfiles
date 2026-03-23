@@ -1,0 +1,61 @@
+@import "/home/nikolas/.cache/wallust/colors-waybar.css";
+
+* {
+    border: none;
+    border-radius: 0;
+    font-family: "JetBrainsMono Nerd Font", sans-serif;
+    font-size: 14px;
+    min-height: 0;
+    margin: 0;
+}
+
+window#waybar {
+    background-color: @background;
+    color: @foreground;
+}
+
+#workspaces button {
+    padding: 0 10px;
+    margin: 2px 4px; 
+    font-size: 16px;
+    font-weight: bold;
+    background: transparent;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    color: @foreground;
+}
+
+#workspaces button.active,
+#workspaces button.focused {
+    background-color: @color6; 
+    color: @background;
+    border-radius: 5px;
+}
+
+#workspaces button:hover {
+    background-color: @color8;
+}
+
+#clock, #pulseaudio, #battery, #network, #memory, #cpu, #tray {
+    color: @foreground; 
+}
+
+#clock {
+    padding: 0 14px;
+    font-weight: bold;
+}
+
+/* Εδώ είναι το fix για να μην κολλάει το Power στην άκρη */
+#custom-power {
+    padding: 0 5px;
+    margin: 2px 5px 2px 2px; /* 15px αέρας δεξιά */
+    font-size: 16px;
+    border-radius: 6px;
+}
+
+#network, #pulseaudio, #bluetooth, #cpu, #memory, #custom-gpu, #language {
+    padding: 0 5px;
+    margin: 2px 2px;
+    font-weight: bold;
+    border-radius: 6px;
+}
