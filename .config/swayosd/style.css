@@ -1,0 +1,32 @@
+@import "../../.cache/wallust/colors-waybar.css";
+
+window {
+    background: transparent;
+}
+
+#osd {
+    background: @background;
+    color: @foreground;
+    border-radius: 12px;
+    border: 2px solid @color4; 
+    padding: 12px;
+    margin: 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+#osd image, 
+#osd label {
+    color: @foreground;
+}
+
+progressbar:disabled trough,
+progressbar trough {
+    background: @color0;
+    border-radius: 8px;
+    min-height: 8px; 
+}
+
+progressbar fill {
+    background: @color4; 
+    border-radius: 8px;
+}
