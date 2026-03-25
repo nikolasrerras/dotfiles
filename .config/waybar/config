@@ -10,6 +10,7 @@
         "clock"
     ],
     "modules-right": [
+      "group/drawer",
       "niri/language",
       "cpu",
       "memory",
@@ -77,6 +78,27 @@
     "niri/language": {
         "format": "{short}",
         "tooltip": false
+    },
+    "group/drawer": {
+        "orientation": "horizontal",
+        "drawer": {
+            "transition-duration": 500,
+            "transition-left-to-right": false
+        },
+        "modules": [
+            "custom/arrow",
+            "tray"
+        ]
+    },
+
+    "custom/arrow": {
+        "format": "",
+        "tooltip": false
+    },
+    
+    "tray": {
+        "icon-size": 18,
+        "spacing": 10
     }
 
 } 
