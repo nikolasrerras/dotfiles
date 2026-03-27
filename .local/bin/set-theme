@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+  echo "bale to theme re tarama"
+  exit 1
+fi
+
+wallust theme "$1"
+pkill -USR2 waybar
+killall swayosd-server
+swayosd-server >/dev/null 2>&1 &
+
+echo "$1"
