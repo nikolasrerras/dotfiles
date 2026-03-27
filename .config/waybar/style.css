@@ -36,7 +36,7 @@ window#waybar {
     background-color: @color8;
 }
 
-#clock, #pulseaudio, #battery, #network, #memory, #cpu, #tray, #custom-arrow {
+#clock, #pulseaudio, #battery, #network, #memory, #cpu, #tray, #custom-arrow, #custom-music {
     color: @foreground; 
 }
 
@@ -86,4 +86,14 @@ window#waybar group#drawer {
     -gtk-icon-effect: dim;
 }
 
+#custom-music {
+    font-weight: bold;
+    padding: 0 10px;
+    margin: 2px 4px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
 
+#custom-music.paused {
+    color: @color8;
+}

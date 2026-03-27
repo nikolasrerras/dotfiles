@@ -4,7 +4,8 @@
     "height": 30,
     
     "modules-left": [
-        "niri/workspaces"
+        "niri/workspaces",
+        "custom/music"
     ],
     "modules-center": [
         "clock"
@@ -90,12 +91,20 @@
             "tray"
         ]
     },
-
     "custom/arrow": {
         "format": "",
         "tooltip": false
     },
-    
+    "custom/music": {
+        "format": "{}",
+        "return-type": "json",
+        "exec": "waybar-module-music",
+        "on-click": "playerctl play-pause",
+        "on-click-right": "playerctl next",
+        "on-click-middle": "playerctl previous",
+        "escape": false,
+        "tooltip": false
+    }, 
     "tray": {
         "icon-size": 18,
         "spacing": 10
