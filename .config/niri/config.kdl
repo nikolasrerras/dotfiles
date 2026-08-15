@@ -1,4 +1,3 @@
-include "colors.kdl"
 // This config is in the KDL format: https://kdl.dev
 // "/-" comments out the following node.
 // Check the wiki for a full description of the configuration:
@@ -73,6 +72,9 @@ input {
     // focus-follows-mouse max-scroll-amount="0%"
 }
 
+//cursor {
+//hide-after-inactive-ms 5000
+//}
 // You can configure outputs by their name, which you can find
 // by running `niri msg outputs` while inside a niri instance.
 // The built-in laptop monitor is usually called "eDP-1".
@@ -80,13 +82,12 @@ input {
 // https://yalter.github.io/niri/Configuration:-Outputs
 // Remember to uncomment the node by removing "/-"!
 output "DP-1" {
-    // Κεντρική Οθόνη (Samsung G5) - Αριστερά
     mode "2560x1440@164.835"
     position x=0 y=0
+    variable-refresh-rate
 }
 
 output "DP-2" {
-    // Δεύτερη Οθόνη (AOC) - Στα δεξιά της κεντρικής
     mode "1920x1080@74.924"
     position x=2560 y=0
 }
@@ -96,7 +97,7 @@ output "DP-2" {
 // https://yalter.github.io/niri/Configuration:-Layout
 layout {
     // Set gaps around windows in logical pixels.
-    gaps 6
+    gaps 7
 
     // When to center a column when changing focus, options are:
     // - "never", default behavior, focusing an off-screen column will keep at the left
@@ -145,6 +146,8 @@ layout {
 
         // How many logical pixels the ring extends out from the windows.
         width 3
+        active-color "#D79921"
+        inactive-color "#282828"
 
         // Colors can be set in a variety of ways:
         // - CSS named colors: "red"
@@ -200,8 +203,8 @@ layout {
     // You can enable drop shadows for windows.
     shadow {
         // Uncomment the next line to enable shadows.
-         on
-
+        //on
+        //
         // By default, the shadow draws only around its window, and not behind it.
         // Uncomment this setting to make the shadow draw behind its window.
         //
@@ -254,15 +257,14 @@ layout {
 
 // This line starts waybar, a commonly used bar for Wayland compositors.
 spawn-at-startup "waybar"
-spawn-at-startup "swaync"
+spawn-at-startup "mako"
 spawn-at-startup "awww-daemon"
-spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 spawn-at-startup "xwayland-satellite"
+spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 spawn-at-startup "swayosd-server"
-spawn-at-startup "swayidle" "-w" \
-    "timeout" "1800" "niri msg action power-off-monitors" \
-    "resume"  "niri msg action power-on-monitors" \
-    "timeout" "7200" "systemctl suspend"
+spawn-at-startup "playerctld" "daemon"
+//spawn-at-startup "swayidle" "-w" \
+//  "timeout" "1800" "niri msg action power-off-monitors" 
 // To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
 // spawn-sh-at-startup "qs -c ~/source/qs/MyAwesomeShell"
 
@@ -291,7 +293,7 @@ screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
 // https://yalter.github.io/niri/Configuration:-Animations
 animations {
     // Uncomment to turn off all animations.
-    // off
+    //off
 
     // Slow down all animations by this factor. Values below 1 speed them up instead.
     // slowdown 3.0
@@ -314,14 +316,12 @@ window-rule {
 window-rule {
     match app-id="steam" title=r#"^notificationtoasts_\d+_desktop$"#
     default-floating-position x=10 y=10 relative-to="top-right"
+    open-focused false
 }
 
 // Open the Firefox picture-in-picture player as floating by default.
 window-rule {
-    // This app-id regular expression will work for both:
-    // - host Firefox (app-id is "firefox")
-    // - Flatpak Firefox (app-id is "org.mozilla.firefox")
-    match app-id=r#"firefox$"# title="^Picture-in-Picture$"
+    match app-id="zen-browser" title="^Picture in Picture$"
     open-floating true
 }
 
@@ -337,30 +337,48 @@ window-rule {
     // block-out-from "screencast"
 }
 
+//window-rule { 
+//    background-effect {
+//        blur true
+//    }
+//}
+
+//layer-rule {
+//    match namespace="^launcher$"
+//    geometry-corner-radius 13
+//    opacity 0.85
+//    background-effect {
+//        blur true
+//    }
+//}
+
 window-rule {
     match app-id="com.floating.tui"
     open-floating true
 }
-
 // Example: enable rounded corners for all windows.
 // (This example rule is commented out with a "/-" in front.)
 
 window-rule {
-    geometry-corner-radius 12
+    geometry-corner-radius 8
     clip-to-geometry true
 }
 
 binds {
 
-    Mod+B { spawn "brave"; }
-    Mod+D { spawn "vesktop"; }
-    Mod+M { spawn "spotify-launcher"; }
-    Mod+N { spawn "code"; }
+    Mod+Shift+B { spawn "brave-origin"; }
+    Mod+B { spawn "zen-browser"; }
+    Mod+D { spawn "discord"; }
+    Mod+M { spawn "spotify"; }
+    Mod+N { spawn "zeditor"; }
     Mod+S { spawn "steam"; }
-    Mod+E { spawn "nautilus"; }
-
+    Mod+E { spawn "thunar"; }
+    Mod+Shift+E { spawn "kitty" "yazi"; }
+    Mod+Shift+N { spawn "kitty" "nvim"; }
     Mod+Escape { spawn "/home/nikolas/.local/bin/powermenu"; }
-    
+    Mod+A {
+    spawn-sh "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 wiremix"
+}
     // Keys consist of modifiers separated by + signs, followed by an XKB key name
     // in the end. To find an XKB name for a particular key, you may use a program
     // like wev.
@@ -376,7 +394,7 @@ binds {
     Mod+Shift+Slash { show-hotkey-overlay; }
 
     // Suggested binds for running programs: terminal, app launcher, screen locker.
-    Mod+return hotkey-overlay-title="Open a Terminal: ghostty" { spawn "ghostty"; }
+    Mod+return hotkey-overlay-title="Open a Terminal: kitty" { spawn "kitty"; }
     Mod+space hotkey-overlay-title="Run an Application: fuzzel" { spawn "fuzzel"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock"; }
 
@@ -628,11 +646,12 @@ binds {
     //Mod+Escape allow-inhibiting=false { toggle-keyboard-shortcuts-inhibit; }
 
     // The quit action will show a confirmation dialog to avoid accidental exits.
-    Mod+Shift+E { quit; }
+    //Mod+Shift+E { quit; }
     Ctrl+Alt+Delete { quit; }
 
     // Powers off the monitors. To turn them back on, do any input like
     // moving the mouse or pressing any other key.
     Mod+Shift+P { power-off-monitors; }
-  
+
 }
+include "/home/nikolas/.config/niri/colors.kdl"

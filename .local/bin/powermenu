@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
-# Οι επιλογές σου (Icons + Text)
 options="󰗼  Logout\n󰤄  Suspend\n󰜉  Restart\n  Shutdown"
 
-# Το -p "System..." φτιάχνει τον τίτλο
 chosen=$(echo -e "$options" | rofi -dmenu -i -p "Power Menu..." -theme ~/.config/rofi/powermenu.rasi 2>/dev/null)
 
 case "$chosen" in

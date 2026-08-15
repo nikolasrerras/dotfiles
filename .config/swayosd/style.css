@@ -21,7 +21,7 @@ window {
 
 progressbar:disabled trough,
 progressbar trough {
-    background: @color0;
+    background: @color8;
     border-radius: 8px;
     min-height: 8px; 
 }

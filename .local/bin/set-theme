@@ -6,8 +6,44 @@ if [ -z "$1" ]; then
 fi
 
 wallust theme "$1"
+sleep 0.2
+CHOICE_NIRI=$(cat ~/.cache/wallust/accent-list.txt | fuzzel --dmenu --prompt "Niri Color ~> " --lines 7)
+
+if [ -n "$CHOICE_NIRI" ]; then
+  HEX_NIRI=$(echo "$CHOICE_NIRI" | grep -m 1 -o -E '#[0-9a-fA-F]{6}')
+  cat <<EOF >~/.config/niri/colors.kdl
+layout {
+    focus-ring {
+        active-color "$HEX_NIRI"
+    }
+}
+EOF
+
+  HEX_FUZZEL="${HEX_NIRI//#/}d9"
+
+  sed -i "s/^border=.*/border=$HEX_FUZZEL/" ~/.config/fuzzel/colors.ini
+  sed -i "s/^selection=.*/selection=$HEX_FUZZEL/" ~/.config/fuzzel/colors.ini
+
+fi
+
+sleep 0.2
+
+CHOICE_WAYBAR=$(cat ~/.cache/wallust/accent-list.txt | fuzzel --dmenu --prompt "Waybar Color ~> " --lines 7)
+
+if [ -n "$CHOICE_WAYBAR" ]; then
+  HEX_WAYBAR=$(echo "$CHOICE_WAYBAR" | grep -m 1 -o -E '#[0-9a-fA-F]{6}')
+  echo "@define-color accent $HEX_WAYBAR;" >~/.config/waybar/accent.css
+  printf 'border-color=%sFF
+progress-color=over %sFF
+' "$HEX_WAYBAR" "$HEX_WAYBAR" >~/.config/mako/accent.conf
+  HEX_FUZZEL_WAYBAR="${HEX_WAYBAR//#/}ff"
+  sed -i "s/^selection=.*/selection=$HEX_FUZZEL_WAYBAR/" ~/.config/fuzzel/colors.ini
+fi
+
 pkill -USR2 waybar
 killall swayosd-server
 swayosd-server >/dev/null 2>&1 &
+
+makoctl reload >/dev/null 2>&1 || true
 
 echo "$1"

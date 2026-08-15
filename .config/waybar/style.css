@@ -1,12 +1,13 @@
 @import "/home/nikolas/.cache/wallust/colors-waybar.css";
+@import "/home/nikolas/.config/waybar/accent.css";
 
 * {
     border: none;
     border-radius: 0;
-    font-family: "JetBrainsMono Nerd Font", sans-serif;
+    font-family: "Symbols Nerd Font", "JetBrainsMono Nerd Font", sans-serif;
     font-size: 14px;
-    min-height: 0;
     margin: 0;
+    padding: 0;
 }
 
 window#waybar {
@@ -15,85 +16,70 @@ window#waybar {
 }
 
 #workspaces button {
-    padding: 0 10px;
-    margin: 2px 4px; 
-    font-size: 16px;
+    padding: 0 8px;
+    margin: 4px 3px;
+    font-size: 13px;
     font-weight: bold;
-    background: transparent;
-    border-radius: 4px;
-    transition: all 0.2s ease;
     color: @foreground;
+    opacity: 0.4;
+    transition: all 0.2s ease;
+    border-radius: 4px;
 }
 
 #workspaces button.active,
 #workspaces button.focused {
-    background-color: @color6; 
+    background-color: @accent;
     color: @background;
-    border-radius: 5px;
+    opacity: 1;
 }
 
 #workspaces button:hover {
     background-color: @color8;
-}
-
-#clock, #pulseaudio, #battery, #network, #memory, #cpu, #tray, #custom-arrow, #custom-music {
-    color: @foreground; 
+    opacity: 0.8;
 }
 
 #clock {
-    padding: 0 14px;
+    padding: 0 20px;
     font-weight: bold;
+    color: @foreground;
 }
 
+#network,
+#pulseaudio,
+#bluetooth,
+#cpu,
+#memory,
+#custom-gpu,
+#language {
+    margin: 0 15px;
+    font-weight: bold;
+    color: @foreground;
+}
 
 #custom-power {
-    padding: 0 5px;
-    margin: 2px 5px 2px 2px;
+    margin: 0 15px 0 10px;
     font-size: 16px;
-    border-radius: 6px;
+    color: @foreground;
 }
 
-#network, #pulseaudio, #bluetooth, #cpu, #memory, #custom-gpu, #language {
-    padding: 0 5px;
-    margin: 2px 2px;
-    font-weight: bold;
-    border-radius: 6px;
-}
-
-window#waybar group#drawer {
-    
-    background-color: transparent; 
-    border-radius: 6px;
-}
-
-#custom-arrow { 
-    font-size: 16px;
-    padding: 0px 10px;
-    margin: 2px 2px;
-}
-
-
-#custom-arrow:hover {
-    color: @color6;
+#language {
+    margin: 0 10px;
 }
 
 #tray {
-    padding: 0 5px;
-    margin: 2px 2px;
+    margin: 0 6px;
 }
 
-#tray > .passive {
-    -gtk-icon-effect: dim;
+#tray > * > * {
+    margin: 0 7px;
 }
 
 #custom-music {
+    margin: 0 12px;
     font-weight: bold;
-    padding: 0 10px;
-    margin: 2px 4px;
-    border-radius: 6px;
-    transition: all 0.2s ease;
+    color: @foreground;
 }
 
-#custom-music.paused {
-    color: @color8;
+#custom-music:hover {
+    color: @accent;
 }

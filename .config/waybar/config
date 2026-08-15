@@ -2,7 +2,7 @@
     "layer": "top",
     "position": "top",
     "height": 30,
-    
+
     "modules-left": [
         "niri/workspaces",
         "custom/music"
@@ -11,23 +11,38 @@
         "clock"
     ],
     "modules-right": [
-      "group/drawer",
-      "niri/language",
-      "cpu",
-      "memory",
-      "custom/gpu",
-      "bluetooth",
-      "pulseaudio",
-      "network",
-      "custom/power"
+        "tray",
+        "niri/language",
+        "cpu",
+        "memory",
+        "custom/gpu",
+        "bluetooth",
+        "pulseaudio",
+        "network",
+        "custom/power"
     ],
 
-   "niri/workspaces": {
-    "format": "{index}",
-    "all-outputs": false
+    "niri/workspaces": {
+        "format": "{index}",
+        "all-outputs": false
     },
+    "custom/music": {
+        "exec": "/home/nikolas/.config/waybar/scripts/music.sh",
+        "interval": 1,
+        "format": "{}",
+        "max-length": 45,
+        "hide-empty-text": true,
+        "escape": true,
+        "tooltip": false,
+        "on-click": "playerctl play-pause",
+        "on-click-right": "playerctl next",
+        "on-click-middle": "playerctl previous",
+        "on-scroll-up": "playerctl next",
+        "on-scroll-down": "playerctl previous"
+    },
+
     "clock": {
-        "format": "{:%d %b, %H:%M}"
+        "format": "{:%a %d %b, %H:%M}"
     },
     "custom/power": {
         "format": "",
@@ -35,79 +50,51 @@
         "on-click": "~/.local/bin/powermenu 2> /dev/null"
     },
     "network": {
-        "format-wifi": "   ",
-        "format-ethernet": " 󰈀  ",
-        "format-disconnected": " ⚠ ",
+        "format-wifi": "{icon}",
+        "format-ethernet": "󰈀",
+        "format-linked": "󰈀",
+        "format-disconnected": "⚠",
+        "format-icons": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"],
         "tooltip": false,
-        "on-click": "ghostty --gtk-single-instance=false --class=com.floating.tui --window-width=90 --window-height=30 --window-padding-x=0 --window-padding-y=0 -e impala > /dev/null 2>&1"
+        "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 impala > /dev/null 2>&1"
     },
     "pulseaudio": {
         "format": "{icon}",
-        "format-muted": " 󰖁 ",
+        "format-muted": "󰖁",
         "format-icons": {
-            "default": ["  ", "  ", "   "]
+            "default": ["", "", ""]
         },
         "tooltip": true,
         "tooltip-format": "{volume}%",
-        "on-click": "ghostty --gtk-single-instance=false --class=com.floating.tui --window-width=90 --window-height=30 --window-padding-x=0 --window-padding-y=0 -e wiremix > /dev/null 2>&1"
+        "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 wiremix > /dev/null 2>&1"
     },
     "bluetooth": {
-        "format": "  ",
-        "format-disabled": " 󰂲 ",
-        "format-connected": " 󰂱 ",
+        "format": "",
+        "format-disabled": "󰂲",
+        "format-connected": "󰂱",
         "tooltip-format": "Bluetooth: {status}",
-        "tooltip-format-connected": "Connected Devices:\n{device_enumerate}",
-        "tooltip-format-enumerate-connected": "• {device_alias}",
-        "on-click": "ghostty --gtk-single-instance=false --class=com.floating.tui --window-width=90 --window-height=30 --window-padding-x=0 --window-padding-y=0 -e bluetui > /dev/null 2>&1"
+        "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 bluetui > /dev/null 2>&1"
     },
     "cpu": {
         "interval": 2,
-        "format": "   {usage}% ",
-        "on-click": "ghostty --gtk-single-instance=false --class=com.floating.tui --window-width=90 --window-height=30 --window-padding-x=0 --window-padding-y=0 -e btop > /dev/null 2>&1"
+        "format": "  {usage}%",
+        "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c btop"
     },
     "memory": {
         "interval": 2,
-        "format": "   {percentage}% ", 
-        "on-click": "ghostty --gtk-single-instance=false --class=com.floating.tui --window-width=90 --window-height=30 --window-padding-x=0 --window-padding-y=0 -e btop > /dev/null 2>&1"
+        "format": "  {percentage}%",
+        "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c btop"
     },
     "custom/gpu": {
         "interval": 2,
         "exec": "sh -c 'cat /sys/class/drm/card*/device/gpu_busy_percent 2>/dev/null | head -n 1'",
-        "format": " 󰢮  {}% ",
-        "on-click": "ghostty --gtk-single-instance=false --class=com.floating.tui --window-width=90 --window-height=30 --window-padding-x=0 --window-padding-y=0 -e btop > /dev/null 2>&1"
+        "format": "󰢮  {}%",
+        "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c btop"
     },
     "niri/language": {
         "format": "{short}",
         "tooltip": false
     },
-    "group/drawer": {
-        "orientation": "horizontal",
-        "drawer": {
-            "transition-duration": 500,
-            "transition-left-to-right": false
-        },
-        "modules": [
-            "custom/arrow",
-            "tray"
-        ]
-    },
-    "custom/arrow": {
-        "format": "",
-        "tooltip": false
-    },
-    "custom/music": {
-        "format": "{}",
-        "return-type": "json",
-        "exec": "waybar-module-music",
-        "on-click": "playerctl play-pause",
-        "on-click-right": "playerctl next",
-        "on-click-middle": "playerctl previous",
-        "escape": false,
-        "tooltip": false
-    }, 
-    "tray": {
-        "icon-size": 18,
-        "spacing": 10
-    }
 
-} 
+    "tray": { "icon-size": 18, "spacing": 0 }
+}

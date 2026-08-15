@@ -14,14 +14,13 @@ configuration {
 }
 
 window {
-    width: 350px; /* Λίγο πιο μαζεμένο πλάτος */
+    width: 350px;
     background-color: @bg;
     border: 2px;
     border-color: @accent;
     border-radius: 12px;
     location: center;
     anchor: center;
-    /* Αφαιρούμε το σταθερό height αν υπήρχε */
 }
 
 mainbox {
@@ -47,23 +46,22 @@ prompt {
 listview {
     background-color: transparent;
     columns: 1;
-    /* ΕΔΩ ΕΙΝΑΙ Η ΔΙΟΡΘΩΣΗ: */
     fixed-height: false;
     dynamic: true;
     scrollbar: false;
-    lines: 5; /* Προσαρμόζεται αυτόματα αν οι επιλογές είναι λιγότερες */
+    lines: 5;
     spacing: 0px;
-    padding: 5px 0px 5px 0px; /* Μικρό padding πάνω-κάτω */
-}
+    padding: 5px 0px 5px 0px;
 
+}
 element {
     background-color: transparent;
     text-color: @fg;
     padding: 12px 25px;
     spacing: 20px;
-    border-radius: 0px; /* Context menu style */
-}
+    border-radius: 0px;
 
+}
 element-text {
     background-color: inherit;
     text-color: inherit;

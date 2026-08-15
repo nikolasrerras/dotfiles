@@ -1,0 +1,7 @@
+Color 1 (Red)      - {{color1}}
+Color 2 (Green)    - {{color2}}
+Color 3 (Yellow)   - {{color3}}
+Color 4 (Blue)     - {{color4}}
+Color 5 (Magenta)  - {{color5}}
+Color 6 (Cyan)     - {{color6}}
+Color 7 (White)    - {{color7}}

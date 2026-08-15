@@ -1,0 +1,10 @@
+.config/fish/fish_variables
+.config/niri/colors.kdl
+.config/fuzzel/colors.ini
+.config/kitty/wallust.conf
+.config/waybar/accent.css
+.config/rofi/powermenu.rasi
+.config/mako/wallust.conf
+.config/mako/accent.conf
+*.bak
+*.backup-*
