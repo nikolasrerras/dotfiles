@@ -1,0 +1,85 @@
+@import "/home/nikolas/.cache/wallust/colors-waybar.css";
+@import "/home/nikolas/.config/waybar/accent.css";
+
+* {
+    border: none;
+    border-radius: 0;
+    font-family: "Symbols Nerd Font", "JetBrainsMono Nerd Font", sans-serif;
+    font-size: 14px;
+    margin: 0;
+    padding: 0;
+}
+
+window#waybar {
+    background-color: @background;
+    color: @foreground;
+}
+
+#workspaces button {
+    padding: 0 8px;
+    margin: 4px 3px;
+    font-size: 13px;
+    font-weight: bold;
+    color: @foreground;
+    opacity: 0.4;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+}
+
+#workspaces button.active,
+#workspaces button.focused {
+    background-color: @accent;
+    color: @background;
+    opacity: 1;
+}
+
+#workspaces button:hover {
+    background-color: @color8;
+    opacity: 0.8;
+}
+
+#clock {
+    padding: 0 20px;
+    font-weight: bold;
+    color: @foreground;
+}
+
+#network,
+#pulseaudio,
+#bluetooth,
+#cpu,
+#memory,
+#custom-gpu,
+#language {
+    margin: 0 15px;
+    font-weight: bold;
+    color: @foreground;
+}
+
+#custom-power {
+    margin: 0 15px 0 10px;
+    font-size: 16px;
+    color: @foreground;
+}
+
+#language {
+    margin: 0 10px;
+}
+
+#tray {
+    margin: 0 6px;
+}
+
+#tray > * > * {
+    margin: 0 7px;
+}
+
+#custom-music {
+    margin: 0 12px;
+    font-weight: bold;
+    color: @foreground;
+}
+
+#custom-music:hover {
+    color: @accent;
+}

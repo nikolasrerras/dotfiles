@@ -1,0 +1,100 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 30,
+
+    "modules-left": [
+        "niri/workspaces",
+        "custom/music"
+    ],
+    "modules-center": [
+        "clock"
+    ],
+    "modules-right": [
+        "tray",
+        "niri/language",
+        "cpu",
+        "memory",
+        "custom/gpu",
+        "bluetooth",
+        "pulseaudio",
+        "network",
+        "custom/power"
+    ],
+
+    "niri/workspaces": {
+        "format": "{index}",
+        "all-outputs": false
+    },
+    "custom/music": {
+        "exec": "/home/nikolas/.config/waybar/scripts/music.sh",
+        "interval": 1,
+        "format": "{}",
+        "max-length": 45,
+        "hide-empty-text": true,
+        "escape": true,
+        "tooltip": false,
+        "on-click": "playerctl play-pause",
+        "on-click-right": "playerctl next",
+        "on-click-middle": "playerctl previous",
+        "on-scroll-up": "playerctl next",
+        "on-scroll-down": "playerctl previous"
+    },
+
+    "clock": {
+        "format": "{:%a %d %b, %H:%M}"
+    },
+    "custom/power": {
+        "format": "",
+        "tooltip": false,
+        "on-click": "~/.local/bin/powermenu 2> /dev/null"
+    },
+    "network": {
+        "format-wifi": "{icon}",
+        "format-ethernet": "󰈀",
+        "format-linked": "󰈀",
+        "format-disconnected": "⚠",
+        "format-icons": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"],
+        "tooltip": false,
+        "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 impala > /dev/null 2>&1"
+    },
+    "pulseaudio": {
+        "format": "{icon}",
+        "format-muted": "󰖁",
+        "format-icons": {
+            "default": ["", "", ""]
+        },
+        "tooltip": true,
+        "tooltip-format": "{volume}%",
+        "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 wiremix > /dev/null 2>&1"
+    },
+    "bluetooth": {
+        "format": "",
+        "format-disabled": "󰂲",
+        "format-connected": "󰂱",
+        "tooltip-format": "Bluetooth: {status}",
+        "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 bluetui > /dev/null 2>&1"
+    },
+    "cpu": {
+        "interval": 2,
+        "format": "  {usage}%",
+        "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c btop"
+    },
+    "memory": {
+        "interval": 2,
+        "format": "  {percentage}%",
+        "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c btop"
+    },
+    "custom/gpu": {
+        "interval": 2,
+        "exec": "sh -c 'cat /sys/class/drm/card*/device/gpu_busy_percent 2>/dev/null | head -n 1'",
+        "format": "󰢮  {}%",
+        "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c btop"
+    },
+    "niri/language": {
+        "format": "{short}",
+        "tooltip": false
+    },
+
+    "tray": { "icon-size": 18, "spacing": 0 }
+}

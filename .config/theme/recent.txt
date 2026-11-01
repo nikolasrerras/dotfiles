@@ -1,0 +1,10 @@
+Gruvbox-Dark
+0x96f
+Nord
+Tokyo-Night
+Gruvbox-Material-Dark
+Catppuccin-Mocha
+Catppuccin-Macchiato
+Tokyo-Night-Storm
+Dracula
+Everforest-Dark-Medium

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+options="󰗼  Logout\n󰤄  Suspend\n󰜉  Restart\n  Shutdown"
+
+chosen=$(echo -e "$options" | rofi -dmenu -i -p "Power Menu..." -theme ~/.config/rofi/powermenu.rasi 2>/dev/null)
+
+case "$chosen" in
+*Logout) niri msg action quit >/dev/null 2>&1 ;;
+*Suspend) systemctl suspend >/dev/null 2>&1 ;;
+*Restart) systemctl reboot --no-wall >/dev/null 2>&1 ;;
+*Shutdown) systemctl poweroff --no-wall >/dev/null 2>&1 ;;
+esac

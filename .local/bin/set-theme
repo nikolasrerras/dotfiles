@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Legacy name — forwards to the new theme system
+exec "$HOME/.local/bin/theme" preset "${1:-}"

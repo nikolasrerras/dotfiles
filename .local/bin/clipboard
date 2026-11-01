@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+# clipboard — clipboard history picker (cliphist + fzf in a floating kitty)
+#
+#   clipboard          open the picker in a floating kitty window
+#   clipboard tui      run the picker in the current terminal
+#   clipboard delete   delete a single entry (interactive)
+#   clipboard clear    wipe the whole history
+#
+# Inside the picker:  Enter = copy   Ctrl-D = delete entry   Ctrl-X = clear all   Esc = close
+
+set -o pipefail
+
+SELF="$(realpath "$0")"
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/cliphist/thumbs"
+IMAGE_RE='\[\[ binary data .* (png|jpe?g|bmp|webp|gif) '
+
+mkdir -p "$CACHE_DIR"
+
+
+# Floating kitty window (matched by the com.floating.tui window rule in niri)
+cmd_open() {
+  exec kitty --class=com.floating.tui \
+    -o remember_window_size=no -o close_on_child_death=yes \
+    -o initial_window_width=140c \
+    -o initial_window_height=36c \
+    -e "$SELF" tui
+}
+
+# fzf preview for one cliphist line: image via kitty graphics, text as-is
+cmd_preview() {
+  local line="$1" id ext file
+  id="${line%%$'\t'*}"
+
+  if [[ $line =~ $IMAGE_RE ]]; then
+    ext="${BASH_REMATCH[1]}"
+    file="$CACHE_DIR/$id.$ext"
+    [[ -s $file ]] || printf '%s\n' "$line" | cliphist decode >"$file" 2>/dev/null
+    kitten icat --clear --transfer-mode=memory --unicode-placeholder --stdin=no \
+      --place="${FZF_PREVIEW_COLUMNS}x${FZF_PREVIEW_LINES}@0x0" "$file" |
+      sed '$d' | sed $'$s/$/\e[m/'
+  else
+    printf '%s\n' "$line" | cliphist decode
+  fi
+}
+
+cmd_tui() {
+  local choice
+  choice=$(
+    cliphist list | fzf \
+      --delimiter=$'\t' --with-nth=2.. \
+      --color=16 \
+      --layout=reverse --border=none \
+      --prompt="Clipboard ~> " \
+      --header="enter: copy · ctrl-d: delete · ctrl-x: clear all · esc: close" \
+      --preview="'$SELF' preview {}" \
+      --preview-window="right,60%,border-left,wrap" \
+      --bind="ctrl-d:execute-silent(printf '%s\n' {} | cliphist delete)+reload(cliphist list)" \
+      --bind="ctrl-x:execute-silent('$SELF' clear)+reload(cliphist list)"
+  )
+  [[ -z $choice ]] && return 0
+  # wl-copy forks to the background, so the copy survives the window closing
+  printf '%s\n' "$choice" | cliphist decode | wl-copy >/dev/null 2>&1
+  cleanup_cache
+}
+
+cmd_delete() {
+  local choice
+  choice=$(cliphist list | fzf --delimiter=$'\t' --with-nth=2.. --color=16 --prompt="Delete ~> ")
+  [[ -z $choice ]] && return 0
+  printf '%s\n' "$choice" | cliphist delete
+  cleanup_cache
+}
+
+cmd_clear() {
+  cliphist wipe
+  rm -f "$CACHE_DIR"/*
+  wl-copy --clear 2>/dev/null
+}
+
+# Remove cached previews of entries no longer in the history
+cleanup_cache() {
+  local f base id
+  declare -A keep=()
+  while IFS=$'\t' read -r id _; do keep[$id]=1; done < <(cliphist list)
+  for f in "$CACHE_DIR"/*; do
+    [[ -e $f ]] || continue
+    base="${f##*/}"
+    [[ -n ${keep[${base%%.*}]:-} ]] || rm -f "$f"
+  done
+}
+
+case "${1:-}" in
+  "")      cmd_open ;;
+  tui)     cmd_tui ;;
+  preview) cmd_preview "${2:-}" ;;
+  delete)  cmd_delete ;;
+  clear)   cmd_clear ;;
+  *)       sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+esac

@@ -1,0 +1,23 @@
+# One wallust theme name per line — shown in the "Preset" menu.
+# Available names: wallust theme --help
+#
+# Custom themes:     ~/.config/theme/colorschemes/<name>.json
+# Per-theme wallpaper (optional): ~/.config/theme/wallpapers/<name>.jpg/.png
+#
+# Your favorites:
+Gruvbox-Dark
+Gruvbox-Material-Dark
+Catppuccin-Mocha
+Catppuccin-Macchiato
+Tokyo-Night
+Tokyo-Night-Storm
+Nord
+Dracula
+Everforest-Dark-Medium
+Kanagawa-Wave
+Rosé-Pine
+Rosé-Pine-Moon
+One-Dark
+Oxocarbon-Dark
+Ayu-Mirage
+random

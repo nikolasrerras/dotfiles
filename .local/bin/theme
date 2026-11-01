@@ -1,0 +1,422 @@
+#!/usr/bin/env bash
+# theme — theme switcher for niri + wallust (fzf in a floating kitty)
+#
+#   theme                open the picker in a floating kitty window
+#   theme tui            run the picker in the current terminal
+#   theme preset <name>  apply a theme directly (then pick accents)
+#   theme accent         change accents only
+#   theme apply          rewrite accent files without prompting
+#   theme import         import extra themes from iTerm2-Color-Schemes
+#
+# Picker keys:  Enter = apply   Ctrl-A = accents only   Esc = close
+
+set -o pipefail
+
+SELF="$(realpath "$0")"
+CFG="$HOME/.config/theme"
+STATE_DIR="$HOME/.cache/theme"
+STATE="$STATE_DIR/state"
+RECENT="$CFG/recent.txt"            # most recently used themes, newest first
+RECENT_MAX=10
+PALETTE="$HOME/.cache/wallust/colors.sh"
+PALETTE_DIR="$STATE_DIR/palettes"   # cached palettes for previews
+ROFI_IN="$STATE_DIR/powermenu.rasi.in"
+DEFAULT_SLOT=3                      # color3 if no accent was ever chosen
+ALL_LABEL="★ All themes…"
+RANDOM_LABEL="random"
+ITERM_REPO="https://github.com/mbadolato/iTerm2-Color-Schemes"
+ITERM_DIR="$CFG/colorschemes/iterm2"  # imported themes live here
+
+mkdir -p "$CFG" "$STATE_DIR" "$PALETTE_DIR"
+
+NIRI_SLOT="" WAYBAR_SLOT=""
+[[ -f $STATE ]] && source "$STATE"
+
+# ───────────── helpers ─────────────
+
+save_state() {
+  {
+    printf 'NIRI_SLOT=%q\n' "$NIRI_SLOT"
+    printf 'WAYBAR_SLOT=%q\n' "$WAYBAR_SLOT"
+  } >"$STATE"
+}
+
+load_palette() {
+  if [[ ! -f $PALETTE ]]; then
+    echo "Missing $PALETTE — apply a theme first" >&2
+    exit 1
+  fi
+  source "$PALETTE"
+}
+
+slot_hex() { local v="color$1"; echo "${!v}"; }
+
+# "#D79921" → "215;153;33"
+rgb() {
+  local h="${1#\#}"
+  printf '%d;%d;%d' "0x${h:0:2}" "0x${h:2:2}" "0x${h:4:2}"
+}
+
+fg() { printf '\e[38;2;%sm' "$(rgb "$1")"; }
+bg() { printf '\e[48;2;%sm' "$(rgb "$1")"; }
+RST=$'\e[0m'
+
+picker() {
+  fzf --ansi --color=16 --layout=reverse --border=none --no-sort --tiebreak=index "$@"
+}
+
+# ───────────── theme lists ─────────────
+
+all_themes() {
+  all_themes_builtin
+  find "$CFG/colorschemes" -maxdepth 2 -type f -name '*.json' -printf '%f\n' 2>/dev/null |
+    sed 's/\.json$//' | sort -f
+}
+
+all_themes_builtin() {
+  local cache="$STATE_DIR/all-themes.txt"
+  if [[ ! -s $cache ]]; then
+    wallust theme --help 2>/dev/null | tr -d '\n' |
+      grep -o 'possible values: [^]]*' | head -1 |
+      sed 's/possible values: //' | tr ',' '\n' | sed 's/^ *//;s/ *$//' |
+      grep -vxE 'random|list|list-fzf|' >"$cache"
+  fi
+  cat "$cache"
+}
+
+recent_themes() {
+  # first run: start from the old presets list, if there is one
+  if [[ ! -f $RECENT && -f $CFG/presets.txt ]]; then
+    grep -vE '^\s*(#|$)' "$CFG/presets.txt" | grep -vx "$RANDOM_LABEL" |
+      awk '!seen[$0]++' | head -n "$RECENT_MAX" >"$RECENT"
+  fi
+  [[ -f $RECENT ]] && cat "$RECENT"
+}
+
+add_recent() {
+  local name="$1"
+  [[ $name == "$RANDOM_LABEL" ]] && return
+  {
+    printf '%s\n' "$name"
+    [[ -f $RECENT ]] && grep -vxF -- "$name" "$RECENT"
+  } | head -n "$RECENT_MAX" >"$RECENT.tmp" && mv "$RECENT.tmp" "$RECENT"
+}
+
+custom_scheme() {
+  find "$CFG/colorschemes" -maxdepth 2 -type f -name "$1.json" 2>/dev/null | head -1
+}
+
+# ───────────── palette previews ─────────────
+
+# Generates (once) a palette file for a theme, without touching the system colors
+gen_palette() {
+  local name="$1" out tmp cs
+  out="$PALETTE_DIR/$name.sh"
+  [[ -s $out ]] && return 0
+  tmp=$(mktemp -d)
+  mkdir -p "$tmp/templates"
+  cat >"$tmp/templates/palette.sh" <<'EOF'
+background='{{background}}'
+foreground='{{foreground}}'
+color0='{{color0}}'
+color1='{{color1}}'
+color2='{{color2}}'
+color3='{{color3}}'
+color4='{{color4}}'
+color5='{{color5}}'
+color6='{{color6}}'
+color7='{{color7}}'
+color8='{{color8}}'
+color9='{{color9}}'
+color10='{{color10}}'
+color11='{{color11}}'
+color12='{{color12}}'
+color13='{{color13}}'
+color14='{{color14}}'
+color15='{{color15}}'
+EOF
+  printf "[templates]\npalette = { template = 'palette.sh', target = '%s' }\n" "$tmp/out.sh" >"$tmp/wallust.toml"
+  cs=$(custom_scheme "$name")
+  if [[ -n $cs ]]; then
+    wallust cs "$cs" -q -s -d "$tmp" >/dev/null 2>&1
+  else
+    wallust theme "$name" -q -s -d "$tmp" >/dev/null 2>&1
+  fi
+  [[ -s $tmp/out.sh ]] && mv "$tmp/out.sh" "$out"
+  rm -rf "$tmp"
+  [[ -s $out ]]
+}
+
+# One line of the fake terminal (text may contain color codes)
+box_line() {
+  local plain pad
+  plain=$(sed 's/\x1b\[[0-9;]*m//g' <<<"$1")
+  pad=$((BOX_W - ${#plain}))
+  ((pad < 0)) && pad=0
+  printf '  %s  %s%*s%s\n' "$(bg "$background")" "$1$(bg "$background")" "$pad" "" "$RST"
+}
+
+cmd_preview() {
+  local name="$1" i v n
+  local names=(Red Green Yellow Blue Magenta Cyan White)
+
+  if [[ $name == "$ALL_LABEL" ]]; then
+    printf '\n  Browse every built-in wallust theme.\n'
+    return
+  fi
+  if [[ $name == "$RANDOM_LABEL" ]]; then
+    printf '\n  Apply a random built-in theme.\n'
+    return
+  fi
+  if ! gen_palette "$name"; then
+    printf '\n  No preview available for %s\n' "$name"
+    return
+  fi
+  source "$PALETTE_DIR/$name.sh"
+
+  BOX_W=$(( ${FZF_PREVIEW_COLUMNS:-60} - 8 ))
+  ((BOX_W > 56)) && BOX_W=56
+
+  local F; F=$(fg "$foreground")
+  printf '\n  \e[1m%s\e[0m\n\n' "$name"
+
+  # fake terminal
+  box_line ""
+  box_line "$(fg "$color2")$ ${F}ls -la"
+  box_line "$(fg "$color4")config/  $(fg "$color2")build.sh  ${F}notes.md"
+  box_line "$(fg "$color5")const ${F}x = $(fg "$color3")\"hello\"${F};"
+  box_line "$(fg "$color1")error:${F} something failed"
+  box_line "$(fg "$color3")warning:${F} check this"
+  box_line "$(fg "$color6")info:${F} all good"
+  box_line "$(fg "$color8")# a comment"
+  box_line ""
+  printf '\n'
+
+  # 16 colors
+  printf '  '
+  for i in 0 1 2 3 4 5 6 7; do v="color$i"; printf '%s      %s ' "$(bg "${!v}")" "$RST"; done
+  printf '\n  '
+  for i in 8 9 10 11 12 13 14 15; do v="color$i"; printf '%s      %s ' "$(bg "${!v}")" "$RST"; done
+  printf '\n\n'
+
+  # accent candidates
+  for i in 1 2 3 4 5 6 7; do
+    v="color$i"; n="${names[i - 1]}"
+    printf '  %s████%s  color%s  %-8s %s\n' "$(fg "${!v}")" "$RST" "$i" "$n" "${!v}"
+  done
+}
+
+# ───────────── accents ─────────────
+
+# Accent picker. Prints a slot number 1–7.  $1 = prompt, $2 = current slot
+pick_slot() {
+  local names=(Red Green Yellow Blue Magenta Cyan White)
+  local current="${2:-$DEFAULT_SLOT}" i v choice cur_hex
+  cur_hex=$(slot_hex "$current")
+  choice=$(
+    {
+      printf '%s████%s  Keep current (color%s %s)\n' "$(fg "$cur_hex")" "$RST" "$current" "$cur_hex"
+      for i in 1 2 3 4 5 6 7; do
+        v="color$i"
+        printf '%s████%s  color%s  %-8s %s\n' "$(fg "${!v}")" "$RST" "$i" "${names[i - 1]}" "${!v}"
+      done
+    } | picker --prompt="$1 ~> " --header="enter: select · esc: keep current"
+  )
+  if [[ $choice =~ Keep\ current || -z $choice ]]; then
+    echo "$current"
+  else
+    [[ $choice =~ color([1-7]) ]] && echo "${BASH_REMATCH[1]}" || echo "$current"
+  fi
+}
+
+choose_accents() {
+  load_palette
+  NIRI_SLOT=$(pick_slot "Niri accent" "$NIRI_SLOT")
+  WAYBAR_SLOT=$(pick_slot "Waybar accent" "$WAYBAR_SLOT")
+}
+
+# ───────────── apply ─────────────
+
+# niri accent   → focus ring, fuzzel border
+# waybar accent → waybar, mako, swayosd, rofi powermenu, fuzzel selection
+apply_accents() {
+  load_palette
+  local n w
+  n=$(slot_hex "${NIRI_SLOT:-$DEFAULT_SLOT}")
+  w=$(slot_hex "${WAYBAR_SLOT:-$DEFAULT_SLOT}")
+
+  cat >"$HOME/.config/niri/colors.kdl" <<EOF
+layout {
+    focus-ring {
+        active-color "$n"
+        inactive-color "$background"
+    }
+}
+EOF
+
+  cat >"$HOME/.config/fuzzel/colors.ini" <<EOF
+[colors]
+background=${background:1}ff
+text=${foreground:1}ff
+match=${color14:1}ff
+selection=${w:1}ff
+selection-text=${background:1}ff
+selection-match=${color1:1}ff
+border=${n:1}d9
+EOF
+
+  echo "@define-color accent $w;" >"$HOME/.config/waybar/accent.css"
+
+  printf 'border-color=%sFF\nprogress-color=over %sFF\n' "$w" "$w" \
+    >"$HOME/.config/mako/accent.conf"
+
+  if [[ -f $ROFI_IN ]]; then
+    sed "s/ACCENT_PLACEHOLDER/$w/" "$ROFI_IN" >"$HOME/.config/rofi/powermenu.rasi"
+  fi
+}
+
+reload_all() {
+  pkill -USR2 -x waybar
+  makoctl reload >/dev/null 2>&1
+  pkill -USR1 -x kitty                      # kitty reloads its config
+  niri msg action load-config-file >/dev/null 2>&1
+  if pgrep -x swayosd-server >/dev/null; then
+    pkill -x swayosd-server
+    sleep 0.2
+    setsid -f swayosd-server </dev/null >/dev/null 2>&1
+  fi
+}
+
+finish() {
+  choose_accents
+  apply_accents
+  save_state
+  reload_all
+}
+
+apply_theme() {
+  local name="$1" cs
+  printf '%s\n' "$name" >"$STATE_DIR/current"   # read by neovim
+  cs=$(custom_scheme "$name")
+  if [[ -n $cs ]]; then
+    wallust cs "$cs" -q -s >/dev/null || { echo "wallust failed with $cs" >&2; return 1; }
+  else
+    wallust theme "$name" -q -s >/dev/null || { echo "Theme not found: $name" >&2; return 1; }
+  fi
+  add_recent "$name"
+}
+
+# ───────────── import ─────────────
+
+# lowercase, letters and digits only: "Gruvbox Dark" == "Gruvbox-Dark"
+normalize() { iconv -f UTF-8 -t ASCII//TRANSLIT -c 2>/dev/null | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9\n'; }
+
+# kitty .conf → pywal-style JSON that `wallust cs` understands
+kitty_to_json() {
+  awk '
+    /^(background|foreground|cursor|color[0-9]+)[ \t]/ { v[$1] = $2 }
+    END {
+      if (!("background" in v) || !("foreground" in v) || !("color15" in v)) exit 1
+      c = ("cursor" in v) ? v["cursor"] : v["foreground"]
+      printf "{\n  \"wallpaper\": \"none\",\n  \"alpha\": \"100\",\n"
+      printf "  \"special\": {\"background\": \"%s\", \"foreground\": \"%s\", \"cursor\": \"%s\"},\n", v["background"], v["foreground"], c
+      printf "  \"colors\": {"
+      for (i = 0; i < 16; i++) printf "%s\"color%d\": \"%s\"", (i ? ", " : ""), i, v["color" i]
+      printf "}\n}\n"
+    }' "$1"
+}
+
+cmd_import() {
+  local repo="$STATE_DIR/iterm2-repo" f name safe added=0 skipped=0
+  command -v git >/dev/null || { echo "git is required" >&2; return 1; }
+
+  if [[ -d $repo/.git ]]; then
+    echo "Updating iTerm2-Color-Schemes…"
+    git -C "$repo" pull --quiet || return 1
+  else
+    echo "Downloading iTerm2-Color-Schemes (kitty themes only)…"
+    rm -rf "$repo"
+    git clone --quiet --depth 1 --filter=blob:none --sparse "$ITERM_REPO" "$repo" || return 1
+    git -C "$repo" sparse-checkout set kitty || return 1
+  fi
+
+  # names wallust already has
+  declare -A have=()
+  rm -f "$STATE_DIR/all-themes.txt"
+  while IFS= read -r name; do have[$name]=1; done < <(all_themes_builtin | normalize)
+
+  rm -rf "$ITERM_DIR"
+  mkdir -p "$ITERM_DIR"
+  for f in "$repo"/kitty/*.conf; do
+    name="${f##*/}"; name="${name%.conf}"
+    if [[ -n ${have[$(normalize <<<"$name")]:-} ]]; then
+      ((skipped++)); continue
+    fi
+    safe=$(tr ' ' '-' <<<"$name" | tr -cd 'A-Za-z0-9+._-')
+    [[ -z $safe ]] && continue
+    if kitty_to_json "$f" >"$ITERM_DIR/$safe.json"; then
+      ((added++))
+    else
+      rm -f "$ITERM_DIR/$safe.json"
+    fi
+  done
+  rm -rf "$PALETTE_DIR"/*
+  echo "Imported $added themes ($skipped already in wallust) → $ITERM_DIR"
+}
+
+# ───────────── commands ─────────────
+
+cmd_open() {
+  exec kitty --class=com.floating.tui \
+    -o remember_window_size=no -o close_on_child_death=yes \
+    -o initial_window_width=130c \
+    -o initial_window_height=34c \
+    -e "$SELF" tui
+}
+
+cmd_tui() {
+  local out key name
+  out=$(
+    {
+      recent_themes
+      printf '%s\n%s\n' "$ALL_LABEL" "$RANDOM_LABEL"
+    } | picker \
+      --prompt="Theme ~> " \
+      --header="enter: apply · ctrl-a: accents only · esc: close" \
+      --expect=ctrl-a \
+      --preview="'$SELF' preview {}" \
+      --preview-window="right,62%,border-left"
+  )
+  key=$(sed -n 1p <<<"$out")
+  name=$(sed -n 2p <<<"$out")
+
+  if [[ $key == ctrl-a ]]; then
+    finish
+    return
+  fi
+  [[ -z $name ]] && return 0
+
+  if [[ $name == "$ALL_LABEL" ]]; then
+    name=$(
+      all_themes | picker \
+        --prompt="All themes ~> " \
+        --header="enter: apply · esc: close" \
+        --preview="'$SELF' preview {}" \
+        --preview-window="right,62%,border-left"
+    )
+    [[ -z $name ]] && return 0
+  fi
+
+  apply_theme "$name" && finish
+}
+
+case "${1:-}" in
+  "")      cmd_open ;;
+  tui)     cmd_tui ;;
+  preview) cmd_preview "${2:-}" ;;
+  preset)  [[ -n ${2:-} ]] && apply_theme "$2" && finish ;;
+  accent)  finish ;;
+  apply)   apply_accents; reload_all ;;
+  import)  cmd_import ;;
+  *)       sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+esac
