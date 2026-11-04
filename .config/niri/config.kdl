@@ -9,7 +9,7 @@
 
 prefer-no-csd
 input {
-  focus-follows-mouse max-scroll-amount="0%"
+  focus-follows-mouse max-scroll-amount="25%"
     keyboard {
         xkb {
             // You can set rules, model, layout, variant and options.
@@ -325,7 +325,7 @@ window-rule {
 
 binds {
 
-    Mod+Shift+B { spawn "brave-origin"; }
+    Mod+Shift+B { spawn "zen-browser" "--private-window"; }
     Mod+B { spawn "zen-browser"; }
     Mod+D { spawn "discord"; }
     Mod+M { spawn "spotify"; }

@@ -48,6 +48,7 @@ window#waybar {
 #pulseaudio,
 #bluetooth,
 #cpu,
+#custom-cpu,
 #memory,
 #custom-gpu,
 #language {
@@ -81,5 +82,15 @@ window#waybar {
 }
 
 #custom-music:hover {
+    color: @accent;
+}
+
+/* power drawer */
+#custom-quit, #custom-suspend, #custom-reboot, #custom-shutdown {
+    margin: 0 8px;
+    font-size: 16px;
+    color: @foreground;
+}
+#custom-quit:hover, #custom-suspend:hover, #custom-reboot:hover, #custom-shutdown:hover {
     color: @accent;
 }
