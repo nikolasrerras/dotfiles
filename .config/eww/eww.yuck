@@ -27,7 +27,7 @@
     (box :class "header" :orientation "h" :space-evenly false
       (label :class "prompt" :xalign 0 :hexpand true
              :text "~/music ❯ ${media.status == 'Playing' ? 'playing' : (media.status == 'Paused' ? 'paused' : 'stopped')}")
-      (button :class "close" :onclick "eww close media" "[x]"))
+      )
     (box :class "top" :orientation "h" :space-evenly false :spacing 14
       (box :class "art" :width 110 :height 110
            :style {media.art != "" ? "background-image: url('${media.art}');" : ""}
@@ -41,7 +41,7 @@
       (button :class {shuffle == "On" ? "btn active" : "btn"}
               :onclick {shuffle == "On" ? "playerctl shuffle Off" : "playerctl shuffle On"} "[󰒝]")
       (button :class "btn" :onclick "playerctl previous" "[󰒮]")
-      (button :class "btn play" :onclick "playerctl play-pause"
+      (button :class "btn" :onclick "playerctl play-pause"
               {media.status == "Playing" ? "[󰏤]" : "[󰐊]"})
       (button :class "btn" :onclick "playerctl next" "[󰒭]")
       (button :class {loop != "None" ? "btn active" : "btn"}
