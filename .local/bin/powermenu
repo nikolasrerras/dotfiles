@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-options="󰗼  Logout\n󰤄  Suspend\n󰜉  Restart\n  Shutdown"
+options="󰗼  logout\n󰤄  suspend\n󰜉  restart\n  shutdown"
 
-chosen=$(echo -e "$options" | rofi -dmenu -i -p "Power Menu..." -theme ~/.config/rofi/powermenu.rasi 2>/dev/null)
+chosen=$(echo -e "$options" | rofi -dmenu -i -p "~/power ❯" -theme ~/.config/rofi/powermenu.rasi 2>/dev/null)
 
 case "$chosen" in
-*Logout) { pgrep -x mango >/dev/null && mmsg -q || niri msg action quit; } >/dev/null 2>&1 ;;
-*Suspend) systemctl suspend >/dev/null 2>&1 ;;
-*Restart) systemctl reboot --no-wall >/dev/null 2>&1 ;;
-*Shutdown) systemctl poweroff --no-wall >/dev/null 2>&1 ;;
+*logout) { pgrep -x mango >/dev/null && mmsg -q || niri msg action quit; } >/dev/null 2>&1 ;;
+*suspend) systemctl suspend >/dev/null 2>&1 ;;
+*restart) systemctl reboot --no-wall >/dev/null 2>&1 ;;
+*shutdown) systemctl poweroff --no-wall >/dev/null 2>&1 ;;
 esac

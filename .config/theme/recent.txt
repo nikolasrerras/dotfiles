@@ -1,4 +1,6 @@
+Kanagawa-Wave
 Gruvbox-Dark
+base16-grayscale-dark
 Dark-Pastel
 base16-gruvbox-soft-dark
 base16-gruvbox-soft-light
@@ -6,5 +8,3 @@ Bim
 Nord
 0x96f
 Tokyo-Night
-Gruvbox-Material-Dark
-Catppuccin-Mocha

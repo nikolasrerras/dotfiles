@@ -27,8 +27,7 @@
   "custom/music": {
     "exec": "/home/nikolas/.config/waybar/scripts/music.sh",
     "interval": 1,
-    "format": "{}",
-    "max-length": 45,
+    "format": "<span alpha=\"55%\">[</span>{}<span alpha=\"55%\">]</span>",
     "hide-empty-text": true,
     "escape": true,
     "tooltip": false,
@@ -38,9 +37,9 @@
     "on-scroll-down": "playerctl previous"
   },
   "clock": {
-    "format": "{:%a %d %b, %H:%M}",
+    "format": "<span alpha=\"55%\">[</span>{:%a %d %b  %H:%M}<span alpha=\"55%\">]</span>",
     "tooltip-format": "<tt>{calendar}</tt>",
-    "format-alt": "{:%A %d %B %Y, %H:%M:%S}",
+    "format-alt": "<span alpha=\"55%\">[</span>{:%A %d %B %Y, %H:%M:%S}<span alpha=\"55%\">]</span>",
     "calendar": {
       "mode": "month",
       "on-scroll": 1,
@@ -52,10 +51,11 @@
       "on-scroll-up": "shift_up",
       "on-scroll-down": "shift_down",
       "on-click-right": "mode"
-    }
+    },
+    "interval": 1
   },
   "custom/power": {
-    "format": "",
+    "format": "<span alpha=\"55%\">[</span> <span size=\"larger\">󰐥</span> <span alpha=\"55%\">]</span>",
     "tooltip": true,
     "on-double-click": "systemctl poweroff --no-wall",
     "tooltip-format": "Shutdown: double click · Menu: right click",
@@ -78,43 +78,44 @@
     "tooltip-format-wifi": "{essid}\nSignal {signalStrength}% ({signaldBm} dBm)\n{frequency} GHz"
   },
   "pulseaudio": {
-    "format": "{icon}",
-    "format-muted": "󰖁",
+    "format": "<span alpha=\"55%\">[</span><span alpha=\"55%\">{icon}</span> {volume}%<span alpha=\"55%\">]</span>",
+    "format-muted": "<span alpha=\"55%\">[</span><span alpha=\"55%\">󰝟</span> mute<span alpha=\"55%\">]</span>",
     "format-icons": {
       "default": [
-        "",
-        "",
-        ""
+        "󰕿",
+        "󰖀",
+        "󰕾"
       ]
     },
     "tooltip": true,
     "tooltip-format": "{volume}%",
     "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 wiremix > /dev/null 2>&1",
-    "on-scroll-up": "swayosd-client --output-volume raise",
-    "on-scroll-down": "swayosd-client --output-volume lower",
-    "on-click-right": "swayosd-client --output-volume mute-toggle"
+    "on-scroll-up": "/home/nikolas/.config/eww/scripts/volume.sh up",
+    "on-scroll-down": "/home/nikolas/.config/eww/scripts/volume.sh down",
+    "on-click-right": "/home/nikolas/.config/eww/scripts/volume.sh mute"
   },
   "bluetooth": {
-    "format": "",
-    "format-disabled": "󰂲",
-    "format-connected": "󰂱",
+    "format": "<span alpha=\"55%\">[</span><span alpha=\"55%\">󰂯</span> on<span alpha=\"55%\">]</span>",
+    "format-disabled": "<span alpha=\"55%\">[</span><span alpha=\"55%\">󰂲</span> off<span alpha=\"55%\">]</span>",
+    "format-connected": "<span alpha=\"55%\">[</span><span alpha=\"55%\">󰂱</span> {num_connections}<span alpha=\"55%\">]</span>",
     "tooltip-format": "Bluetooth: {status}",
-    "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 bluetui > /dev/null 2>&1"
+    "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 bluetui > /dev/null 2>&1",
+    "format-off": "<span alpha=\"55%\">[</span><span alpha=\"55%\">󰂲</span> off<span alpha=\"55%\">]</span>"
   },
   "memory": {
     "interval": 2,
-    "format": "  {percentage}%",
+    "format": "<span alpha=\"55%\">[</span><span alpha=\"55%\">󰍛</span> {percentage}%<span alpha=\"55%\">]</span>",
     "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c btop"
   },
   "custom/gpu": {
     "interval": 2,
     "exec": "/home/nikolas/.config/waybar/scripts/gpu.sh",
-    "format": "󰢮  {}%",
+    "format": "<span alpha=\"55%\">[</span><span alpha=\"55%\">󰢮</span> {}%<span alpha=\"55%\">]</span>",
     "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c btop",
     "return-type": "json"
   },
   "niri/language": {
-    "format": "{short}",
+    "format": "<span alpha=\"55%\">[</span><span alpha=\"55%\">󰌌</span> {short}<span alpha=\"55%\">]</span>",
     "tooltip": false
   },
   "tray": {
@@ -136,19 +137,19 @@
     ]
   },
   "custom/quit": {
-    "format": "󰗼",
+    "format": "<span alpha=\"55%\">[</span>󰗼<span alpha=\"55%\">]</span>",
     "tooltip": true,
     "tooltip-format": "Logout",
     "on-click": "niri msg action quit"
   },
   "custom/suspend": {
-    "format": "󰤄",
+    "format": "<span alpha=\"55%\">[</span>󰤄<span alpha=\"55%\">]</span>",
     "tooltip": true,
     "tooltip-format": "Suspend",
     "on-click": "systemctl suspend"
   },
   "custom/reboot": {
-    "format": "󰜉",
+    "format": "<span alpha=\"55%\">[</span>󰜉<span alpha=\"55%\">]</span>",
     "tooltip": true,
     "tooltip-format": "Restart",
     "on-click": "systemctl reboot --no-wall"
@@ -157,14 +158,14 @@
     "exec": "/home/nikolas/.config/waybar/scripts/cpu.sh",
     "return-type": "json",
     "interval": 2,
-    "format": "  {}%",
+    "format": "<span alpha=\"55%\">[</span><span alpha=\"55%\"></span> {}%<span alpha=\"55%\">]</span>",
     "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c btop"
   },
   "custom/wifi": {
     "exec": "/home/nikolas/.config/waybar/scripts/wifi.sh",
     "return-type": "json",
     "interval": 5,
-    "format": "{icon}",
+    "format": "<span alpha=\"55%\">[</span><span alpha=\"55%\">{icon}</span> {percentage}%<span alpha=\"55%\">]</span>",
     "format-icons": [
       "󰤯",
       "󰤟",
@@ -175,20 +176,30 @@
     "tooltip": true,
     "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 impala > /dev/null 2>&1"
   },
+  "custom/tray-l": {
+    "format": "<span alpha=\"55%\">[</span>",
+    "tooltip": false
+  },
+  "custom/tray-r": {
+    "format": "<span alpha=\"55%\">]</span>",
+    "tooltip": false
+  },
   "group/tray": {
     "orientation": "inherit",
     "drawer": {
       "transition-duration": 300,
-      "click-to-reveal": false,
+      "click-to-reveal": true,
       "transition-left-to-right": false
     },
     "modules": [
       "custom/tray-toggle",
-      "tray"
+      "custom/tray-l",
+      "tray",
+      "custom/tray-r"
     ]
   },
   "custom/tray-toggle": {
-    "format": "",
+    "format": "<span alpha=\"55%\">[</span>&lt;<span alpha=\"55%\">]</span>",
     "tooltip": false
   }
 }

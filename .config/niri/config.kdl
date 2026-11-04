@@ -145,7 +145,7 @@ layout {
         // off
 
         // How many logical pixels the ring extends out from the windows.
-        width 3
+        width 2
         active-color "#D79921"
         inactive-color "#282828"
 
@@ -320,7 +320,7 @@ window-rule {
 // (This example rule is commented out with a "/-" in front.)
 
 window-rule {
-    geometry-corner-radius 8
+    geometry-corner-radius 4
     clip-to-geometry true
 }
 
@@ -363,9 +363,9 @@ binds {
     // The allow-when-locked=true property makes them work even when the session is locked.
     // Using spawn-sh allows to pass multiple arguments together with the command.
     // "-l 1.0" limits the volume to 100%.
-    XF86AudioRaiseVolume allow-when-locked=true { spawn "swayosd-client" "--output-volume" "5"; }
-    XF86AudioLowerVolume allow-when-locked=true { spawn "swayosd-client" "--output-volume" "-5"; }
-    XF86AudioMute        allow-when-locked=true { spawn "swayosd-client" "--output-volume" "mute-toggle"; }
+    XF86AudioRaiseVolume allow-when-locked=true { spawn "/home/nikolas/.config/eww/scripts/volume.sh" "up"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn "/home/nikolas/.config/eww/scripts/volume.sh" "down"; }
+    XF86AudioMute        allow-when-locked=true { spawn "/home/nikolas/.config/eww/scripts/volume.sh" "mute"; }
     XF86AudioMicMute     allow-when-locked=true { spawn "swayosd-client" "--input-volume" "mute-toggle"; }
 
     // Example media keys mapping using playerctl.

@@ -52,3 +52,16 @@
   color: $accent;
   font-weight: bold;
 }
+
+// volume OSD
+.osd {
+  background-color: $bg;
+  color: $fg;
+  border: 2px solid $accent;
+  border-radius: 4px;
+  padding: 12px 20px;
+}
+.osd-text {
+  color: $accent;
+  font-size: 19px;
+}

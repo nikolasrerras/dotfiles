@@ -20,4 +20,5 @@ else
     text="$player — $title"
 fi
 
+max=42; (( ${#text} > max )) && text="${text:0:max-1}…"
 printf "%s  %s\n" "$icon" "$text"

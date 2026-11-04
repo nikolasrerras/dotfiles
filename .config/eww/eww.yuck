@@ -57,3 +57,21 @@
   (eventbox :onhover "eww update media_inside=true"
             :onhoverlost "setsid -f ~/.config/eww/scripts/close-later.sh"
     (media-player)))
+
+;; ─────────────────────────────────────────────
+;;  Volume OSD, terminal style (scripts/volume.sh)
+;; ─────────────────────────────────────────────
+(defvar osd_text "")
+(defvar osd_token "0")
+
+(defwidget osd []
+  (box :class "osd"
+    (label :class "osd-text" :text osd_text)))
+
+(defwindow osd
+  :monitor 0
+  :geometry (geometry :y "80px" :width "480px" :anchor "bottom center")
+  :stacking "overlay"
+  :exclusive false
+  :focusable false
+  (osd))

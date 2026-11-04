@@ -266,6 +266,7 @@ border=${n:1}d9
 EOF
 
   echo "@define-color accent $w;" >"$HOME/.config/waybar/accent.css"
+  [[ -x $HOME/.config/eww/scripts/colors.sh ]] && "$HOME/.config/eww/scripts/colors.sh"
 
   printf 'border-color=%sFF\nprogress-color=over %sFF\n' "$w" "$w" \
     >"$HOME/.config/mako/accent.conf"
@@ -280,6 +281,7 @@ reload_all() {
   makoctl reload >/dev/null 2>&1
   pkill -USR1 -x kitty                      # kitty reloads its config
   niri msg action load-config-file >/dev/null 2>&1
+  pgrep -x eww >/dev/null && eww reload >/dev/null 2>&1
   if pgrep -x swayosd-server >/dev/null; then
     pkill -x swayosd-server
     sleep 0.2

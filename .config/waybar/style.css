@@ -1,11 +1,16 @@
+/* ─────────────────────────────────────────────
+   waybar, terminal style
+   colors: wallust palette + accent from the theme system
+   ───────────────────────────────────────────── */
 @import "/home/nikolas/.cache/wallust/colors-waybar.css";
 @import "/home/nikolas/.config/waybar/accent.css";
 
 * {
     border: none;
     border-radius: 0;
-    font-family: "Symbols Nerd Font", "JetBrainsMono Nerd Font", sans-serif;
-    font-size: 14px;
+    font-family: "JetBrainsMono Nerd Font", monospace;
+    font-size: 13px;
+    min-height: 0;
     margin: 0;
     padding: 0;
 }
@@ -13,86 +18,137 @@
 window#waybar {
     background-color: @background;
     color: @foreground;
+    border-bottom: 1px solid @color8;
 }
 
-#workspaces button {
-    padding: 0 8px;
-    margin: 4px 3px;
-    font-size: 13px;
-    font-weight: bold;
-    color: @foreground;
-    opacity: 0.4;
-    transition: all 0.2s ease;
+button,
+button:hover {
+    background: none;
+    box-shadow: none;
+    text-shadow: none;
+}
+
+/* tooltips look like the media popup */
+tooltip {
+    background-color: @background;
+    border: none;
     border-radius: 4px;
 }
-
-#workspaces button.active,
-#workspaces button.focused {
-    background-color: @accent;
-    color: @background;
-    opacity: 1;
-}
-
-#workspaces button:hover {
-    background-color: @color8;
-    opacity: 0.8;
-}
-
-#clock {
-    padding: 0 20px;
-    font-weight: bold;
+tooltip label {
     color: @foreground;
+    padding: 4px 6px;
 }
 
-#network,
-#custom-wifi,
-#pulseaudio,
-#bluetooth,
-#cpu,
-#custom-cpu,
-#memory,
-#custom-gpu,
-#language {
-    margin: 0 15px;
-    font-weight: bold;
-    color: @foreground;
-}
-
-#custom-power {
-    margin: 0 15px 0 10px;
-    font-size: 16px;
-    color: @foreground;
-}
-
-#language {
-    margin: 0 10px;
-}
-
-#tray {
-    margin: 0 6px;
-}
-
-#tray > * > * {
-    margin: 0 7px;
-}
+/* ── left ── */
 
 #custom-music {
-    margin: 0 12px;
-    font-weight: bold;
+    padding: 0 12px;
     color: @foreground;
 }
-
 #custom-music:hover {
     color: @accent;
 }
 
-/* power drawer */
-#custom-quit, #custom-suspend, #custom-reboot, #custom-shutdown {
-    margin: 0 8px;
-    font-size: 16px;
+/* ── center ── */
+#clock {
+    padding: 0 12px;
+    color: @foreground;
+    font-weight: bold;
+}
+
+/* ── right: text modules separated by │ ── */
+#custom-tray-toggle,
+#language,
+#custom-cpu,
+#memory,
+#custom-gpu,
+#bluetooth,
+#pulseaudio,
+#custom-wifi,
+#custom-power {
+    padding: 0 5px;
     color: @foreground;
 }
-#custom-quit:hover, #custom-suspend:hover, #custom-reboot:hover, #custom-shutdown:hover {
+
+#custom-tray-toggle {
+    color: @color8;
+}
+
+#custom-tray-toggle:hover,
+#custom-cpu:hover,
+#memory:hover,
+#custom-gpu:hover,
+#bluetooth:hover,
+#pulseaudio:hover,
+#custom-wifi:hover,
+#custom-power:hover {
     color: @accent;
 }
 
+#pulseaudio.muted,
+#bluetooth.disabled,
+#bluetooth.off,
+#custom-wifi.disconnected {
+    color: @color8;
+}
+
+#tray {
+    padding: 0 6px;
+}
+#tray > * > * {
+    margin: 0 5px;
+}
+
+/* power drawer */
+#custom-power {
+    color: @accent;
+}
+#custom-quit,
+#custom-suspend,
+#custom-reboot {
+    padding: 0 5px;
+    color: @foreground;
+}
+#custom-quit:hover,
+#custom-suspend:hover,
+#custom-reboot:hover {
+    color: @accent;
+}
+
+
+
+
+
+/* brackets around the tray */
+#custom-tray-l { padding: 0 0 0 5px; color: @foreground; }
+#custom-tray-r { padding: 0 5px 0 0; color: @foreground; }
+#tray { padding: 0 2px; }
+
+
+/* workspaces: underline on the active one */
+
+
+/* workspaces: underline on the active one */
+#workspaces {
+    margin-right: 6px;
+}
+#workspaces button {
+    padding: 0 6px;
+    color: @color8;
+}
+#workspaces button:hover {
+    color: @foreground;
+}
+#workspaces button.active,
+#workspaces button.focused {
+    background-color: transparent;
+    color: @accent;
+    box-shadow: inset 0 -2px @accent;
+}
+
+
+
+
+#workspaces button label {
+    font-size: 14px;
+}
