@@ -330,11 +330,11 @@ binds {
     Mod+B { spawn "zen-browser"; }
     Mod+D { spawn "discord"; }
     Mod+M { spawn "spotify"; }
-    Mod+N { spawn "zeditor"; }
+    Mod+N { spawn "kitty" "nvim"; }
     Mod+S { spawn "steam"; }
-    Mod+E { spawn "nautilus"; }
-    Mod+Shift+E { spawn "kitty" "yazi";} 
-    Mod+Shift+N { spawn "kitty" "nvim"; }
+    Mod+E { spawn "kitty" "yazi"; }
+    Mod+Shift+E { spawn "nautilus";} 
+    Mod+Shift+N { spawn "zeditor"; }
     Mod+Escape { spawn "/home/nikolas/.local/bin/powermenu"; }
     Mod+Shift+T { spawn "/home/nikolas/.local/bin/theme"; }
     Mod+A {
@@ -623,3 +623,4 @@ window-rule {
     open-floating true
     default-floating-position x=32 y=32 relative-to="bottom-right"
 }
+

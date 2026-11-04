@@ -9,9 +9,9 @@
 
 (defpoll bar :interval "1s" :initial "00:00 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 00:00"
   "~/.config/eww/scripts/bar.sh 30")
-(defpoll loop :interval "2s" :initial "None"
+(defpoll loop :interval "1s" :initial "None"
   "playerctl loop 2>/dev/null || echo None")
-(defpoll shuffle :interval "2s" :initial "Off"
+(defpoll shuffle :interval "1s" :initial "Off"
   "playerctl shuffle 2>/dev/null || echo Off")
 
 (defvar media_inside false)
@@ -39,14 +39,14 @@
     (label :class "bar" :xalign 0 :text bar)
     (box :class "controls" :orientation "h" :space-evenly true
       (button :class {shuffle == "On" ? "btn active" : "btn"}
-              :onclick "playerctl shuffle toggle" "[󰒝]")
+              :onclick {shuffle == "On" ? "playerctl shuffle Off" : "playerctl shuffle On"} "[󰒝]")
       (button :class "btn" :onclick "playerctl previous" "[󰒮]")
       (button :class "btn play" :onclick "playerctl play-pause"
               {media.status == "Playing" ? "[󰏤]" : "[󰐊]"})
       (button :class "btn" :onclick "playerctl next" "[󰒭]")
       (button :class {loop != "None" ? "btn active" : "btn"}
               :onclick "~/.config/eww/scripts/loop.sh"
-              {loop == "Track" ? "[󰑘]" : "[󰑖]"}))))
+              {loop == "Track" ? "[󰑘]" : (loop == "Playlist" ? "[󰑖]" : "[󰑗]")}))))
 
 (defwindow media
   :monitor 0
