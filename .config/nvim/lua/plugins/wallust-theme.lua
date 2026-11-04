@@ -203,7 +203,7 @@ return {
   -- real colorschemes (catppuccin and tokyonight already come with LazyVim)
   { "ellisonleao/gruvbox.nvim", lazy = true },
   { "sainnhe/gruvbox-material", lazy = true },
-  { "rebelot/kanagawa.nvim", lazy = true },
+  { "rebelot/kanagawa.nvim", lazy = true, opts = { colors = { theme = { all = { ui = { bg_gutter = "none" } } } } } },
   { "rose-pine/neovim", name = "rose-pine", lazy = true },
   { "sainnhe/everforest", lazy = true },
   { "gbprod/nord.nvim", lazy = true },
