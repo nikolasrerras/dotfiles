@@ -1,0 +1,54 @@
+// Terminal-style media popup. Colors come from the theme system (scripts/colors.sh)
+@import "colors";
+
+* {
+  all: unset;
+  font-family: "JetBrainsMono Nerd Font", monospace;
+  font-size: 13px;
+}
+
+.player {
+  background-color: $bg;
+  color: $fg;
+  border: 2px solid $accent;
+  border-radius: 4px;
+  padding: 12px 14px;
+}
+
+.header { margin-bottom: 10px; }
+.prompt { color: $accent; }
+
+.close { color: $muted; }
+.close:hover { color: $accent; }
+
+.art {
+  border: 1px solid $muted;
+  background-size: cover;
+  background-position: center;
+}
+.art-placeholder {
+  font-size: 40px;
+  color: $muted;
+}
+
+.key { color: $muted; }
+.title { font-weight: bold; }
+.artist { color: $accent; }
+
+.bar {
+  margin-top: 12px;
+  color: $accent;
+}
+
+.controls { margin-top: 8px; }
+
+.btn {
+  color: $fg;
+  padding: 2px 4px;
+}
+.btn:hover { color: $accent; }
+.btn.active { color: $accent; }
+.play {
+  color: $accent;
+  font-weight: bold;
+}

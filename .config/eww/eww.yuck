@@ -1,0 +1,59 @@
+;; ─────────────────────────────────────────────
+;;  Media player popup, terminal style
+;;  (opened from the waybar music module)
+;; ─────────────────────────────────────────────
+
+(deflisten media
+  :initial '{"status":"Stopped","title":"","artist":"","album":"","art":"","length":0}'
+  "~/.config/eww/scripts/media.sh")
+
+(defpoll bar :interval "1s" :initial "00:00 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 00:00"
+  "~/.config/eww/scripts/bar.sh 30")
+(defpoll loop :interval "2s" :initial "None"
+  "playerctl loop 2>/dev/null || echo None")
+(defpoll shuffle :interval "2s" :initial "Off"
+  "playerctl shuffle 2>/dev/null || echo Off")
+
+(defvar media_inside false)
+(defvar media_token "0")
+
+(defwidget row [key value ?cls]
+  (box :orientation "h" :space-evenly false
+    (label :class "key" :xalign 0 :text key)
+    (label :class "val ${cls}" :xalign 0 :limit-width 24 :text value)))
+
+(defwidget media-player []
+  (box :class "player" :orientation "v" :space-evenly false
+    (box :class "header" :orientation "h" :space-evenly false
+      (label :class "prompt" :xalign 0 :hexpand true
+             :text "~/music ❯ ${media.status == 'Playing' ? 'playing' : (media.status == 'Paused' ? 'paused' : 'stopped')}")
+      (button :class "close" :onclick "eww close media" "[x]"))
+    (box :class "top" :orientation "h" :space-evenly false :spacing 14
+      (box :class "art" :width 110 :height 110
+           :style {media.art != "" ? "background-image: url('${media.art}');" : ""}
+        (label :class "art-placeholder" :visible {media.art == ""} :text "󰝚"))
+      (box :class "info" :orientation "v" :space-evenly false :valign "center" :hexpand true :spacing 4
+        (row :key "title  " :value {media.title != "" ? media.title : "nothing playing"} :cls "title")
+        (row :key "artist " :value {media.artist != "" ? media.artist : "-"} :cls "artist")
+        (row :key "album  " :value {media.album != "" ? media.album : "-"} :cls "album")))
+    (label :class "bar" :xalign 0 :text bar)
+    (box :class "controls" :orientation "h" :space-evenly true
+      (button :class {shuffle == "On" ? "btn active" : "btn"}
+              :onclick "playerctl shuffle toggle" "[󰒝]")
+      (button :class "btn" :onclick "playerctl previous" "[󰒮]")
+      (button :class "btn play" :onclick "playerctl play-pause"
+              {media.status == "Playing" ? "[󰏤]" : "[󰐊]"})
+      (button :class "btn" :onclick "playerctl next" "[󰒭]")
+      (button :class {loop != "None" ? "btn active" : "btn"}
+              :onclick "~/.config/eww/scripts/loop.sh"
+              {loop == "Track" ? "[󰑘]" : "[󰑖]"}))))
+
+(defwindow media
+  :monitor 0
+  :geometry (geometry :x "70px" :y "6px" :width "420px" :anchor "top left")
+  :stacking "overlay"
+  :exclusive false
+  :focusable false
+  (eventbox :onhover "eww update media_inside=true"
+            :onhoverlost "setsid -f ~/.config/eww/scripts/close-later.sh"
+    (media-player)))

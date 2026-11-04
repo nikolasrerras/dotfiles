@@ -10,14 +10,14 @@
     "clock"
   ],
   "modules-right": [
-    "tray",
+    "group/tray",
     "niri/language",
     "custom/cpu",
     "memory",
     "custom/gpu",
     "bluetooth",
     "pulseaudio",
-    "network",
+    "custom/wifi",
     "group/power"
   ],
   "niri/workspaces": {
@@ -32,9 +32,8 @@
     "hide-empty-text": true,
     "escape": true,
     "tooltip": false,
-    "on-click": "playerctl play-pause",
-    "on-click-right": "playerctl next",
-    "on-click-middle": "playerctl previous",
+    "on-click": "/home/nikolas/.config/eww/scripts/toggle.sh",
+    "on-click-right": "playerctl play-pause",
     "on-scroll-up": "playerctl next",
     "on-scroll-down": "playerctl previous"
   },
@@ -74,8 +73,9 @@
       "󰤥",
       "󰤨"
     ],
-    "tooltip": false,
-    "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 impala > /dev/null 2>&1"
+    "tooltip": true,
+    "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 impala > /dev/null 2>&1",
+    "tooltip-format-wifi": "{essid}\nSignal {signalStrength}% ({signaldBm} dBm)\n{frequency} GHz"
   },
   "pulseaudio": {
     "format": "{icon}",
@@ -159,5 +159,36 @@
     "interval": 2,
     "format": "  {}%",
     "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c btop"
+  },
+  "custom/wifi": {
+    "exec": "/home/nikolas/.config/waybar/scripts/wifi.sh",
+    "return-type": "json",
+    "interval": 5,
+    "format": "{icon}",
+    "format-icons": [
+      "󰤯",
+      "󰤟",
+      "󰤢",
+      "󰤥",
+      "󰤨"
+    ],
+    "tooltip": true,
+    "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 impala > /dev/null 2>&1"
+  },
+  "group/tray": {
+    "orientation": "inherit",
+    "drawer": {
+      "transition-duration": 300,
+      "click-to-reveal": false,
+      "transition-left-to-right": false
+    },
+    "modules": [
+      "custom/tray-toggle",
+      "tray"
+    ]
+  },
+  "custom/tray-toggle": {
+    "format": "",
+    "tooltip": false
   }
 }

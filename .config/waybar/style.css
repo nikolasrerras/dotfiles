@@ -45,6 +45,7 @@ window#waybar {
 }
 
 #network,
+#custom-wifi,
 #pulseaudio,
 #bluetooth,
 #cpu,
@@ -94,3 +95,4 @@ window#waybar {
 #custom-quit:hover, #custom-suspend:hover, #custom-reboot:hover, #custom-shutdown:hover {
     color: @accent;
 }
+
