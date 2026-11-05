@@ -522,6 +522,7 @@ binds {
 
     // Switches focus between the current and the previous workspace.
     // Mod+Tab { focus-workspace-previous; }
+    Mod+Tab { toggle-overview; }
 
     // The following binds move the focused window in and out of a column.
     // If the window is alone, they will consume it into the nearby column to the side.
@@ -584,9 +585,10 @@ binds {
     // Mod+Space       { switch-layout "next"; }
     // Mod+Shift+Space { switch-layout "prev"; }
 
-    Print { screenshot; }
-    Ctrl+Print { screenshot-screen; }
-    Alt+Print { screenshot-window; }
+    Print { spawn "/home/nikolas/.local/bin/shot" "region"; }
+    Shift+Print { screenshot; }
+    Ctrl+Print { spawn "/home/nikolas/.local/bin/shot" "screen"; }
+    Alt+Print { spawn "/home/nikolas/.local/bin/shot" "window"; }
 
     // Applications such as remote-desktop clients and software KVM switches may
     // request that niri stops processing the keyboard shortcuts defined here
@@ -632,4 +634,17 @@ window-rule {
     match app-id="^dropdown$"
     open-floating true
     default-floating-position x=8 y=8 relative-to="top-right"
+}
+
+// satty (screenshot annotation): floating
+window-rule {
+    match app-id=r#"^(com\.gabm\.satty|satty)$"#
+    open-floating true
+}
+
+// no overview when the pointer touches the top-left corner
+gestures {
+    hot-corners {
+        off
+    }
 }

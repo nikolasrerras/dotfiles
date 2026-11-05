@@ -1,14 +1,1 @@
-// written by `theme blur wallpaper`
-window-rule {
-    match app-id=r#"^(kitty|com\.floating\.tui|dropdown)$"#
-    background-effect {
-        blur true
-    }
-}
-
-layer-rule {
-    match namespace=r#"^(waybar|launcher|notifications|gtk-layer-shell|eww.*)$"#
-    background-effect {
-        blur true
-    }
-}
+// blur off (theme blur wallpaper | behind to enable)
