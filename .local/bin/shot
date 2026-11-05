@@ -21,19 +21,23 @@ case ${1:-region} in
     grim -o "$out" "$tmp" || exit 1
     ;;
   window)
-    # window position = output position + tile position + offset of the window in its tile
-    geo=$(jq -rn \
-      --argjson o "$(niri msg -j focused-output)" \
-      --argjson w "$(niri msg -j focused-window)" '
-      ($w.layout.tile_pos_in_workspace_view // empty) as $t
-      | ($w.layout.window_offset_in_tile // [0, 0]) as $off
-      | ($w.layout.window_size) as $s
-      | "\(($o.logical.x + $t[0] + $off[0]) | round),\(($o.logical.y + $t[1] + $off[1]) | round) \($s[0])x\($s[1])"')
-    if [[ -n $geo ]]; then
-      grim -g "$geo" "$tmp" || exit 1
-    else
-      grim -o "$(niri msg -j focused-output | jq -r .name)" "$tmp" || exit 1
-    fi
+    # let niri capture the window itself (it knows where tiled windows are),
+    # then pick up the saved file from niri's event stream
+    ev=$(mktemp)
+    niri msg -j event-stream >"$ev" 2>/dev/null &
+    pid=$!
+    sleep 0.2
+    niri msg action screenshot-window >/dev/null 2>&1
+    path=""
+    for _ in $(seq 50); do
+      path=$(jq -r 'select(.ScreenshotCaptured?) | .ScreenshotCaptured.path // empty' "$ev" 2>/dev/null | head -n1)
+      [[ -n $path ]] && break
+      sleep 0.1
+    done
+    kill "$pid" 2>/dev/null
+    rm -f "$ev"
+    [[ -f $path ]] || exit 1
+    mv "$path" "$tmp"           # satty decides where (and whether) to save it
     ;;
   *)
     sed -n '2,7p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;

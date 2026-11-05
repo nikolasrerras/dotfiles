@@ -328,7 +328,7 @@ binds {
 
     Mod+Shift+B { spawn "zen-browser" "--private-window"; }
     Mod+B { spawn "zen-browser"; }
-    Mod+D { spawn "vesktop"; }
+    Mod+D { spawn "discord"; }
     Mod+M { spawn "spotify"; }
     Mod+N { spawn "kitty" "nvim"; }
     Mod+S { spawn "steam"; }
