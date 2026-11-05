@@ -6,6 +6,8 @@
 #   theme preset <name>  apply a theme directly (then pick accents)
 #   theme accent         change accents only
 #   theme apply          rewrite accent files without prompting
+#   theme transparency [off|<30-99>|cycle]          see-through backgrounds
+#   theme blur [off|wallpaper|behind]               blur behind them
 #   theme import         import extra themes from iTerm2-Color-Schemes
 #
 # Picker keys:  Enter = apply   Ctrl-A = accents only   Esc = close
@@ -24,13 +26,20 @@ ROFI_IN="$STATE_DIR/powermenu.rasi.in"
 DEFAULT_SLOT=3                      # color3 if no accent was ever chosen
 ALL_LABEL="★ All themes…"
 RANDOM_LABEL="random"
+TRANSP_PREFIX="◐ transparency:"
+BLUR_PREFIX="◌ blur:"
+TRANSP_LEVELS=(100 95 90 85 80 75 70 60 50)   # opacity %, 100 = off
 ITERM_REPO="https://github.com/mbadolato/iTerm2-Color-Schemes"
 ITERM_DIR="$CFG/colorschemes/iterm2"  # imported themes live here
 
+
 mkdir -p "$CFG" "$STATE_DIR" "$PALETTE_DIR"
 
-NIRI_SLOT="" WAYBAR_SLOT=""
+NIRI_SLOT="" WAYBAR_SLOT="" OPACITY=100 BLUR="off" EFFECTS=""
 [[ -f $STATE ]] && source "$STATE"
+# older state files had a single on/off switch
+if [[ $EFFECTS == on && $OPACITY == 100 ]]; then OPACITY=85 BLUR=wallpaper; fi
+[[ $BLUR == on ]] && BLUR=wallpaper
 
 # ───────────── helpers ─────────────
 
@@ -38,6 +47,8 @@ save_state() {
   {
     printf 'NIRI_SLOT=%q\n' "$NIRI_SLOT"
     printf 'WAYBAR_SLOT=%q\n' "$WAYBAR_SLOT"
+    printf 'OPACITY=%q\n' "$OPACITY"
+    printf 'BLUR=%q\n' "$BLUR"
   } >"$STATE"
 }
 
@@ -50,6 +61,17 @@ load_palette() {
 }
 
 slot_hex() { local v="color$1"; echo "${!v}"; }
+
+transparent() { ((${OPACITY:-100} < 100)); }
+blur_on() { [[ ${BLUR:-off} != off ]]; }
+transp_label() {
+  if transparent; then printf '%s %s%%\n' "$TRANSP_PREFIX" "$OPACITY"
+  else printf '%s off\n' "$TRANSP_PREFIX"; fi
+}
+blur_label() { printf '%s %s\n' "$BLUR_PREFIX" "${BLUR:-off}"; }
+# opacity as 0.85 / d9
+opacity_dec() { awk -v o="${OPACITY:-100}" 'BEGIN { printf "%.2f", o / 100 }'; }
+opacity_hex() { printf '%02x' $(( ${OPACITY:-100} * 255 / 100 )); }
 
 # "#D79921" → "215;153;33"
 rgb() {
@@ -168,6 +190,22 @@ cmd_preview() {
     printf '\n  Apply a random built-in theme.\n'
     return
   fi
+  if [[ $name == "$TRANSP_PREFIX"* ]]; then
+    printf '\n  \e[1mTransparency, system-wide\e[0m\n\n'
+    printf '  Enter opens the list of levels.\n'
+    printf '  (%% = how solid the background is)\n\n'
+    printf '  kitty, fuzzel, mako, waybar, eww popups\n\n'
+    printf '  Currently: \e[1m%s\e[0m\n' "$(transparent && echo "$OPACITY%" || echo off)"
+    return
+  fi
+  if [[ $name == "$BLUR_PREFIX"* ]]; then
+    printf '\n  \e[1mBlur behind transparent windows\e[0m\n\n'
+    printf '  wallpaper  only the wallpaper, blurred (light)\n'
+    printf '  behind     whatever is behind, windows too\n\n'
+    printf '  Only visible when transparency is on.\n\n'
+    printf '  Currently: \e[1m%s\e[0m\n' "${BLUR:-off}"
+    return
+  fi
   if ! gen_palette "$name"; then
     printf '\n  No preview available for %s\n' "$name"
     return
@@ -238,12 +276,14 @@ choose_accents() {
 # ───────────── apply ─────────────
 
 # niri accent   → focus ring, fuzzel border
-# waybar accent → waybar, mako, swayosd, rofi powermenu, fuzzel selection
+# waybar accent → waybar, mako, swayosd, rofi powermenu, fuzzel selection,
+#                 vesktop, gtk apps
 apply_accents() {
   load_palette
-  local n w
+  local n w a f
   n=$(slot_hex "${NIRI_SLOT:-$DEFAULT_SLOT}")
   w=$(slot_hex "${WAYBAR_SLOT:-$DEFAULT_SLOT}")
+  a=$(opacity_hex)
 
   cat >"$HOME/.config/niri/colors.kdl" <<EOF
 layout {
@@ -256,7 +296,7 @@ EOF
 
   cat >"$HOME/.config/fuzzel/colors.ini" <<EOF
 [colors]
-background=${background:1}ff
+background=${background:1}${a}
 text=${foreground:1}ff
 match=${color14:1}ff
 selection=${w:1}ff
@@ -265,14 +305,65 @@ selection-match=${color1:1}ff
 border=${n:1}d9
 EOF
 
-  echo "@define-color accent $w;" >"$HOME/.config/waybar/accent.css"
-  [[ -x $HOME/.config/eww/scripts/colors.sh ]] && "$HOME/.config/eww/scripts/colors.sh"
+  {
+    echo "@define-color accent $w;"
+    if transparent; then
+      echo "@define-color bar_bg alpha(@background, $(opacity_dec));"
+    else
+      echo "@define-color bar_bg @background;"
+    fi
+  } >"$HOME/.config/waybar/accent.css"
 
-  printf 'border-color=%sFF\nprogress-color=over %sFF\n' "$w" "$w" \
+  if [[ -x $HOME/.config/eww/scripts/colors.sh ]]; then
+    "$HOME/.config/eww/scripts/colors.sh"
+    transparent && printf '$bg: rgba($bg, %s);\n' "$(opacity_dec)" >>"$HOME/.config/eww/colors.scss"
+  fi
+
+  printf 'border-color=%sFF\nprogress-color=over %sFF\nbackground-color=%s%s\n' "$w" "$w" "$background" "${a^^}" \
     >"$HOME/.config/mako/accent.conf"
 
   if [[ -f $ROFI_IN ]]; then
     sed "s/ACCENT_PLACEHOLDER/$w/" "$ROFI_IN" >"$HOME/.config/rofi/powermenu.rasi"
+  fi
+
+  # vesktop: accent of the bar instead of color4
+  f="$HOME/.config/vesktop/themes/wallust.theme.css"
+  [[ -f $f ]] && sed -i "s/--wl-accent: #[0-9A-Fa-f]*;/--wl-accent: $w;/" "$f"
+
+  # gtk3 / gtk4 apps: accent of the bar
+  for f in "$HOME/.config/gtk-3.0/colors.css" "$HOME/.config/gtk-4.0/colors.css"; do
+    [[ -f $f ]] && sed -i -E "s/^@define-color accent_(bg_)?color #[0-9A-Fa-f]+;/@define-color accent_\1color $w;/" "$f"
+  done
+
+  apply_effects
+}
+
+# transparency (kitty) + blur (niri rules)
+apply_effects() {
+  printf 'dynamic_background_opacity yes\nbackground_opacity %s\n' "$(opacity_dec)" \
+    >"$HOME/.config/kitty/effects.conf"
+
+  if blur_on; then
+    local xray=""
+    [[ $BLUR == behind ]] && xray=$'\n        xray false'
+    cat >"$HOME/.config/niri/effects.kdl" <<EOF
+// written by \`theme blur $BLUR\`
+window-rule {
+    match app-id=r#"^(kitty|com\.floating\.tui|dropdown)\$"#
+    background-effect {
+        blur true$xray
+    }
+}
+
+layer-rule {
+    match namespace=r#"^(waybar|launcher|notifications|gtk-layer-shell|eww.*)\$"#
+    background-effect {
+        blur true$xray
+    }
+}
+EOF
+  else
+    echo '// blur off (theme blur wallpaper | behind to enable)' >"$HOME/.config/niri/effects.kdl"
   fi
 }
 
@@ -282,6 +373,7 @@ reload_all() {
   pkill -USR1 -x kitty                      # kitty reloads its config
   niri msg action load-config-file >/dev/null 2>&1
   pgrep -x eww >/dev/null && eww reload >/dev/null 2>&1
+  command -v spicetify >/dev/null && spicetify -q refresh -s -n >/dev/null 2>&1
   if pgrep -x swayosd-server >/dev/null; then
     pkill -x swayosd-server
     sleep 0.2
@@ -306,6 +398,75 @@ apply_theme() {
     wallust theme "$name" -q -s >/dev/null || { echo "Theme not found: $name" >&2; return 1; }
   fi
   add_recent "$name"
+}
+
+set_transparency() {
+  local v="${1:-cycle}" i
+  case $v in
+    off|100) OPACITY=100 ;;
+    [3-9][0-9]) OPACITY=$v ;;
+    cycle)
+      for i in "${!TRANSP_LEVELS[@]}"; do
+        if [[ ${TRANSP_LEVELS[i]} == "${OPACITY:-100}" ]]; then
+          OPACITY=${TRANSP_LEVELS[(i + 1) % ${#TRANSP_LEVELS[@]}]}
+          break
+        fi
+      done
+      ;;
+    *) echo "usage: theme transparency [off|<30-99>|cycle]" >&2; return 1 ;;
+  esac
+  save_state; apply_accents; reload_all
+}
+
+# submenu: pick a transparency level
+pick_transparency() {
+  local lv choice cur
+  cur=${OPACITY:-100}
+  choice=$(
+    for lv in "${TRANSP_LEVELS[@]}"; do
+      local mark="  "
+      [[ $lv == "$cur" ]] && mark="● "
+      if ((lv == 100)); then
+        printf '%soff   solid\n' "$mark"
+      else
+        local bar; bar=$(printf '%*s' $(( (100 - lv) / 5 )) ''); bar=${bar// /░}
+        printf '%s%s%%   %s\n' "$mark" "$lv" "$bar"
+      fi
+    done | picker --prompt="Transparency ~> " --header="enter: select · esc: back"
+  ) || return 0
+  if [[ $choice == *off* ]]; then
+    set_transparency off
+  elif [[ $choice =~ ([0-9]+)% ]]; then
+    set_transparency "${BASH_REMATCH[1]}"
+  fi
+}
+
+set_blur() {
+  case "${1:-toggle}" in
+    off|wallpaper|behind) BLUR=$1 ;;
+    on) BLUR=wallpaper ;;
+    toggle) blur_on && BLUR=off || BLUR=wallpaper ;;
+    *) echo "usage: theme blur [off|wallpaper|behind]" >&2; return 1 ;;
+  esac
+  save_state; apply_accents; reload_all
+}
+
+# submenu: pick a blur mode
+pick_blur() {
+  local choice m mark
+  choice=$(
+    for m in off wallpaper behind; do
+      mark="  "; [[ $m == "${BLUR:-off}" ]] && mark="● "
+      case $m in
+        off)       printf '%soff\n' "$mark" ;;
+        wallpaper) printf '%swallpaper   only the wallpaper (light)\n' "$mark" ;;
+        behind)    printf '%sbehind      whatever is behind, windows too\n' "$mark" ;;
+      esac
+    done | picker --prompt="Blur ~> " --header="enter: select · esc: back"
+  ) || return 0
+  for m in off wallpaper behind; do
+    [[ $choice == *"$m"* ]] && { set_blur "$m"; return; }
+  done
 }
 
 # ───────────── import ─────────────
@@ -378,38 +539,47 @@ cmd_open() {
 
 cmd_tui() {
   local out key name
-  out=$(
-    {
-      recent_themes
-      printf '%s\n%s\n' "$ALL_LABEL" "$RANDOM_LABEL"
-    } | picker \
-      --prompt="Theme ~> " \
-      --header="enter: apply · ctrl-a: accents only · esc: close" \
-      --expect=ctrl-a \
-      --preview="'$SELF' preview {}" \
-      --preview-window="right,62%,border-left"
-  )
-  key=$(sed -n 1p <<<"$out")
-  name=$(sed -n 2p <<<"$out")
-
-  if [[ $key == ctrl-a ]]; then
-    finish
-    return
-  fi
-  [[ -z $name ]] && return 0
-
-  if [[ $name == "$ALL_LABEL" ]]; then
-    name=$(
-      all_themes | picker \
-        --prompt="All themes ~> " \
-        --header="enter: apply · esc: close" \
+  while true; do
+    out=$(
+      {
+        recent_themes
+        printf '%s\n%s\n' "$ALL_LABEL" "$RANDOM_LABEL"
+        transp_label
+        blur_label
+      } | picker \
+        --prompt="Theme ~> " \
+        --header="enter: apply · ctrl-a: accents only · esc: close" \
+        --expect=ctrl-a \
         --preview="'$SELF' preview {}" \
         --preview-window="right,62%,border-left"
     )
-    [[ -z $name ]] && return 0
-  fi
+    key=$(sed -n 1p <<<"$out")
+    name=$(sed -n 2p <<<"$out")
 
-  apply_theme "$name" && finish
+    if [[ $key == ctrl-a ]]; then
+      finish
+      return
+    fi
+    [[ -z $name ]] && return 0
+
+    # transparency / blur: change and stay in the picker
+    if [[ $name == "$TRANSP_PREFIX"* ]]; then pick_transparency; continue; fi
+    if [[ $name == "$BLUR_PREFIX"* ]]; then pick_blur; continue; fi
+
+    if [[ $name == "$ALL_LABEL" ]]; then
+      name=$(
+        all_themes | picker \
+          --prompt="All themes ~> " \
+          --header="enter: apply · esc: close" \
+          --preview="'$SELF' preview {}" \
+          --preview-window="right,62%,border-left"
+      )
+      [[ -z $name ]] && return 0
+    fi
+
+    apply_theme "$name" && finish
+    return
+  done
 }
 
 case "${1:-}" in
@@ -419,6 +589,8 @@ case "${1:-}" in
   preset)  [[ -n ${2:-} ]] && apply_theme "$2" && finish ;;
   accent)  finish ;;
   apply)   apply_accents; reload_all ;;
+  transparency) set_transparency "${2:-cycle}" ;;
+  blur)    set_blur "${2:-toggle}" ;;
   import)  cmd_import ;;
-  *)       sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+  *)       sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
 esac

@@ -1,0 +1,5 @@
+include colors
+
+set font "JetBrainsMono Nerd Font 11"
+set recolor-keephue true
+# Ctrl+R: dark mode for the PDF itself, in theme colors

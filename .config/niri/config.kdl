@@ -328,7 +328,7 @@ binds {
 
     Mod+Shift+B { spawn "zen-browser" "--private-window"; }
     Mod+B { spawn "zen-browser"; }
-    Mod+D { spawn "discord"; }
+    Mod+D { spawn "vesktop"; }
     Mod+M { spawn "spotify"; }
     Mod+N { spawn "kitty" "nvim"; }
     Mod+S { spawn "steam"; }
@@ -336,6 +336,7 @@ binds {
     Mod+Shift+E { spawn "nautilus";} 
     Mod+Shift+N { spawn "zeditor"; }
     Mod+Escape { spawn "/home/nikolas/.local/bin/powermenu"; }
+    Mod+Shift+Return hotkey-overlay-title="Dropdown terminal" { spawn "/home/nikolas/.local/bin/dropdown"; }
     Mod+Shift+T { spawn "/home/nikolas/.local/bin/theme"; }
     Mod+A {
     spawn-sh "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 wiremix"
@@ -607,6 +608,7 @@ binds {
 
 }
 include "/home/nikolas/.config/niri/colors.kdl"
+include "/home/nikolas/.config/niri/effects.kdl"
 
 cursor {
     xcursor-theme "phinger-cursors-dark"
@@ -624,3 +626,10 @@ window-rule {
     default-floating-position x=32 y=32 relative-to="bottom-right"
 }
 
+
+// dropdown terminal: floating, top of the screen
+window-rule {
+    match app-id="^dropdown$"
+    open-floating true
+    default-floating-position x=8 y=8 relative-to="top-right"
+}

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Dropdown terminal: toggles a floating kitty attached to a persistent tmux session
+id=$(niri msg -j windows | jq -r ".[] | select(.app_id == \"dropdown\") | .id" | head -1)
+if [[ -n $id ]]; then
+  niri msg action close-window --id "$id"
+else
+  setsid -f kitty --class=dropdown -o remember_window_size=no -o confirm_os_window_close=0 -o initial_window_width=77c -o initial_window_height=18c tmux new-session -A -s dropdown >/dev/null 2>&1
+fi

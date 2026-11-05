@@ -1,0 +1,36 @@
+# starship: one-line terminal-style prompt, colors follow the terminal (theme system)
+# [~/D/diploma/papers] [ main *2] [ 3.13] [⏱ 4s] ❯
+
+add_newline = true
+format = '[\[](bright-black)$directory[\]](bright-black) ([\[](bright-black)$git_branch$git_status[\]](bright-black) )([\[](bright-black)$python[\]](bright-black) )([\[](bright-black)$cmd_duration[\]](bright-black) )$character'
+
+[directory]
+format = '[$path]($style)[$read_only]($read_only_style)'
+style = "bold yellow"
+read_only = " "
+truncation_length = 2
+truncate_to_repo = false
+fish_style_pwd_dir_length = 1
+
+[git_branch]
+format = '[$symbol$branch]($style)'
+symbol = " "
+style = "purple"
+
+[git_status]
+format = '[( $all_status$ahead_behind)]($style)'
+style = "purple"
+
+[python]
+format = '[$symbol$version( \($virtualenv\))]($style)'
+symbol = " "
+style = "blue"
+
+[cmd_duration]
+format = '[⏱ $duration]($style)'
+min_time = 2000
+style = "white"
+
+[character]
+success_symbol = "[❯](green)"
+error_symbol = "[❯](red)"

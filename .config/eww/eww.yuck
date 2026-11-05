@@ -75,3 +75,49 @@
   :exclusive false
   :focusable false
   (osd))
+
+;; ─────────────────────────────────────────────
+;;  Calendar and system popups (scripts/popup.sh)
+;; ─────────────────────────────────────────────
+(defvar calendar_inside false)
+(defvar calendar_token "0")
+(defvar system_inside false)
+(defvar system_token "0")
+
+(defvar cal_off 0)
+(defvar cal_title "")
+(defvar cal_text "")
+(defvar sys_text "")
+
+(defpoll sys_poll :interval "2s" :run-while {system_inside}
+  "~/.config/eww/scripts/sys.sh")
+
+(defwidget calendar-popup []
+  (box :class "player" :orientation "v" :space-evenly false
+    (label :class "prompt" :xalign 0 :text "~/calendar ❯ ${cal_title}")
+    (label :class "cal" :xalign 0.5 :justify "left" :markup cal_text)
+    (box :class "controls" :orientation "h" :space-evenly true
+      (button :class "btn" :onclick "~/.config/eww/scripts/cal.sh prev" "[<]")
+      (button :class "btn" :onclick "~/.config/eww/scripts/cal.sh today" "[today]")
+      (button :class "btn" :onclick "~/.config/eww/scripts/cal.sh next" "[>]"))))
+
+(defwidget system-popup []
+  (box :class "player" :orientation "v" :space-evenly false
+    (label :class "prompt" :xalign 0 :text "~/system ❯ status")
+    (label :class "sys" :xalign 0 :markup {sys_poll != "" ? sys_poll : sys_text})))
+
+(defwindow calendar
+  :monitor 0
+  :geometry (geometry :y "6px" :width "300px" :anchor "top center")
+  :stacking "overlay" :exclusive false :focusable false
+  (eventbox :onhover "eww update calendar_inside=true"
+            :onhoverlost "setsid -f ~/.config/eww/scripts/close-later.sh calendar"
+    (calendar-popup)))
+
+(defwindow system
+  :monitor 0
+  :geometry (geometry :x "6px" :y "6px" :width "440px" :anchor "top right")
+  :stacking "overlay" :exclusive false :focusable false
+  (eventbox :onhover "eww update system_inside=true"
+            :onhoverlost "setsid -f ~/.config/eww/scripts/close-later.sh system"
+    (system-popup)))

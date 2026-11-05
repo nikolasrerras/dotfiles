@@ -51,6 +51,15 @@ kitty      = { template = "kitty.template",  target = "~/.config/kitty/wallust.c
 mako       = { template = "mako.template",   target = "~/.config/mako/wallust.conf" }
 rofi_power = { template = "rofi-power.rasi", target = "~/.cache/theme/powermenu.rasi.in" }
 palette    = { template = "colors.sh",       target = "~/.cache/wallust/colors.sh" }
+btop       = { template = "btop.theme",      target = "~/.config/btop/themes/wallust.theme" }
+gtk3       = { template = "gtk-colors.css",  target = "~/.config/gtk-3.0/colors.css" }
+gtk4       = { template = "gtk-colors.css",  target = "~/.config/gtk-4.0/colors.css" }
+zen        = { template = "zen-user.js",     target = "~/.config/zen/b9nox66o.Default (release)/user.js" }
+spicetify  = { template = "spicetify.ini",   target = "~/.config/spicetify/Themes/wallust/color.ini" }
+vesktop    = { template = "vesktop.css",     target = "~/.config/vesktop/themes/wallust.theme.css" }
+zathura    = { template = "zathura-colors",  target = "~/.config/zathura/colors" }
+imv        = { template = "imv.config",      target = "~/.config/imv/config" }
+mpv        = { template = "mpv-colors.conf", target = "~/.config/mpv/colors.conf" }
 
 [hooks]
 # Run commands when wallust is invoked. Useful to avoid scripting.

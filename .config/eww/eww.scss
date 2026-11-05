@@ -65,3 +65,6 @@
   color: $accent;
   font-size: 19px;
 }
+
+// calendar + system popups (reuse .player / .prompt / .btn)
+.cal, .sys { margin-top: 10px; }

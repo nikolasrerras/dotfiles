@@ -1,7 +1,7 @@
 Kanagawa-Wave
+Dark-Pastel
 Gruvbox-Dark
 base16-grayscale-dark
-Dark-Pastel
 base16-gruvbox-soft-dark
 base16-gruvbox-soft-light
 Bim

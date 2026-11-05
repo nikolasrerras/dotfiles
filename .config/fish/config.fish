@@ -16,3 +16,11 @@ zoxide init fish | source
 
 
 
+
+# no fastfetch inside tmux (dropdown terminal)
+if set -q TMUX
+    function fish_greeting; end
+end
+
+# starship prompt (comment out to go back to the CachyOS prompt)
+starship init fish | source
