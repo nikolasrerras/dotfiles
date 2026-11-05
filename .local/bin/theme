@@ -8,6 +8,7 @@
 #   theme apply          rewrite accent files without prompting
 #   theme transparency [off|<30-99>|cycle]          see-through backgrounds
 #   theme blur [off|wallpaper|behind]               blur behind them
+#   theme night [off|auto|<kelvin>|restore]         night light (gammastep)
 #   theme import         import extra themes from iTerm2-Color-Schemes
 #
 # Picker keys:  Enter = apply   Ctrl-A = accents only   Esc = close
@@ -28,6 +29,9 @@ ALL_LABEL="★ All themes…"
 RANDOM_LABEL="random"
 TRANSP_PREFIX="◐ transparency:"
 BLUR_PREFIX="◌ blur:"
+NIGHT_PREFIX="☾ night light:"
+NIGHT_LOCATION="37.98:23.73"         # Athens, for sunset / sunrise
+NIGHT_DAY=6500 NIGHT_WARM=4000       # auto mode: day / night temperature
 TRANSP_LEVELS=(100 95 90 85 80 75 70 60 50)   # opacity %, 100 = off
 ITERM_REPO="https://github.com/mbadolato/iTerm2-Color-Schemes"
 ITERM_DIR="$CFG/colorschemes/iterm2"  # imported themes live here
@@ -35,11 +39,13 @@ ITERM_DIR="$CFG/colorschemes/iterm2"  # imported themes live here
 
 mkdir -p "$CFG" "$STATE_DIR" "$PALETTE_DIR"
 
-NIRI_SLOT="" WAYBAR_SLOT="" OPACITY=100 BLUR="off" EFFECTS=""
+NIRI_SLOT="" WAYBAR_SLOT="" OPACITY=100 BLUR="off" NIGHT="off" EFFECTS=""
 [[ -f $STATE ]] && source "$STATE"
 # older state files had a single on/off switch
 if [[ $EFFECTS == on && $OPACITY == 100 ]]; then OPACITY=85 BLUR=wallpaper; fi
 [[ $BLUR == on ]] && BLUR=wallpaper
+# night light only counts as on while gammastep is running
+[[ $NIGHT != off ]] && ! pgrep -x gammastep >/dev/null && NIGHT=off
 
 # ───────────── helpers ─────────────
 
@@ -49,6 +55,7 @@ save_state() {
     printf 'WAYBAR_SLOT=%q\n' "$WAYBAR_SLOT"
     printf 'OPACITY=%q\n' "$OPACITY"
     printf 'BLUR=%q\n' "$BLUR"
+    printf 'NIGHT=%q\n' "$NIGHT"
   } >"$STATE"
 }
 
@@ -69,6 +76,12 @@ transp_label() {
   else printf '%s off\n' "$TRANSP_PREFIX"; fi
 }
 blur_label() { printf '%s %s\n' "$BLUR_PREFIX" "${BLUR:-off}"; }
+night_label() {
+  case ${NIGHT:-off} in
+    off|auto) printf '%s %s\n' "$NIGHT_PREFIX" "${NIGHT:-off}" ;;
+    *)        printf '%s %sK\n' "$NIGHT_PREFIX" "$NIGHT" ;;
+  esac
+}
 # opacity as 0.85 / d9
 opacity_dec() { awk -v o="${OPACITY:-100}" 'BEGIN { printf "%.2f", o / 100 }'; }
 opacity_hex() { printf '%02x' $(( ${OPACITY:-100} * 255 / 100 )); }
@@ -196,6 +209,14 @@ cmd_preview() {
     printf '  (%% = how solid the background is)\n\n'
     printf '  kitty, fuzzel, mako, waybar, eww popups\n\n'
     printf '  Currently: \e[1m%s\e[0m\n' "$(transparent && echo "$OPACITY%" || echo off)"
+    return
+  fi
+  if [[ $name == "$NIGHT_PREFIX"* ]]; then
+    printf '\n  \e[1mNight light\e[0m\n\n'
+    printf '  auto    warm colors from sunset to sunrise\n'
+    printf '          (Athens), changing gradually\n'
+    printf '  5000K … 3500K  warm right now, lower = warmer\n\n'
+    printf '  Currently: \e[1m%s\e[0m\n' "$(night_label | sed "s/^$NIGHT_PREFIX //")"
     return
   fi
   if [[ $name == "$BLUR_PREFIX"* ]]; then
@@ -469,6 +490,51 @@ pick_blur() {
   done
 }
 
+# night light (gammastep keeps running while it is active)
+apply_night() {
+  pkill -x gammastep 2>/dev/null
+  sleep 0.2
+  command -v gammastep >/dev/null || { [[ ${NIGHT:-off} != off ]] && echo "gammastep is not installed" >&2; return 0; }
+  case ${NIGHT:-off} in
+    off)  ;;
+    auto) setsid -f gammastep -m wayland -l "$NIGHT_LOCATION" -t "$NIGHT_DAY:$NIGHT_WARM" >/dev/null 2>&1 ;;
+    *)    setsid -f gammastep -m wayland -P -O "$NIGHT" >/dev/null 2>&1 ;;
+  esac
+}
+
+set_night() {
+  case "${1:-}" in
+    off|auto) NIGHT=$1 ;;
+    [1-9][0-9][0-9][0-9]) NIGHT=$1 ;;
+    restore) apply_night; return ;;
+    *) echo "usage: theme night [off|auto|<kelvin>|restore]" >&2; return 1 ;;
+  esac
+  save_state
+  apply_night
+}
+
+# submenu: pick a night light mode
+pick_night() {
+  local choice m mark
+  choice=$(
+    for m in off auto 5000 4500 4000 3500; do
+      mark="  "; [[ $m == "${NIGHT:-off}" ]] && mark="● "
+      case $m in
+        off)  printf '%soff\n' "$mark" ;;
+        auto) printf '%sauto      warm from sunset to sunrise\n' "$mark" ;;
+        5000) printf '%s5000K     slightly warm\n' "$mark" ;;
+        3500) printf '%s3500K     very warm\n' "$mark" ;;
+        *)    printf '%s%sK\n' "$mark" "$m" ;;
+      esac
+    done | picker --prompt="Night light ~> " --header="enter: select · esc: back"
+  ) || return 0
+  case $choice in
+    *off*)  set_night off ;;
+    *auto*) set_night auto ;;
+    *)      [[ $choice =~ ([0-9]{4})K ]] && set_night "${BASH_REMATCH[1]}" ;;
+  esac
+}
+
 # ───────────── import ─────────────
 
 # lowercase, letters and digits only: "Gruvbox Dark" == "Gruvbox-Dark"
@@ -546,6 +612,7 @@ cmd_tui() {
         printf '%s\n%s\n' "$ALL_LABEL" "$RANDOM_LABEL"
         transp_label
         blur_label
+        night_label
       } | picker \
         --prompt="Theme ~> " \
         --header="enter: apply · ctrl-a: accents only · esc: close" \
@@ -565,6 +632,7 @@ cmd_tui() {
     # transparency / blur: change and stay in the picker
     if [[ $name == "$TRANSP_PREFIX"* ]]; then pick_transparency; continue; fi
     if [[ $name == "$BLUR_PREFIX"* ]]; then pick_blur; continue; fi
+    if [[ $name == "$NIGHT_PREFIX"* ]]; then pick_night; continue; fi
 
     if [[ $name == "$ALL_LABEL" ]]; then
       name=$(
@@ -591,6 +659,7 @@ case "${1:-}" in
   apply)   apply_accents; reload_all ;;
   transparency) set_transparency "${2:-cycle}" ;;
   blur)    set_blur "${2:-toggle}" ;;
+  night)   set_night "${2:-}" ;;
   import)  cmd_import ;;
-  *)       sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+  *)       sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
 esac
