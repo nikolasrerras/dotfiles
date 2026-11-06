@@ -648,3 +648,8 @@ gestures {
         off
     }
 }
+
+// do not paint the focus ring behind windows: it would show through transparent ones
+window-rule {
+    draw-border-with-background false
+}

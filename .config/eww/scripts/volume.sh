@@ -21,9 +21,15 @@ filled=$((pct * width / 100))
 full=$(printf '%*s' "$filled" '');               full=${full// /█}
 empty=$(printf '%*s' "$((width - filled))" ''); empty=${empty// /░}
 
-label="vol "
-[[ -n $muted ]] && label="mute"
-text=$(printf '%s %s%s %3d%%' "$label" "$full" "$empty" "$pct")
+is_muted=false
+if [[ -n $muted ]]; then
+  # muted: empty bar and the word muted instead of the percentage
+  is_muted=true
+  empty=$(printf '%*s' "$width" ''); empty=${empty// /░}
+  text=$(printf 'vol  %s muted' "$empty")
+else
+  text=$(printf 'vol  %s%s %3d%%' "$full" "$empty" "$pct")
+fi
 
 # show (or refresh) the OSD and close it 1.5 s after the last change
 token=$(date +%s%N)
