@@ -1,0 +1,12 @@
+/home/nikolas/.cache
+/home/nikolas/.local/share/Steam
+/home/nikolas/.local/share/Trash
+/home/nikolas/.local/share/baloo
+/home/nikolas/.local/share/umu
+/home/nikolas/.local/share/nvim/lazy
+/home/nikolas/Games
+/home/nikolas/go
+/home/nikolas/zen-profile-backup
+node_modules
+__pycache__
+.venv
