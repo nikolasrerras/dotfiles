@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+unset FZF_DEFAULT_OPTS  # these pickers set their own fzf options
 # clipboard — clipboard history picker (cliphist + fzf in a floating kitty)
 #
 #   clipboard          open the picker in a floating kitty window

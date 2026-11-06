@@ -121,3 +121,34 @@
   (eventbox :onhover "eww update system_inside=true"
             :onhoverlost "setsid -f ~/.config/eww/scripts/close-later.sh system"
     (system-popup)))
+
+;; ─────────────────────────────────────────────
+;;  Power popup (scripts/popup.sh power)
+;; ─────────────────────────────────────────────
+(defvar power_inside false)
+(defvar power_token "0")
+(defvar power_confirm "")
+(defvar power_uptime "")
+
+(defwidget power-popup []
+  (box :class "player power" :orientation "v" :space-evenly false
+    (label :class "prompt" :xalign 0 :text "~/power ❯ up ${power_uptime}")
+    (box :class "controls" :orientation "v" :space-evenly false :spacing 4
+      (button :class {power_confirm == "logout" ? "btn active" : "btn"}
+              :onclick {power_confirm == "logout" ? "niri msg action quit --skip-confirmation" : "eww update power_confirm=logout"}
+              (label :xalign 0 :text {power_confirm == "logout" ? "[󰗼 sure?]" : "[󰗼 logout]"}))
+      (button :class "btn" :onclick "eww close power; systemctl suspend" (label :xalign 0 :text "[󰤄 suspend]"))
+      (button :class {power_confirm == "restart" ? "btn active" : "btn"}
+              :onclick {power_confirm == "restart" ? "systemctl reboot" : "eww update power_confirm=restart"}
+              (label :xalign 0 :text {power_confirm == "restart" ? "[󰜉 sure?]" : "[󰜉 restart]"}))
+      (button :class {power_confirm == "shutdown" ? "btn active" : "btn"}
+              :onclick {power_confirm == "shutdown" ? "systemctl poweroff" : "eww update power_confirm=shutdown"}
+              (label :xalign 0 :text {power_confirm == "shutdown" ? "[󰐥 sure?]" : "[󰐥 shutdown]"})))))
+
+(defwindow power
+  :monitor 0
+  :geometry (geometry :x "6px" :y "6px" :width "260px" :anchor "top right")
+  :stacking "overlay" :exclusive false :focusable false
+  (eventbox :onhover "eww update power_inside=true"
+            :onhoverlost "setsid -f ~/.config/eww/scripts/close-later.sh power"
+    (power-popup)))

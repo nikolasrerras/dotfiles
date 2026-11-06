@@ -12,6 +12,8 @@ fi
 case $win in
   calendar) "$dir/cal.sh" today ;;
   system)   eww update sys_text="$("$dir/sys.sh")" ;;
+  power)    eww update power_confirm="" \
+              power_uptime="$(awk '{ s = int($1); printf "%dh %dm", s / 3600, (s % 3600) / 60 }' /proc/uptime)" ;;
 esac
 
 out=$(niri msg -j focused-output 2>/dev/null | jq -r .model)

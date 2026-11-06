@@ -68,3 +68,7 @@
 
 // calendar + system popups (reuse .player / .prompt / .btn)
 .cal, .sys { margin-top: 10px; }
+
+// power popup
+.power .controls { margin-top: 12px; }
+.power .btn { font-size: 16px; padding: 6px 10px; }

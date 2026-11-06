@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+unset FZF_DEFAULT_OPTS  # these pickers set their own fzf options
 # theme — theme switcher for niri + wallust (fzf in a floating kitty)
 #
 #   theme                open the picker in a floating kitty window
@@ -320,8 +321,8 @@ EOF
 background=${background:1}${a}
 text=${foreground:1}ff
 match=${color14:1}ff
-selection=${w:1}ff
-selection-text=${background:1}ff
+selection=${color8:1}55
+selection-text=${w:1}ff
 selection-match=${color1:1}ff
 border=${n:1}d9
 EOF

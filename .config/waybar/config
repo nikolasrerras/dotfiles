@@ -18,7 +18,7 @@
     "bluetooth",
     "pulseaudio",
     "custom/wifi",
-    "group/power"
+    "custom/power"
   ],
   "niri/workspaces": {
     "format": "{index}",
@@ -46,9 +46,9 @@
   "custom/power": {
     "format": "<span alpha=\"55%\">[</span> <span size=\"larger\">󰐥</span> <span alpha=\"55%\">]</span>",
     "tooltip": true,
-    "on-double-click": "systemctl poweroff --no-wall",
-    "tooltip-format": "Shutdown: double click · Menu: right click",
-    "on-click-right": "~/.local/bin/powermenu 2> /dev/null"
+    "tooltip-format": "Power · right click: menu",
+    "on-click-right": "/home/nikolas/.local/bin/powermenu",
+    "on-click": "/home/nikolas/.config/eww/scripts/popup.sh power"
   },
   "network": {
     "format-wifi": "{icon}",
@@ -86,10 +86,14 @@
   "bluetooth": {
     "format": "<span alpha=\"55%\">[</span><span alpha=\"55%\">󰂯</span> on<span alpha=\"55%\">]</span>",
     "format-disabled": "<span alpha=\"55%\">[</span><span alpha=\"55%\">󰂲</span> off<span alpha=\"55%\">]</span>",
-    "format-connected": "<span alpha=\"55%\">[</span><span alpha=\"55%\">󰂱</span> {num_connections}<span alpha=\"55%\">]</span>",
+    "format-connected": "<span alpha=\"55%\">[</span><span alpha=\"55%\">󰂱</span> {device_alias}<span alpha=\"55%\">]</span>",
     "tooltip-format": "Bluetooth: {status}",
     "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 bluetui > /dev/null 2>&1",
-    "format-off": "<span alpha=\"55%\">[</span><span alpha=\"55%\">󰂲</span> off<span alpha=\"55%\">]</span>"
+    "format-off": "<span alpha=\"55%\">[</span><span alpha=\"55%\">󰂲</span> off<span alpha=\"55%\">]</span>",
+    "format-connected-battery": "<span alpha=\"55%\">[</span><span alpha=\"55%\">󰂱</span> {device_alias} {device_battery_percentage}%<span alpha=\"55%\">]</span>",
+    "tooltip-format-connected": "{controller_alias}\n\n{device_enumerate}",
+    "tooltip-format-enumerate-connected": "{device_alias}",
+    "tooltip-format-enumerate-connected-battery": "{device_alias}  {device_battery_percentage}%"
   },
   "memory": {
     "interval": 2,
@@ -112,38 +116,6 @@
   "tray": {
     "icon-size": 18,
     "spacing": 0
-  },
-  "group/power": {
-    "orientation": "inherit",
-    "drawer": {
-      "transition-duration": 300,
-      "children-class": "power-child",
-      "transition-left-to-right": false
-    },
-    "modules": [
-      "custom/power",
-      "custom/quit",
-      "custom/suspend",
-      "custom/reboot"
-    ]
-  },
-  "custom/quit": {
-    "format": "<span alpha=\"55%\">[</span>󰗼<span alpha=\"55%\">]</span>",
-    "tooltip": true,
-    "tooltip-format": "Logout",
-    "on-click": "niri msg action quit"
-  },
-  "custom/suspend": {
-    "format": "<span alpha=\"55%\">[</span>󰤄<span alpha=\"55%\">]</span>",
-    "tooltip": true,
-    "tooltip-format": "Suspend",
-    "on-click": "systemctl suspend"
-  },
-  "custom/reboot": {
-    "format": "<span alpha=\"55%\">[</span>󰜉<span alpha=\"55%\">]</span>",
-    "tooltip": true,
-    "tooltip-format": "Restart",
-    "on-click": "systemctl reboot --no-wall"
   },
   "custom/cpu": {
     "exec": "/home/nikolas/.config/waybar/scripts/cpu.sh",

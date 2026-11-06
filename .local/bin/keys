@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+unset FZF_DEFAULT_OPTS  # these pickers set their own fzf options
 # keys — searchable list of the niri key bindings (fzf in a floating kitty)
 #
 #   keys       open the list in a floating kitty window

@@ -49,7 +49,6 @@ palette = "salience"
 waybar     = { template = "waybar.css",      target = "~/.cache/wallust/colors-waybar.css" }
 kitty      = { template = "kitty.template",  target = "~/.config/kitty/wallust.conf" }
 mako       = { template = "mako.template",   target = "~/.config/mako/wallust.conf" }
-rofi_power = { template = "rofi-power.rasi", target = "~/.cache/theme/powermenu.rasi.in" }
 palette    = { template = "colors.sh",       target = "~/.cache/wallust/colors.sh" }
 satty      = { template = "satty.toml",      target = "~/.config/satty/config.toml" }
 btop       = { template = "btop.theme",      target = "~/.config/btop/themes/wallust.theme" }
