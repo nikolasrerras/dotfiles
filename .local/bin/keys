@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+# keys — searchable list of the niri key bindings (fzf in a floating kitty)
+#
+#   keys       open the list in a floating kitty window
+#   keys tui   show it in the current terminal
+#   keys list  print the list
+
+SELF="$(realpath "$0")"
+CFG="$HOME/.config/niri/config.kdl"
+
+list() {
+  python3 - "$CFG" <<'PY'
+import re, sys, os
+
+text = open(sys.argv[1], encoding="utf-8").read()
+
+# take the body of the top-level `binds { ... }` block
+start = re.search(r'^binds\s*\{', text, re.M)
+if not start:
+    sys.exit("no binds block found")
+depth, i = 0, start.end() - 1
+for j in range(i, len(text)):
+    if text[j] == '{': depth += 1
+    elif text[j] == '}':
+        depth -= 1
+        if depth == 0:
+            body = text[start.end():j]
+            break
+
+line_re = re.compile(r'^\s*([^\s{/][^\s{]*)((?:\s+[\w-]+=(?:"[^"]*"|\S+))*)\s*\{\s*(.*?)\s*\}\s*$')
+title_re = re.compile(r'hotkey-overlay-title="([^"]*)"')
+
+def describe(action):
+    action = action.rstrip(';').strip()
+    m = re.match(r'spawn(?:-sh)?\s+(.*)', action)
+    if m:
+        args = re.findall(r'"([^"]*)"', m.group(1))
+        if not args:
+            return action
+        words = [os.path.basename(args[0])] + [a for a in args[1:] if not a.startswith('-')]
+        return 'run: ' + ' '.join(words)
+    return action.replace('-', ' ')
+
+rows = []
+for line in body.splitlines():
+    if line.strip().startswith('//'):
+        continue
+    m = line_re.match(line)
+    if not m:
+        continue
+    key, props, action = m.groups()
+    t = title_re.search(props or '')
+    desc = re.sub(r'<[^>]+>', '', t.group(1)) if t else describe(action)
+    rows.append((key, desc))
+
+w = max(len(k) for k, _ in rows) + 3
+for k, d in rows:
+    print(f"{k:<{w}}{d}")
+PY
+  # things that are not niri binds
+  cat <<'TXT'
+bar: music  click        media player popup
+bar: music  right        play / pause
+bar: music  scroll       next / previous track
+bar: clock  click        date with seconds
+bar: clock  right        calendar
+bar: cpu/mem/gpu click   system popup
+bar: cpu/mem/gpu right   btop
+bar: volume scroll       volume (with osd)
+bar: volume right        mute
+bar: wifi   click        impala
+bar: power  hover        logout / suspend / restart
+bar: power  dbl-click    shutdown
+bar: power  right        power menu
+fish: Ctrl+R             history search (atuin)
+fish: Ctrl+T             find file (fzf)
+fish: Alt+C              jump to subfolder (fzf)
+fish: z <name>           jump to a folder you visited (zoxide)
+fish: y                  yazi, stay in its folder on exit
+TXT
+}
+
+case "${1:-}" in
+  "")
+    exec kitty --class=com.floating.tui \
+      -o remember_window_size=no -o close_on_child_death=yes \
+      -o initial_window_width=96c -o initial_window_height=34c \
+      -e "$SELF" tui ;;
+  tui)
+    list | fzf --ansi --color=16 --layout=reverse --border=none --no-sort \
+      --prompt="~/keys ❯ " --header="type to search · esc: close" >/dev/null ;;
+  list) list ;;
+  *) sed -n '2,7p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+esac

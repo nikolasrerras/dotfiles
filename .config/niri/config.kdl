@@ -336,6 +336,7 @@ binds {
     Mod+Shift+E { spawn "nautilus";} 
     Mod+Shift+N { spawn "zeditor"; }
     Mod+Escape { spawn "/home/nikolas/.local/bin/powermenu"; }
+    Mod+Slash hotkey-overlay-title="Key bindings" { spawn "/home/nikolas/.local/bin/keys"; }
     Mod+Shift+Return hotkey-overlay-title="Dropdown terminal" { spawn "/home/nikolas/.local/bin/dropdown"; }
     Mod+Shift+T { spawn "/home/nikolas/.local/bin/theme"; }
     Mod+A {
