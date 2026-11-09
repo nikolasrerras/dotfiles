@@ -9,7 +9,7 @@
     border: none;
     border-radius: 0;
     font-family: "JetBrainsMono Nerd Font", monospace;
-    font-size: 13px;
+    font-size: 14px;
     min-height: 0;
     margin: 0;
     padding: 0;
@@ -133,7 +133,8 @@ tooltip label {
     margin-right: 6px;
 }
 #workspaces button {
-    padding: 0 6px;
+    padding: 0 10px;
+    min-width: 0;
     color: @color8;
 }
 #workspaces button:hover {

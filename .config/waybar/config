@@ -97,7 +97,7 @@
   },
   "memory": {
     "interval": 2,
-    "format": "<span alpha=\"55%\">[</span><span alpha=\"55%\">󰍛</span> {percentage}%<span alpha=\"55%\">]</span>",
+    "format": "<span alpha=\"55%\">[</span><span alpha=\"55%\">󰆼</span> {percentage}%<span alpha=\"55%\">]</span>",
     "on-click": "/home/nikolas/.config/eww/scripts/popup.sh system",
     "on-click-right": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c btop"
   },

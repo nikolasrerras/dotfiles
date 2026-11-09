@@ -5,7 +5,8 @@ unset FZF_DEFAULT_OPTS  # these pickers set their own fzf options
 #   theme                open the picker in a floating kitty window
 #   theme tui            run the picker in the current terminal
 #   theme preset <name>  apply a theme directly (then pick accents)
-#   theme accent         change accents only
+#   theme accent         change the two main accents
+#   theme groups         change the accent of each group
 #   theme apply          rewrite accent files without prompting
 #   theme transparency [off|<30-99>|cycle]          see-through backgrounds
 #   theme blur [off|wallpaper|behind]               blur behind them
@@ -24,10 +25,10 @@ RECENT="$CFG/recent.txt"            # most recently used themes, newest first
 RECENT_MAX=10
 PALETTE="$HOME/.cache/wallust/colors.sh"
 PALETTE_DIR="$STATE_DIR/palettes"   # cached palettes for previews
-ROFI_IN="$STATE_DIR/powermenu.rasi.in"
 DEFAULT_SLOT=3                      # color3 if no accent was ever chosen
 ALL_LABEL="★ All themes…"
 RANDOM_LABEL="random"
+GROUPS_LABEL="◆ accents…"
 TRANSP_PREFIX="◐ transparency:"
 BLUR_PREFIX="◌ blur:"
 NIGHT_PREFIX="☾ night light:"
@@ -36,11 +37,14 @@ NIGHT_DAY=6500 NIGHT_WARM=4000       # auto mode: day / night temperature
 TRANSP_LEVELS=(100 95 90 85 80 75 70 60 50)   # opacity %, 100 = off
 ITERM_REPO="https://github.com/mbadolato/iTerm2-Color-Schemes"
 ITERM_DIR="$CFG/colorschemes/iterm2"  # imported themes live here
+ACCENTS_DIR="$CFG/accents"           # accents remembered per theme
 
 
-mkdir -p "$CFG" "$STATE_DIR" "$PALETTE_DIR"
+mkdir -p "$CFG" "$STATE_DIR" "$PALETTE_DIR" "$ACCENTS_DIR"
 
-NIRI_SLOT="" WAYBAR_SLOT="" OPACITY=100 BLUR="off" NIGHT="off" EFFECTS=""
+# accent groups: NIRI = windows (focus ring), WAYBAR = bar & popups (the main one),
+# LAUNCH = fuzzel + powermenu, NOTIFY = mako; empty LAUNCH / NOTIFY = follow the bar
+NIRI_SLOT="" WAYBAR_SLOT="" LAUNCH_SLOT="" NOTIFY_SLOT="" OPACITY=100 BLUR="off" NIGHT="off" EFFECTS=""
 [[ -f $STATE ]] && source "$STATE"
 # older state files had a single on/off switch
 if [[ $EFFECTS == on && $OPACITY == 100 ]]; then OPACITY=85 BLUR=wallpaper; fi
@@ -54,10 +58,31 @@ save_state() {
   {
     printf 'NIRI_SLOT=%q\n' "$NIRI_SLOT"
     printf 'WAYBAR_SLOT=%q\n' "$WAYBAR_SLOT"
+    printf 'LAUNCH_SLOT=%q\n' "$LAUNCH_SLOT"
+    printf 'NOTIFY_SLOT=%q\n' "$NOTIFY_SLOT"
     printf 'OPACITY=%q\n' "$OPACITY"
     printf 'BLUR=%q\n' "$BLUR"
     printf 'NIGHT=%q\n' "$NIGHT"
   } >"$STATE"
+}
+
+# accents remembered per theme ($ACCENTS_DIR/<theme>)
+theme_file() { printf '%s/%s' "$ACCENTS_DIR" "$(tr '/' '_' <<<"$1")"; }
+current_theme() { cat "$STATE_DIR/current" 2>/dev/null; }
+
+save_theme_accents() {
+  local name; name=$(current_theme)
+  [[ -z $name || $name == "$RANDOM_LABEL" ]] && return
+  printf 'NIRI_SLOT=%q\nWAYBAR_SLOT=%q\nLAUNCH_SLOT=%q\nNOTIFY_SLOT=%q\n' \
+    "$NIRI_SLOT" "$WAYBAR_SLOT" "$LAUNCH_SLOT" "$NOTIFY_SLOT" >"$(theme_file "$name")"
+}
+
+# returns 1 if this theme has no saved accents yet
+load_theme_accents() {
+  local f; f=$(theme_file "$1")
+  [[ -f $f ]] || return 1
+  LAUNCH_SLOT="" NOTIFY_SLOT=""
+  source "$f"
 }
 
 load_palette() {
@@ -204,6 +229,15 @@ cmd_preview() {
     printf '\n  Apply a random built-in theme.\n'
     return
   fi
+  if [[ $name == "$GROUPS_LABEL" ]]; then
+    printf '\n  \e[1mAccent of each group\e[0m\n\n'
+    printf '  windows        focus ring\n'
+    printf '  bar & popups   waybar, eww, osd, gtk, vesktop\n'
+    printf '  launcher       fuzzel, powermenu\n'
+    printf '  notifications  mako\n\n'
+    printf '  Remembered per theme.\n'
+    return
+  fi
   if [[ $name == "$TRANSP_PREFIX"* ]]; then
     printf '\n  \e[1mTransparency, system-wide\e[0m\n\n'
     printf '  Enter opens the list of levels.\n'
@@ -268,14 +302,22 @@ cmd_preview() {
 
 # ───────────── accents ─────────────
 
-# Accent picker. Prints a slot number 1–7.  $1 = prompt, $2 = current slot
+# Accent picker. Prints a slot number 1–7, or "follow".
+#   $1 = prompt, $2 = current slot ("" = follows the bar), $3 = "follow" to offer that choice
 pick_slot() {
   local names=(Red Green Yellow Blue Magenta Cyan White)
-  local current="${2:-$DEFAULT_SLOT}" i v choice cur_hex
-  cur_hex=$(slot_hex "$current")
+  local current="$2" i v choice cur_hex
+  if [[ -z $current && $3 != follow ]]; then current=$DEFAULT_SLOT; fi
   choice=$(
     {
-      printf '%s████%s  Keep current (color%s %s)\n' "$(fg "$cur_hex")" "$RST" "$current" "$cur_hex"
+      if [[ -z $current ]]; then
+        printf '      Keep current (follows the bar)\n'
+      else
+        cur_hex=$(slot_hex "$current")
+        printf '%s████%s  Keep current (color%s %s)\n' "$(fg "$cur_hex")" "$RST" "$current" "$cur_hex"
+      fi
+      [[ $3 == follow && -n $current ]] && printf '      Follow the bar accent\n'
+
       for i in 1 2 3 4 5 6 7; do
         v="color$i"
         printf '%s████%s  color%s  %-8s %s\n' "$(fg "${!v}")" "$RST" "$i" "${names[i - 1]}" "${!v}"
@@ -283,10 +325,46 @@ pick_slot() {
     } | picker --prompt="$1 ~> " --header="enter: select · esc: keep current"
   )
   if [[ $choice =~ Keep\ current || -z $choice ]]; then
-    echo "$current"
+    echo "${current:-follow}"
+  elif [[ $choice =~ Follow ]]; then
+    echo follow
   else
     [[ $choice =~ color([1-7]) ]] && echo "${BASH_REMATCH[1]}" || echo "$current"
   fi
+}
+
+# submenu: the accent of each group
+pick_groups() {
+  local choice line g slot hex desc
+  while true; do
+    load_palette
+    choice=$(
+      for g in windows bar launcher notifications; do
+        case $g in
+          windows)       slot=$NIRI_SLOT;   desc="focus ring" ;;
+          bar)           slot=$WAYBAR_SLOT; desc="waybar, eww, osd, gtk, vesktop" ;;
+          launcher)      slot=$LAUNCH_SLOT; desc="fuzzel, powermenu" ;;
+          notifications) slot=$NOTIFY_SLOT; desc="mako" ;;
+        esac
+        if [[ -z $slot && ( $g == launcher || $g == notifications ) ]]; then
+          hex=$(slot_hex "${WAYBAR_SLOT:-$DEFAULT_SLOT}")
+          printf '%s████%s  %-14s %-13s %s\n' "$(fg "$hex")" "$RST" "$g" "follows bar" "$desc"
+        else
+          slot=${slot:-$DEFAULT_SLOT}; hex=$(slot_hex "$slot")
+          printf '%s████%s  %-14s %-13s %s\n' "$(fg "$hex")" "$RST" "$g" "color$slot" "$desc"
+        fi
+      done | picker --prompt="Accents ~> " --header="enter: change · esc: back"
+    ) || return 0
+    case $choice in
+      # launcher / notifications first: their lines may say "follows bar"
+      *launcher*)      line=$(pick_slot "Launcher accent" "$LAUNCH_SLOT" follow); [[ $line == follow ]] && LAUNCH_SLOT="" || LAUNCH_SLOT=$line ;;
+      *notifications*) line=$(pick_slot "Notifications accent" "$NOTIFY_SLOT" follow); [[ $line == follow ]] && NOTIFY_SLOT="" || NOTIFY_SLOT=$line ;;
+      *windows*)       NIRI_SLOT=$(pick_slot "Windows accent" "$NIRI_SLOT") ;;
+      *bar*)           WAYBAR_SLOT=$(pick_slot "Bar accent" "$WAYBAR_SLOT") ;;
+      *) return 0 ;;
+    esac
+    apply_accents; save_state; save_theme_accents; reload_all
+  done
 }
 
 choose_accents() {
@@ -297,14 +375,17 @@ choose_accents() {
 
 # ───────────── apply ─────────────
 
-# niri accent   → focus ring, fuzzel border
-# waybar accent → waybar, mako, swayosd, rofi powermenu, fuzzel selection,
-#                 vesktop, gtk apps
+# windows (niri)  → focus ring
+# bar (waybar)     → waybar, eww popups + osd, swayosd, vesktop, gtk apps
+# launcher         → fuzzel launcher + powermenu   (follows the bar if unset)
+# notifications    → mako                          (follows the bar if unset)
 apply_accents() {
   load_palette
-  local n w a f
+  local n w l m a f
   n=$(slot_hex "${NIRI_SLOT:-$DEFAULT_SLOT}")
   w=$(slot_hex "${WAYBAR_SLOT:-$DEFAULT_SLOT}")
+  l=$(slot_hex "${LAUNCH_SLOT:-${WAYBAR_SLOT:-$DEFAULT_SLOT}}")
+  m=$(slot_hex "${NOTIFY_SLOT:-${WAYBAR_SLOT:-$DEFAULT_SLOT}}")
   a=$(opacity_hex)
 
   cat >"$HOME/.config/niri/colors.kdl" <<EOF
@@ -322,9 +403,9 @@ background=${background:1}${a}
 text=${foreground:1}ff
 match=${color14:1}ff
 selection=${color8:1}55
-selection-text=${w:1}ff
+selection-text=${l:1}ff
 selection-match=${color1:1}ff
-border=${n:1}d9
+border=${l:1}d9
 EOF
 
   {
@@ -341,12 +422,8 @@ EOF
     transparent && printf '$bg: rgba($bg, %s);\n' "$(opacity_dec)" >>"$HOME/.config/eww/colors.scss"
   fi
 
-  printf 'border-color=%sFF\nprogress-color=over %sFF\nbackground-color=%s%s\n' "$w" "$w" "$background" "${a^^}" \
+  printf 'border-color=%sFF\nprogress-color=over %sFF\nbackground-color=%s%s\n' "$m" "$m" "$background" "${a^^}" \
     >"$HOME/.config/mako/accent.conf"
-
-  if [[ -f $ROFI_IN ]]; then
-    sed "s/ACCENT_PLACEHOLDER/$w/" "$ROFI_IN" >"$HOME/.config/rofi/powermenu.rasi"
-  fi
 
   # vesktop: accent of the bar instead of color4
   f="$HOME/.config/vesktop/themes/wallust.theme.css"
@@ -407,7 +484,17 @@ finish() {
   choose_accents
   apply_accents
   save_state
+  save_theme_accents
   reload_all
+}
+
+# after a theme was applied: reuse its saved accents, or ask for new ones
+finish_theme() {
+  if load_theme_accents "$1"; then
+    apply_accents; save_state; reload_all
+  else
+    finish
+  fi
 }
 
 apply_theme() {
@@ -611,6 +698,7 @@ cmd_tui() {
       {
         recent_themes
         printf '%s\n%s\n' "$ALL_LABEL" "$RANDOM_LABEL"
+        printf '%s\n' "$GROUPS_LABEL"
         transp_label
         blur_label
         night_label
@@ -631,6 +719,7 @@ cmd_tui() {
     [[ -z $name ]] && return 0
 
     # transparency / blur: change and stay in the picker
+    if [[ $name == "$GROUPS_LABEL" ]]; then pick_groups; continue; fi
     if [[ $name == "$TRANSP_PREFIX"* ]]; then pick_transparency; continue; fi
     if [[ $name == "$BLUR_PREFIX"* ]]; then pick_blur; continue; fi
     if [[ $name == "$NIGHT_PREFIX"* ]]; then pick_night; continue; fi
@@ -646,7 +735,7 @@ cmd_tui() {
       [[ -z $name ]] && return 0
     fi
 
-    apply_theme "$name" && finish
+    apply_theme "$name" && finish_theme "$name"
     return
   done
 }
@@ -655,12 +744,13 @@ case "${1:-}" in
   "")      cmd_open ;;
   tui)     cmd_tui ;;
   preview) cmd_preview "${2:-}" ;;
-  preset)  [[ -n ${2:-} ]] && apply_theme "$2" && finish ;;
+  preset)  [[ -n ${2:-} ]] && apply_theme "$2" && finish_theme "$2" ;;
+  groups)  pick_groups ;;
   accent)  finish ;;
   apply)   apply_accents; reload_all ;;
   transparency) set_transparency "${2:-cycle}" ;;
   blur)    set_blur "${2:-toggle}" ;;
   night)   set_night "${2:-}" ;;
   import)  cmd_import ;;
-  *)       sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+  *)       sed -n '3,16p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
 esac
