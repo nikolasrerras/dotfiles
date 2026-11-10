@@ -55,7 +55,6 @@ btop       = { template = "btop.theme",      target = "~/.config/btop/themes/wal
 gtk3       = { template = "gtk-colors.css",  target = "~/.config/gtk-3.0/colors.css" }
 gtk4       = { template = "gtk-colors.css",  target = "~/.config/gtk-4.0/colors.css" }
 zen        = { template = "zen-user.js",     target = "~/.config/zen/b9nox66o.Default (release)/user.js" }
-spicetify  = { template = "spicetify.ini",   target = "~/.config/spicetify/Themes/wallust/color.ini" }
 zathura    = { template = "zathura-colors",  target = "~/.config/zathura/colors" }
 imv        = { template = "imv.config",      target = "~/.config/imv/config" }
 mpv        = { template = "mpv-colors.conf", target = "~/.config/mpv/colors.conf" }

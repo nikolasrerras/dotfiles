@@ -232,7 +232,7 @@ cmd_preview() {
   if [[ $name == "$GROUPS_LABEL" ]]; then
     printf '\n  \e[1mAccent of each group\e[0m\n\n'
     printf '  windows        focus ring\n'
-    printf '  bar & popups   waybar, eww, osd, gtk, vesktop\n'
+    printf '  bar & popups   waybar, eww, osd, gtk\n'
     printf '  launcher       fuzzel, powermenu\n'
     printf '  notifications  mako\n\n'
     printf '  Remembered per theme.\n'
@@ -342,7 +342,7 @@ pick_groups() {
       for g in windows bar launcher notifications; do
         case $g in
           windows)       slot=$NIRI_SLOT;   desc="focus ring" ;;
-          bar)           slot=$WAYBAR_SLOT; desc="waybar, eww, osd, gtk, vesktop" ;;
+          bar)           slot=$WAYBAR_SLOT; desc="waybar, eww, osd, gtk" ;;
           launcher)      slot=$LAUNCH_SLOT; desc="fuzzel, powermenu" ;;
           notifications) slot=$NOTIFY_SLOT; desc="mako" ;;
         esac
@@ -376,7 +376,7 @@ choose_accents() {
 # ───────────── apply ─────────────
 
 # windows (niri)  → focus ring
-# bar (waybar)     → waybar, eww popups + osd, swayosd, vesktop, gtk apps
+# bar (waybar)     → waybar, eww popups + osd, swayosd, gtk apps
 # launcher         → fuzzel launcher + powermenu   (follows the bar if unset)
 # notifications    → mako                          (follows the bar if unset)
 apply_accents() {
@@ -425,10 +425,6 @@ EOF
   printf 'border-color=%sFF\nprogress-color=over %sFF\nbackground-color=%s%s\n' "$m" "$m" "$background" "${a^^}" \
     >"$HOME/.config/mako/accent.conf"
 
-  # vesktop: accent of the bar instead of color4
-  f="$HOME/.config/vesktop/themes/wallust.theme.css"
-  [[ -f $f ]] && sed -i "s/--wl-accent: #[0-9A-Fa-f]*;/--wl-accent: $w;/" "$f"
-
   # gtk3 / gtk4 apps: accent of the bar
   for f in "$HOME/.config/gtk-3.0/colors.css" "$HOME/.config/gtk-4.0/colors.css"; do
     [[ -f $f ]] && sed -i -E "s/^@define-color accent_(bg_)?color #[0-9A-Fa-f]+;/@define-color accent_\1color $w;/" "$f"
@@ -472,7 +468,6 @@ reload_all() {
   pkill -USR1 -x kitty                      # kitty reloads its config
   niri msg action load-config-file >/dev/null 2>&1
   pgrep -x eww >/dev/null && eww reload >/dev/null 2>&1
-  command -v spicetify >/dev/null && spicetify -q refresh -s -n >/dev/null 2>&1
   if pgrep -x swayosd-server >/dev/null; then
     pkill -x swayosd-server
     sleep 0.2
