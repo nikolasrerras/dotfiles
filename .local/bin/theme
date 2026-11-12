@@ -42,9 +42,10 @@ ACCENTS_DIR="$CFG/accents"           # accents remembered per theme
 
 mkdir -p "$CFG" "$STATE_DIR" "$PALETTE_DIR" "$ACCENTS_DIR"
 
-# accent groups: NIRI = windows (focus ring), WAYBAR = bar & popups (the main one),
-# LAUNCH = fuzzel + powermenu, NOTIFY = mako; empty LAUNCH / NOTIFY = follow the bar
-NIRI_SLOT="" WAYBAR_SLOT="" LAUNCH_SLOT="" NOTIFY_SLOT="" OPACITY=100 BLUR="off" NIGHT="off" EFFECTS=""
+# accent groups: NIRI = windows (focus ring), WAYBAR = the bar (the main one),
+# POPUP = eww popups + osd + gtk apps, LAUNCH = fuzzel + powermenu, NOTIFY = mako;
+# empty POPUP / LAUNCH / NOTIFY = follow the bar
+NIRI_SLOT="" WAYBAR_SLOT="" POPUP_SLOT="" LAUNCH_SLOT="" NOTIFY_SLOT="" OPACITY=100 BLUR="off" NIGHT="off" EFFECTS=""
 [[ -f $STATE ]] && source "$STATE"
 # older state files had a single on/off switch
 if [[ $EFFECTS == on && $OPACITY == 100 ]]; then OPACITY=85 BLUR=wallpaper; fi
@@ -58,6 +59,7 @@ save_state() {
   {
     printf 'NIRI_SLOT=%q\n' "$NIRI_SLOT"
     printf 'WAYBAR_SLOT=%q\n' "$WAYBAR_SLOT"
+    printf 'POPUP_SLOT=%q\n' "$POPUP_SLOT"
     printf 'LAUNCH_SLOT=%q\n' "$LAUNCH_SLOT"
     printf 'NOTIFY_SLOT=%q\n' "$NOTIFY_SLOT"
     printf 'OPACITY=%q\n' "$OPACITY"
@@ -73,15 +75,15 @@ current_theme() { cat "$STATE_DIR/current" 2>/dev/null; }
 save_theme_accents() {
   local name; name=$(current_theme)
   [[ -z $name || $name == "$RANDOM_LABEL" ]] && return
-  printf 'NIRI_SLOT=%q\nWAYBAR_SLOT=%q\nLAUNCH_SLOT=%q\nNOTIFY_SLOT=%q\n' \
-    "$NIRI_SLOT" "$WAYBAR_SLOT" "$LAUNCH_SLOT" "$NOTIFY_SLOT" >"$(theme_file "$name")"
+  printf 'NIRI_SLOT=%q\nWAYBAR_SLOT=%q\nPOPUP_SLOT=%q\nLAUNCH_SLOT=%q\nNOTIFY_SLOT=%q\n' \
+    "$NIRI_SLOT" "$WAYBAR_SLOT" "$POPUP_SLOT" "$LAUNCH_SLOT" "$NOTIFY_SLOT" >"$(theme_file "$name")"
 }
 
 # returns 1 if this theme has no saved accents yet
 load_theme_accents() {
   local f; f=$(theme_file "$1")
   [[ -f $f ]] || return 1
-  LAUNCH_SLOT="" NOTIFY_SLOT=""
+  POPUP_SLOT="" LAUNCH_SLOT="" NOTIFY_SLOT=""
   source "$f"
 }
 
@@ -232,7 +234,8 @@ cmd_preview() {
   if [[ $name == "$GROUPS_LABEL" ]]; then
     printf '\n  \e[1mAccent of each group\e[0m\n\n'
     printf '  windows        focus ring\n'
-    printf '  bar & popups   waybar, eww, osd, gtk\n'
+    printf '  bar            waybar\n'
+    printf '  popups         eww, osd, gtk\n'
     printf '  launcher       fuzzel, powermenu\n'
     printf '  notifications  mako\n\n'
     printf '  Remembered per theme.\n'
@@ -339,14 +342,15 @@ pick_groups() {
   while true; do
     load_palette
     choice=$(
-      for g in windows bar launcher notifications; do
+      for g in windows bar popups launcher notifications; do
         case $g in
           windows)       slot=$NIRI_SLOT;   desc="focus ring" ;;
-          bar)           slot=$WAYBAR_SLOT; desc="waybar, eww, osd, gtk" ;;
+          bar)           slot=$WAYBAR_SLOT; desc="waybar" ;;
+          popups)        slot=$POPUP_SLOT;  desc="eww, osd, gtk" ;;
           launcher)      slot=$LAUNCH_SLOT; desc="fuzzel, powermenu" ;;
           notifications) slot=$NOTIFY_SLOT; desc="mako" ;;
         esac
-        if [[ -z $slot && ( $g == launcher || $g == notifications ) ]]; then
+        if [[ -z $slot && $g != windows && $g != bar ]]; then
           hex=$(slot_hex "${WAYBAR_SLOT:-$DEFAULT_SLOT}")
           printf '%s████%s  %-14s %-13s %s\n' "$(fg "$hex")" "$RST" "$g" "follows bar" "$desc"
         else
@@ -356,7 +360,8 @@ pick_groups() {
       done | picker --prompt="Accents ~> " --header="enter: change · esc: back"
     ) || return 0
     case $choice in
-      # launcher / notifications first: their lines may say "follows bar"
+      # popups / launcher / notifications first: their lines may say "follows bar"
+      *popups*)        line=$(pick_slot "Popups accent" "$POPUP_SLOT" follow); [[ $line == follow ]] && POPUP_SLOT="" || POPUP_SLOT=$line ;;
       *launcher*)      line=$(pick_slot "Launcher accent" "$LAUNCH_SLOT" follow); [[ $line == follow ]] && LAUNCH_SLOT="" || LAUNCH_SLOT=$line ;;
       *notifications*) line=$(pick_slot "Notifications accent" "$NOTIFY_SLOT" follow); [[ $line == follow ]] && NOTIFY_SLOT="" || NOTIFY_SLOT=$line ;;
       *windows*)       NIRI_SLOT=$(pick_slot "Windows accent" "$NIRI_SLOT") ;;
@@ -376,14 +381,16 @@ choose_accents() {
 # ───────────── apply ─────────────
 
 # windows (niri)  → focus ring
-# bar (waybar)     → waybar, eww popups + osd, swayosd, gtk apps
+# bar (waybar)     → waybar, swayosd
+# popups           → eww popups + osd, gtk apps    (follows the bar if unset)
 # launcher         → fuzzel launcher + powermenu   (follows the bar if unset)
 # notifications    → mako                          (follows the bar if unset)
 apply_accents() {
   load_palette
-  local n w l m a f
+  local n w p l m a f
   n=$(slot_hex "${NIRI_SLOT:-$DEFAULT_SLOT}")
   w=$(slot_hex "${WAYBAR_SLOT:-$DEFAULT_SLOT}")
+  p=$(slot_hex "${POPUP_SLOT:-${WAYBAR_SLOT:-$DEFAULT_SLOT}}")
   l=$(slot_hex "${LAUNCH_SLOT:-${WAYBAR_SLOT:-$DEFAULT_SLOT}}")
   m=$(slot_hex "${NOTIFY_SLOT:-${WAYBAR_SLOT:-$DEFAULT_SLOT}}")
   a=$(opacity_hex)
@@ -419,15 +426,17 @@ EOF
 
   if [[ -x $HOME/.config/eww/scripts/colors.sh ]]; then
     "$HOME/.config/eww/scripts/colors.sh"
+    # colors.sh takes the accent of the bar; the popups group may have its own
+    sed -i "s/^\$accent: .*/\$accent: $p;/" "$HOME/.config/eww/colors.scss"
     transparent && printf '$bg: rgba($bg, %s);\n' "$(opacity_dec)" >>"$HOME/.config/eww/colors.scss"
   fi
 
   printf 'border-color=%sFF\nprogress-color=over %sFF\nbackground-color=%s%s\n' "$m" "$m" "$background" "${a^^}" \
     >"$HOME/.config/mako/accent.conf"
 
-  # gtk3 / gtk4 apps: accent of the bar
+  # gtk3 / gtk4 apps: accent of the popups group
   for f in "$HOME/.config/gtk-3.0/colors.css" "$HOME/.config/gtk-4.0/colors.css"; do
-    [[ -f $f ]] && sed -i -E "s/^@define-color accent_(bg_)?color #[0-9A-Fa-f]+;/@define-color accent_\1color $w;/" "$f"
+    [[ -f $f ]] && sed -i -E "s/^@define-color accent_(bg_)?color #[0-9A-Fa-f]+;/@define-color accent_\1color $p;/" "$f"
   done
 
   apply_effects

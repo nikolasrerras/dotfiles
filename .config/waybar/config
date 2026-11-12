@@ -10,7 +10,9 @@
     "clock"
   ],
   "modules-right": [
-    "group/tray",
+    "custom/tray-l",
+    "tray",
+    "custom/tray-r",
     "niri/language",
     "custom/cpu",
     "memory",
@@ -146,24 +148,6 @@
   },
   "custom/tray-r": {
     "format": "<span alpha=\"55%\">]</span>",
-    "tooltip": false
-  },
-  "group/tray": {
-    "orientation": "inherit",
-    "drawer": {
-      "transition-duration": 300,
-      "click-to-reveal": true,
-      "transition-left-to-right": false
-    },
-    "modules": [
-      "custom/tray-toggle",
-      "custom/tray-l",
-      "tray",
-      "custom/tray-r"
-    ]
-  },
-  "custom/tray-toggle": {
-    "format": "<span alpha=\"55%\">[</span>&lt;<span alpha=\"55%\">]</span>",
     "tooltip": false
   }
 }

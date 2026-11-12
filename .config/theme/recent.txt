@@ -1,4 +1,5 @@
 Kanagawa-Wave
+Kanagawa-Dragon
 Dark-Pastel
 Gruvbox-Dark
 base16-grayscale-dark
@@ -7,4 +8,3 @@ base16-gruvbox-soft-light
 Bim
 Nord
 0x96f
-Tokyo-Night

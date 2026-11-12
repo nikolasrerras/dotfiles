@@ -18,7 +18,6 @@
 window#waybar {
     background-color: @bar_bg;
     color: @foreground;
-    border-bottom: 1px solid @color8;
 }
 
 button,
@@ -57,7 +56,6 @@ tooltip label {
 }
 
 /* ── right: text modules separated by │ ── */
-#custom-tray-toggle,
 #language,
 #custom-cpu,
 #memory,
@@ -70,11 +68,9 @@ tooltip label {
     color: @foreground;
 }
 
-#custom-tray-toggle {
-    color: @color8;
-}
 
-#custom-tray-toggle:hover,
+#custom-tray-l:hover,
+#custom-tray-r:hover,
 #custom-cpu:hover,
 #memory:hover,
 #custom-gpu:hover,
@@ -101,7 +97,6 @@ tooltip label {
 
 /* power drawer */
 #custom-power {
-    color: @accent;
 }
 #custom-quit,
 #custom-suspend,
@@ -138,7 +133,7 @@ tooltip label {
     color: @color8;
 }
 #workspaces button:hover {
-    color: @foreground;
+    color: @accent;
 }
 #workspaces button.active,
 #workspaces button.focused {
@@ -152,4 +147,15 @@ tooltip label {
 
 #workspaces button label {
     font-size: 14px;
+}
+
+/* custom modules: waybar 0.16 no longer sets :hover on them, so use their container */
+*:hover > #custom-music,
+*:hover > #custom-tray-l,
+*:hover > #custom-tray-r,
+*:hover > #custom-cpu,
+*:hover > #custom-gpu,
+*:hover > #custom-wifi,
+*:hover > #custom-power {
+    color: @accent;
 }
