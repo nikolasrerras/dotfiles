@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily AK820 clock sync
+
+[Timer]
+OnStartupSec=2min
+OnCalendar=daily
+Persistent=true
+
+[Install]
+WantedBy=timers.target

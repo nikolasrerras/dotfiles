@@ -1,0 +1,6 @@
+[Unit]
+Description=Sync AK820 keyboard clock (sandboxed)
+
+[Service]
+Type=oneshot
+ExecStart=-%h/.local/bin/ak820-sandbox time
