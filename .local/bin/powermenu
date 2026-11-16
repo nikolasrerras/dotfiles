@@ -2,7 +2,7 @@
 
 options="󰗼  logout\n󰤄  suspend\n󰜉  restart\n  shutdown"
 
-chosen=$(echo -e "$options" | fuzzel --dmenu --prompt "~/power ❯ " --lines 4 --width 34 --line-height 30 2>/dev/null)
+chosen=$(echo -e "$options" | fuzzel --config /home/nikolas/.config/fuzzel/power.ini --dmenu --prompt "~/power ❯ " --lines 4 --width 34 --line-height 30 2>/dev/null)
 
 case "$chosen" in
 *logout) { pgrep -x mango >/dev/null && mmsg -q || niri msg action quit; } >/dev/null 2>&1 ;;
