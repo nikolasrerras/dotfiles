@@ -8,14 +8,14 @@ copy-command = "wl-copy"
 output-filename = "~/Pictures/Screenshots/satty-%Y-%m-%d_%H-%M-%S.png"
 
 [font]
-family = "JetBrainsMono Nerd Font"
+family = "DepartureMono Nerd Font"
 
 [color-palette]
 palette = [
-    "#C34043",
-    "#C0A36E",
-    "#76946A",
-    "#7E9CD8",
-    "#957FB8",
-    "#DCD7BA",
+    "#C26265",
+    "#AD9B49",
+    "#52AA60",
+    "#487FD4",
+    "#AF5BD1",
+    "#B4BCCA",
 ]

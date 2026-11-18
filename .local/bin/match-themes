@@ -1,0 +1,137 @@
+#!/usr/bin/env python3
+# match-themes — rank the themes of the theme picker by how well they fit a wallpaper.
+#
+#   match-themes                 rank against the wallpaper on screen now (awww / swww)
+#   match-themes <image>         rank against another image
+#   match-themes --names [...]   print only the theme names (used by `theme`)
+#   match-themes --top N [...]   how many to show (default 12)
+#
+# The wallpaper's colours come from wallust (the same tool the theme picker uses), and
+# every theme is scored by how close its background is to the wallpaper's background
+# and how many of the wallpaper's colours it has. Nothing is applied: it only ranks.
+#
+# Uses the same theme list and palette cache as ~/.local/bin/theme:
+#   built-in wallust themes  -> ~/.cache/theme/all-themes.txt
+#   imported / custom themes -> ~/.config/theme/colorschemes/**/*.json
+#   palettes                 -> ~/.cache/theme/palettes/<name>.sh (created if missing)
+
+import json, re, subprocess, sys, tempfile
+from pathlib import Path
+
+HOME = Path.home()
+STATE_DIR = HOME / ".cache/theme"
+PALETTE_DIR = STATE_DIR / "palettes"
+SCHEMES = HOME / ".config/theme/colorschemes"
+
+PALETTE_TEMPLATE = ("background='{{background}}'\nforeground='{{foreground}}'\n"
+                    + "".join(f"color{i}='{{{{color{i}}}}}'\n" for i in range(16)))
+
+def rgb(h):
+    h = h.lstrip("#")[:6]
+    return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
+
+def dist(a, b):
+    # "redmean" colour distance: cheap and closer to perception than plain RGB
+    (r1, g1, b1), (r2, g2, b2) = rgb(a), rgb(b)
+    rm = (r1 + r2) / 2
+    return ((2 + rm / 256) * (r1 - r2) ** 2 + 4 * (g1 - g2) ** 2 + (2 + (255 - rm) / 256) * (b1 - b2) ** 2) ** 0.5
+
+def read_palette(text):
+    pal = dict(re.findall(r"^(\w+)='(#[0-9A-Fa-f]{6})", text, re.M))
+    return pal if "background" in pal else None
+
+def run_wallust(args):
+    """Run wallust with a throw-away config that only writes a palette; return it."""
+    with tempfile.TemporaryDirectory() as tmp:
+        t = Path(tmp)
+        (t / "templates").mkdir()
+        (t / "templates/palette.sh").write_text(PALETTE_TEMPLATE)
+        (t / "wallust.toml").write_text(
+            f"[templates]\npalette = {{ template = 'palette.sh', target = '{t}/out.sh' }}\n")
+        subprocess.run(["wallust", *args, "-q", "-s", "-d", tmp],
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        out = t / "out.sh"
+        return out.read_text() if out.exists() else None
+
+def current_wallpaper():
+    for tool in ("awww", "swww"):
+        try:
+            out = subprocess.run([tool, "query"], capture_output=True, text=True).stdout
+        except FileNotFoundError:
+            continue
+        m = re.search(r"image: (.+)$", out, re.M)
+        if m:
+            return m.group(1).strip()
+    return None
+
+def builtin_themes():
+    cache = STATE_DIR / "all-themes.txt"
+    if not cache.exists():
+        sys.exit("No theme list yet: open the theme picker once, then run this again.")
+    return [l.strip() for l in cache.read_text().splitlines() if l.strip()]
+
+def builtin_palette(name):
+    out = PALETTE_DIR / f"{name}.sh"
+    if not out.exists():
+        text = run_wallust(["theme", name])
+        if not text:
+            return None
+        PALETTE_DIR.mkdir(parents=True, exist_ok=True)
+        out.write_text(text)
+    return read_palette(out.read_text())
+
+def json_palette(path):
+    try:
+        d = json.loads(path.read_text())
+        pal = {"background": d["special"]["background"], "foreground": d["special"]["foreground"]}
+        pal.update(d["colors"])
+        return pal
+    except Exception:
+        return None
+
+def score(pal, target):
+    theme_colours = [pal[f"color{i}"] for i in range(1, 16) if f"color{i}" in pal]
+    wall_colours = [target[f"color{i}"] for i in range(1, 7) if f"color{i}" in target]
+    bg = dist(pal["background"], target["background"])
+    hues = sum(min(dist(w, c) for c in theme_colours) for w in wall_colours) / len(wall_colours)
+    return bg + hues
+
+def main():
+    args = sys.argv[1:]
+    names_only = "--names" in args
+    top = 12
+    if "--top" in args:
+        top = int(args[args.index("--top") + 1])
+    rest = [a for i, a in enumerate(args)
+            if a not in ("--names", "--top") and (i == 0 or args[i - 1] != "--top")]
+
+    image = rest[0] if rest else current_wallpaper()
+    if not image or not Path(image).exists():
+        sys.exit("No wallpaper found: pass an image, e.g. match-themes ~/Pictures/wall.jpg")
+    wall_text = run_wallust(["run", image])
+    target = read_palette(wall_text or "")
+    if not target:
+        sys.exit(f"wallust could not read colours from {image}")
+
+    themes = [(n, lambda n=n: builtin_palette(n)) for n in builtin_themes()]
+    themes += [(p.stem, lambda p=p: json_palette(p)) for p in SCHEMES.glob("**/*.json")]
+
+    results = []
+    for i, (name, get) in enumerate(themes, 1):
+        print(f"\rmatching {i}/{len(themes)}", end="", file=sys.stderr)
+        pal = get()
+        if pal:
+            results.append((score(pal, target), name, pal["background"]))
+    print("\r" + " " * 30 + "\r", end="", file=sys.stderr)
+
+    best = sorted(results)[:top]
+    if names_only:
+        for _, name, _ in best:
+            print(name)
+        return
+    print(f"wallpaper: {image}\nits background: {target['background']}\n")
+    print(f"{'theme':<34} background")
+    for _, name, bg in best:
+        print(f"{name:<34} {bg}")
+
+main()

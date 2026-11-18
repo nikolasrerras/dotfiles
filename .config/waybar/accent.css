@@ -1,2 +1,2 @@
-@define-color accent #C0A36E;
-@define-color bar_bg @background;
+@define-color accent #269D9A;
+@define-color bar_bg alpha(@background, 0.95);

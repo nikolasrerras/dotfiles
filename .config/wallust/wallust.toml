@@ -58,6 +58,7 @@ zen        = { template = "zen-user.js",     target = "~/.config/zen/b9nox66o.De
 zathura    = { template = "zathura-colors",  target = "~/.config/zathura/colors" }
 imv        = { template = "imv.config",      target = "~/.config/imv/config" }
 mpv        = { template = "mpv-colors.conf", target = "~/.config/mpv/colors.conf" }
+zed        = { template = "zed.json",        target = "~/.config/zed/themes/wallust.json" }
 
 [hooks]
 # Run commands when wallust is invoked. Useful to avoid scripting.

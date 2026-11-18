@@ -1,4 +1,4 @@
-font=JetBrainsMono Nerd Font 11
+font=DepartureMono Nerd Font 11
 
 width=420
 height=160
@@ -8,7 +8,7 @@ outer-margin=8,8,0,0
 margin=0,0,8,0
 padding=10,14
 border-size=2
-border-radius=4
+border-radius=0
 
 icons=1
 max-icon-size=42

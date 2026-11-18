@@ -320,7 +320,7 @@ window-rule {
 // (This example rule is commented out with a "/-" in front.)
 
 window-rule {
-    geometry-corner-radius 4
+    geometry-corner-radius 0
     clip-to-geometry true
 }
 
@@ -384,6 +384,7 @@ binds {
     Mod+O repeat=false { toggle-overview; }
 
     Mod+Q repeat=false { close-window; }
+    Mod+semicolon repeat=false { close-window; }
 
     Mod+Left  { focus-column-left; }
     Mod+Down  { focus-window-down; }

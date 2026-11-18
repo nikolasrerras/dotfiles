@@ -3,10 +3,10 @@
   "position": "top",
   "height": 30,
   "modules-left": [
-    "niri/workspaces",
-    "custom/music"
+    "niri/workspaces"
   ],
   "modules-center": [
+    "custom/music",
     "clock"
   ],
   "modules-right": [
@@ -14,9 +14,6 @@
     "tray",
     "custom/tray-r",
     "niri/language",
-    "custom/cpu",
-    "memory",
-    "custom/gpu",
     "bluetooth",
     "pulseaudio",
     "custom/wifi",
@@ -27,8 +24,7 @@
     "all-outputs": false
   },
   "custom/music": {
-    "exec": "/home/nikolas/.config/waybar/scripts/music.sh",
-    "interval": 1,
+    "exec": "/home/nikolas/.config/waybar/scripts/music-scroll.sh",
     "format": "<span alpha=\"55%\">[</span>{}<span alpha=\"55%\">]</span>",
     "hide-empty-text": true,
     "escape": true,
@@ -39,7 +35,7 @@
     "on-scroll-down": "playerctl previous"
   },
   "clock": {
-    "format": "{:%a %d %b  %H:%M}",
+    "format": "{:%H:%M}",
     "format-alt": "{:%A %d %B %Y, %H:%M:%S}",
     "interval": 1,
     "on-click-right": "/home/nikolas/.config/eww/scripts/popup.sh calendar",
@@ -80,22 +76,24 @@
     },
     "tooltip": true,
     "tooltip-format": "{volume}%",
-    "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 wiremix > /dev/null 2>&1",
+    "on-click": "/home/nikolas/.config/eww/scripts/popup.sh audio",
     "on-scroll-up": "/home/nikolas/.config/eww/scripts/volume.sh up",
     "on-scroll-down": "/home/nikolas/.config/eww/scripts/volume.sh down",
-    "on-click-right": "/home/nikolas/.config/eww/scripts/volume.sh mute"
+    "on-click-right": "/home/nikolas/.config/eww/scripts/volume.sh mute",
+    "on-click-middle": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 wiremix > /dev/null 2>&1"
   },
   "bluetooth": {
     "format": "<span alpha=\"55%\">[</span><span alpha=\"55%\">󰂯</span> on<span alpha=\"55%\">]</span>",
     "format-disabled": "<span alpha=\"55%\">[</span><span alpha=\"55%\">󰂲</span> off<span alpha=\"55%\">]</span>",
     "format-connected": "<span alpha=\"55%\">[</span><span alpha=\"55%\">󰂱</span> {device_alias}<span alpha=\"55%\">]</span>",
     "tooltip-format": "Bluetooth: {status}",
-    "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 bluetui > /dev/null 2>&1",
+    "on-click": "/home/nikolas/.config/eww/scripts/popup.sh bluetooth",
     "format-off": "<span alpha=\"55%\">[</span><span alpha=\"55%\">󰂲</span> off<span alpha=\"55%\">]</span>",
     "format-connected-battery": "<span alpha=\"55%\">[</span><span alpha=\"55%\">󰂱</span> {device_alias} {device_battery_percentage}%<span alpha=\"55%\">]</span>",
     "tooltip-format-connected": "{controller_alias}\n\n{device_enumerate}",
     "tooltip-format-enumerate-connected": "{device_alias}",
-    "tooltip-format-enumerate-connected-battery": "{device_alias}  {device_battery_percentage}%"
+    "tooltip-format-enumerate-connected-battery": "{device_alias}  {device_battery_percentage}%",
+    "on-click-middle": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 bluetui > /dev/null 2>&1"
   },
   "memory": {
     "interval": 2,
@@ -140,7 +138,8 @@
       "󰤨"
     ],
     "tooltip": true,
-    "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 impala > /dev/null 2>&1"
+    "on-click": "/home/nikolas/.config/eww/scripts/popup.sh wifi",
+    "on-click-middle": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 impala > /dev/null 2>&1"
   },
   "custom/tray-l": {
     "format": "<span alpha=\"55%\">[</span>",

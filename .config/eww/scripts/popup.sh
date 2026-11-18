@@ -14,6 +14,9 @@ case $win in
   system)   eww update sys_text="$("$dir/sys.sh")" ;;
   power)    eww update power_confirm="" \
               power_uptime="$(awk '{ s = int($1); printf "%dh %dm", s / 3600, (s % 3600) / 60 }' /proc/uptime)" ;;
+  audio)    eww update audio="$("$dir/audio.sh")" ;;
+  wifi)     eww update wifi="$("$dir/wifi.sh")"; setsid -f "$dir/wifi.sh" scan >/dev/null 2>&1 ;;
+  bluetooth) eww update bluetooth="$("$dir/bluetooth.sh")" ;;
 esac
 
 out=$(niri msg -j focused-output 2>/dev/null | jq -r .model)

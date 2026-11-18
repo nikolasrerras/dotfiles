@@ -50,7 +50,7 @@
 
 (defwindow media
   :monitor 0
-  :geometry (geometry :x "70px" :y "6px" :width "420px" :anchor "top left")
+  :geometry (geometry :x "-120px" :y "6px" :width "420px" :anchor "top center")
   :stacking "overlay"
   :exclusive false
   :focusable false
@@ -152,3 +152,125 @@
   (eventbox :onhover "eww update power_inside=true"
             :onhoverlost "setsid -f ~/.config/eww/scripts/close-later.sh power"
     (power-popup)))
+
+;; ─────────────────────────────────────────────
+;;  Audio popup (scripts/popup.sh audio)
+;; ─────────────────────────────────────────────
+(defvar audio_inside false)
+(defvar audio_token "0")
+(defvar audio '{"vol":0,"muted":false,"mic":0,"mic_muted":false,"sinks":[]}')
+
+(defwidget audio-row [key value muted onchange onmute icon]
+  (box :class "audio-row" :orientation "h" :space-evenly false :spacing 10
+    (label :class "key" :xalign 0 :text key)
+    (scale :class "slider" :hexpand true :min 0 :max 101 :value value :onchange onchange)
+    (label :class "val" :width 40 :xalign 1 :text {muted ? "mute" : "${value}%"})
+    (button :class {muted ? "btn active" : "btn"} :onclick onmute icon)))
+
+(defwidget audio-popup []
+  (box :class "player" :orientation "v" :space-evenly false
+    (label :class "prompt" :xalign 0
+           :text "~/audio ❯ ${audio.muted ? 'muted' : audio.vol + '%'}")
+    (box :class "audio-levels" :orientation "v" :space-evenly false :spacing 6
+      (audio-row :key "out" :value {audio.vol} :muted {audio.muted}
+                 :onchange "setsid -f ~/.config/eww/scripts/audio.sh set {}"
+                 :onmute "setsid -f ~/.config/eww/scripts/audio.sh mute"
+                 :icon {audio.muted ? "[󰝟]" : "[󰕾]"})
+      (audio-row :key "mic" :value {audio.mic} :muted {audio.mic_muted}
+                 :onchange "setsid -f ~/.config/eww/scripts/audio.sh mic {}"
+                 :onmute "setsid -f ~/.config/eww/scripts/audio.sh mic-mute"
+                 :icon {audio.mic_muted ? "[󰍭]" : "[󰍬]"}))
+    (label :class "key audio-title" :xalign 0 :text "output")
+    (box :orientation "v" :space-evenly false
+      (for s in {audio.sinks}
+        (button :class {s.default ? "btn active" : "btn"}
+                :onclick "setsid -f ~/.config/eww/scripts/audio.sh sink ${s.name}"
+          (label :xalign 0 :limit-width 42 :text "${s.default ? '●' : '○'} ${s.desc}"))))
+    (box :class "controls" :orientation "h" :space-evenly true
+      (button :class "btn"
+              :onclick "eww close audio; setsid -f kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 wiremix >/dev/null 2>&1"
+              "[mixer]"))))
+
+(defwindow audio
+  :monitor 0
+  :geometry (geometry :x "6px" :y "6px" :width "400px" :anchor "top right")
+  :stacking "overlay" :exclusive false :focusable false
+  (eventbox :onhover "eww update audio_inside=true"
+            :onhoverlost "setsid -f ~/.config/eww/scripts/close-later.sh audio"
+    (audio-popup)))
+
+;; ─────────────────────────────────────────────
+;;  Wifi popup (scripts/popup.sh wifi)
+;; ─────────────────────────────────────────────
+(defvar wifi_inside false)
+(defvar wifi_token "0")
+(defvar wifi '{"powered":false,"state":"off","ssid":"","ip":"","networks":[]}')
+
+(defwidget wifi-popup []
+  (box :class "player" :orientation "v" :space-evenly false
+    (label :class "prompt" :xalign 0
+           :text "~/wifi ❯ ${!wifi.powered ? 'off' : (wifi.ssid != '' ? wifi.ssid : wifi.state)}")
+    (box :class "wifi-info" :orientation "v" :space-evenly false :visible {wifi.ssid != ""}
+      (row :key "ip     " :value {wifi.ip != "" ? wifi.ip : "-"}))
+    (label :class "key wifi-title" :xalign 0 :visible {wifi.powered} :text "networks")
+    (box :orientation "v" :space-evenly false :visible {wifi.powered}
+      (for n in {wifi.networks}
+        (button :class {n.connected ? "btn active" : "btn"}
+                :onclick "setsid -f ~/.config/eww/scripts/wifi.sh connect ${n.b64}"
+          (label :xalign 0 :limit-width 40
+                 :text "${n.icon} ${n.name}${n.secure && !n.known ? '  󰌾' : ''}"))))
+    (box :class "controls" :orientation "h" :space-evenly false :spacing 14 :halign "center"
+      (button :class "btn" :onclick "setsid -f ~/.config/eww/scripts/wifi.sh scan" "[scan]")
+      (button :class {wifi.powered ? "btn" : "btn active"}
+              :onclick "setsid -f ~/.config/eww/scripts/wifi.sh power"
+              {wifi.powered ? "[off]" : "[on]"})
+      (button :class "btn" :visible {wifi.ssid != ""}
+              :onclick "setsid -f ~/.config/eww/scripts/wifi.sh disconnect" "[disconnect]")
+      (button :class "btn"
+              :onclick "eww close wifi; setsid -f kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 impala >/dev/null 2>&1"
+              "[impala]"))))
+
+(defwindow wifi
+  :monitor 0
+  :geometry (geometry :x "6px" :y "6px" :width "440px" :anchor "top right")
+  :stacking "overlay" :exclusive false :focusable false
+  (eventbox :onhover "eww update wifi_inside=true"
+            :onhoverlost "setsid -f ~/.config/eww/scripts/close-later.sh wifi"
+    (wifi-popup)))
+
+;; ─────────────────────────────────────────────
+;;  Bluetooth popup (scripts/popup.sh bluetooth)
+;; ─────────────────────────────────────────────
+(defvar bluetooth_inside false)
+(defvar bluetooth_token "0")
+(defvar bluetooth '{"powered":false,"connected":0,"devices":[]}')
+
+(defwidget bluetooth-popup []
+  (box :class "player" :orientation "v" :space-evenly false
+    (label :class "prompt" :xalign 0
+           :text "~/bluetooth ❯ ${bluetooth.powered ? 'on' : 'off'}")
+    (label :class "key bt-title" :xalign 0 :visible {bluetooth.powered}
+           :text {arraylength(bluetooth.devices) > 0 ? "devices" : "no paired devices"})
+    (box :orientation "v" :space-evenly false :visible {bluetooth.powered}
+      (for d in {bluetooth.devices}
+        (button :class {d.connected ? "btn active" : "btn"}
+                :onclick "setsid -f ~/.config/eww/scripts/bluetooth.sh toggle ${d.mac}"
+          (label :xalign 0 :limit-width 40
+                 :text "${d.icon} ${d.name}${d.battery != '' ? '  ' + d.battery + '%' : ''}"))))
+    (box :class "controls" :orientation "h" :space-evenly false :spacing 14 :halign "center"
+      (button :class {bluetooth.powered ? "btn" : "btn active"}
+              :onclick "setsid -f ~/.config/eww/scripts/bluetooth.sh power"
+              {bluetooth.powered ? "[off]" : "[on]"})
+      (button :class "btn" :visible {bluetooth.connected > 0}
+              :onclick "setsid -f ~/.config/eww/scripts/bluetooth.sh disconnect" "[disconnect]")
+      (button :class "btn"
+              :onclick "eww close bluetooth; setsid -f kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 bluetui >/dev/null 2>&1"
+              "[bluetui]"))))
+
+(defwindow bluetooth
+  :monitor 0
+  :geometry (geometry :x "6px" :y "6px" :width "380px" :anchor "top right")
+  :stacking "overlay" :exclusive false :focusable false
+  (eventbox :onhover "eww update bluetooth_inside=true"
+            :onhoverlost "setsid -f ~/.config/eww/scripts/close-later.sh bluetooth"
+    (bluetooth-popup)))
