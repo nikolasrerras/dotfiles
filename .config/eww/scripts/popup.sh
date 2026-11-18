@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # Toggle an eww popup on the focused monitor:  popup.sh <window>
-# Closes by itself 1 s after the pointer leaves it (or if it is never entered).
+# Closes on a second click on its module, or on a click outside it (backdrop window).
 win=${1:-media}
 dir="$HOME/.config/eww/scripts"
+if [[ $win == close ]]; then for w in $(eww active-windows | cut -d: -f1); do [[ $w == osd ]] || eww close "$w"; done; exit 0; fi  # close every popup (used by the backdrop)
 
 if eww active-windows | grep -q "^$win"; then
-  eww close "$win"
+  eww close "$win" backdrop
   exit 0
 fi
 
@@ -19,6 +20,7 @@ case $win in
   bluetooth) eww update bluetooth="$("$dir/bluetooth.sh")" ;;
 esac
 
+for w in $(eww active-windows | cut -d: -f1); do [[ $w == osd ]] || eww close "$w"; done  # one popup at a time
 out=$(niri msg -j focused-output 2>/dev/null | jq -r .model)
 eww open "$win" --screen "$out"
-setsid -f "$dir/close-later.sh" "$win" >/dev/null 2>&1
+eww open backdrop --screen "$out"  # transparent layer behind the popup: a click outside closes it

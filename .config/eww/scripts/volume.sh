@@ -10,6 +10,8 @@ case "$1" in
   down) wpctl set-volume "$sink" "${step}%-" ;;
   mute) wpctl set-mute "$sink" toggle ;;
 esac
+[[ $1 == show ]] || exit 0  # the OSD itself is shown by volume-osd.sh, which listens for every volume change
+eww active-windows | grep -q "^audio" && exit 0  # the audio popup already shows the volume
 
 # "Volume: 0.60" or "Volume: 0.60 [MUTED]"
 read -r _ vol muted < <(wpctl get-volume "$sink")

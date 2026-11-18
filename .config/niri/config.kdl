@@ -656,3 +656,9 @@ window-rule {
     draw-border-with-background false
 }
 
+
+// keyboard layout OSD (eww)
+spawn-at-startup "/home/nikolas/.config/eww/scripts/lang-osd.sh"
+
+// volume OSD on every volume change (eww)
+spawn-at-startup "/home/nikolas/.config/eww/scripts/volume-osd.sh"

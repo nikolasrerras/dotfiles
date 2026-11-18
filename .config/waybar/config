@@ -78,7 +78,8 @@
     "on-scroll-up": "/home/nikolas/.config/eww/scripts/volume.sh up",
     "on-scroll-down": "/home/nikolas/.config/eww/scripts/volume.sh down",
     "on-click-right": "/home/nikolas/.config/eww/scripts/volume.sh mute",
-    "on-click-middle": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 wiremix > /dev/null 2>&1"
+    "on-click-middle": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 wiremix > /dev/null 2>&1",
+    "scroll-step": 5
   },
   "bluetooth": {
     "format": "<span alpha=\"55%\">󰂯</span> on",

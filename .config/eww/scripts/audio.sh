@@ -36,9 +36,11 @@ state() {
 
 refresh() { $EWW update audio="$(state)"; }
 
+exec 9>/tmp/eww-audio.lock; flock 9
 case "${1:-}" in
   "")       state ;;
   set)      wpctl set-volume -l 1.0 "$sink" "${2%.*}%"; refresh ;;
+  step)     t=$sink; [ "$2" = mic ] && t=$source; d=+; [ "$3" = down ] && d=-; wpctl set-volume -l 1.0 "$t" "5%$d"; refresh ;;
   mute)     wpctl set-mute "$sink" toggle; refresh ;;
   mic)      wpctl set-volume -l 1.0 "$source" "${2%.*}%"; refresh ;;
   mic-mute) wpctl set-mute "$source" toggle; refresh ;;

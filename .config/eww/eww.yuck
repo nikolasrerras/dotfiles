@@ -7,8 +7,8 @@
   :initial '{"status":"Stopped","title":"","artist":"","album":"","art":"","length":0}'
   "~/.config/eww/scripts/media.sh")
 
-(defpoll bar :interval "1s" :initial "00:00 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 00:00"
-  "~/.config/eww/scripts/bar.sh 30")
+(defpoll progress :interval "1s" :initial '{"pos":"00:00","len":"00:00","lensec":0,"filled":0}'
+  "~/.config/eww/scripts/bar.sh")
 (defpoll loop :interval "1s" :initial "None"
   "playerctl loop 2>/dev/null || echo None")
 (defpoll shuffle :interval "1s" :initial "Off"
@@ -36,7 +36,13 @@
         (row :key "title  " :value {media.title != "" ? media.title : "nothing playing"} :cls "title")
         (row :key "artist " :value {media.artist != "" ? media.artist : "-"} :cls "artist")
         (row :key "album  " :value {media.album != "" ? media.album : "-"} :cls "album")))
-    (label :class "bar" :xalign 0 :text bar)
+    (box :class "bar" :orientation "h" :space-evenly false :spacing 8
+      (label :text {progress.pos})
+      (box :orientation "h" :space-evenly false
+        (for i in "[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29]"
+          (button :class "cell" :onclick "playerctl position ${i * progress.lensec / 30}"
+            "${i < progress.filled ? '█' : '░'}")))
+      (label :text {progress.len}))
     (box :class "controls media-controls" :orientation "h" :space-evenly true
       (button :class {shuffle == "On" ? "btn active" : "btn"}
               :onclick {shuffle == "On" ? "playerctl shuffle Off" : "playerctl shuffle On"} "󰒝")
@@ -55,7 +61,7 @@
   :exclusive false
   :focusable false
   (eventbox :onhover "eww update media_inside=true"
-            :onhoverlost "setsid -f ~/.config/eww/scripts/close-later.sh"
+
     (media-player)))
 
 ;; ─────────────────────────────────────────────
@@ -111,7 +117,7 @@
   :geometry (geometry :y "6px" :width "300px" :anchor "top center")
   :stacking "overlay" :exclusive false :focusable false
   (eventbox :onhover "eww update calendar_inside=true"
-            :onhoverlost "setsid -f ~/.config/eww/scripts/close-later.sh calendar"
+
     (calendar-popup)))
 
 (defwindow system
@@ -119,7 +125,7 @@
   :geometry (geometry :x "6px" :y "6px" :width "440px" :anchor "top right")
   :stacking "overlay" :exclusive false :focusable false
   (eventbox :onhover "eww update system_inside=true"
-            :onhoverlost "setsid -f ~/.config/eww/scripts/close-later.sh system"
+
     (system-popup)))
 
 ;; ─────────────────────────────────────────────
@@ -150,7 +156,7 @@
   :geometry (geometry :x "6px" :y "6px" :width "260px" :anchor "top right")
   :stacking "overlay" :exclusive false :focusable false
   (eventbox :onhover "eww update power_inside=true"
-            :onhoverlost "setsid -f ~/.config/eww/scripts/close-later.sh power"
+
     (power-popup)))
 
 ;; ─────────────────────────────────────────────
@@ -160,10 +166,14 @@
 (defvar audio_token "0")
 (defvar audio '{"vol":0,"muted":false,"mic":0,"mic_muted":false,"sinks":[]}')
 
-(defwidget audio-row [key value muted onchange onmute icon]
+(defwidget audio-row [key value muted cmd onmute icon]
   (box :class "audio-row" :orientation "h" :space-evenly false :spacing 10
     (label :class "key" :xalign 0 :text key)
-    (scale :class "slider" :hexpand true :min 0 :max 101 :value value :onchange onchange)
+    (eventbox :hexpand true :onscroll "setsid -f ~/.config/eww/scripts/audio.sh step ${cmd} {}"
+      (box :orientation "h" :space-evenly false
+        (for i in "[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29]"
+          (button :class "cell" :onclick "setsid -f ~/.config/eww/scripts/audio.sh ${cmd} ${round((i + 1) * 10 / 3, 0)}"
+            "${i * 10 / 3 < value ? '█' : '░'}"))))
     (label :class "val" :width 40 :xalign 1 :text {muted ? "mute" : "${value}%"})
     (button :class {muted ? "btn active" : "btn"} :onclick onmute icon)))
 
@@ -173,11 +183,11 @@
            :text "~/audio ❯ ${audio.muted ? 'muted' : audio.vol + '%'}")
     (box :class "audio-levels" :orientation "v" :space-evenly false :spacing 6
       (audio-row :key "out" :value {audio.vol} :muted {audio.muted}
-                 :onchange "setsid -f ~/.config/eww/scripts/audio.sh set {}"
+                 :cmd "set"
                  :onmute "setsid -f ~/.config/eww/scripts/audio.sh mute"
                  :icon {audio.muted ? "󰝟" : "󰕾"})
       (audio-row :key "mic" :value {audio.mic} :muted {audio.mic_muted}
-                 :onchange "setsid -f ~/.config/eww/scripts/audio.sh mic {}"
+                 :cmd "mic"
                  :onmute "setsid -f ~/.config/eww/scripts/audio.sh mic-mute"
                  :icon {audio.mic_muted ? "󰍭" : "󰍬"}))
     (label :class "key audio-title" :xalign 0 :text "output")
@@ -196,7 +206,7 @@
   :geometry (geometry :x "6px" :y "6px" :width "400px" :anchor "top right")
   :stacking "overlay" :exclusive false :focusable false
   (eventbox :onhover "eww update audio_inside=true"
-            :onhoverlost "setsid -f ~/.config/eww/scripts/close-later.sh audio"
+
     (audio-popup)))
 
 ;; ─────────────────────────────────────────────
@@ -235,7 +245,7 @@
   :geometry (geometry :x "6px" :y "6px" :width "440px" :anchor "top right")
   :stacking "overlay" :exclusive false :focusable false
   (eventbox :onhover "eww update wifi_inside=true"
-            :onhoverlost "setsid -f ~/.config/eww/scripts/close-later.sh wifi"
+
     (wifi-popup)))
 
 ;; ─────────────────────────────────────────────
@@ -272,5 +282,16 @@
   :geometry (geometry :x "6px" :y "6px" :width "380px" :anchor "top right")
   :stacking "overlay" :exclusive false :focusable false
   (eventbox :onhover "eww update bluetooth_inside=true"
-            :onhoverlost "setsid -f ~/.config/eww/scripts/close-later.sh bluetooth"
+
     (bluetooth-popup)))
+
+;; transparent layer behind popups: a click outside a popup closes it (scripts/popup.sh)
+(defwindow backdrop
+  :monitor 0
+  :geometry (geometry :width "100%" :height "100%" :anchor "center")
+  :stacking "fg"
+  :exclusive false
+  :focusable false
+  (eventbox :class "backdrop"
+            :onclick "setsid -f ~/.config/eww/scripts/popup.sh close"
+            :onrightclick "setsid -f ~/.config/eww/scripts/popup.sh close"))
