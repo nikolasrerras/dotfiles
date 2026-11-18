@@ -72,7 +72,7 @@
 
 (defwidget osd []
   (box :class "osd"
-    (label :class "osd-text" :text osd_text)))
+    (label :class "osd-text" :markup osd_text)))
 
 (defwindow osd
   :monitor 0

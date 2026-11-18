@@ -117,3 +117,6 @@
 
 // popup backdrop: fully transparent, only catches clicks
 .backdrop { background-color: rgba(0, 0, 0, 0); }
+
+// bigger click area for the bar cells (transparent, the glyphs stay the same)
+.cell { padding: 4px 0; }

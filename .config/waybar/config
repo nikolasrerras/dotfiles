@@ -27,7 +27,7 @@
     "hide-empty-text": true,
     "escape": true,
     "tooltip": false,
-    "on-click": "/home/nikolas/.config/eww/scripts/toggle.sh",
+    "on-click": "/home/nikolas/.config/eww/scripts/popup.sh media",
     "on-click-right": "playerctl play-pause",
     "on-scroll-up": "playerctl next",
     "on-scroll-down": "playerctl previous"
