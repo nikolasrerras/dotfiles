@@ -12,7 +12,7 @@
 #
 # Edit AK820_DIR if the tool lives somewhere else.
 
-AK820_DIR="${AK820_DIR:-$HOME/ak820-linux-0.3.1}"
+AK820_DIR="${AK820_DIR:-$HOME/.local/share/ak820}"
 VIDPID='0C45:00008009'          # HID_ID as the kernel prints it
 IFACES=" 2 3 "                  # screen/command interfaces, see the project README
 
