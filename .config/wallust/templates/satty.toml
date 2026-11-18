@@ -8,7 +8,7 @@ copy-command = "wl-copy"
 output-filename = "~/Pictures/Screenshots/satty-%Y-%m-%d_%H-%M-%S.png"
 
 [font]
-family = "DepartureMono Nerd Font"
+family = "Terminess Nerd Font"
 
 [color-palette]
 palette = [

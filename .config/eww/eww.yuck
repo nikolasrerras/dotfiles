@@ -37,16 +37,16 @@
         (row :key "artist " :value {media.artist != "" ? media.artist : "-"} :cls "artist")
         (row :key "album  " :value {media.album != "" ? media.album : "-"} :cls "album")))
     (label :class "bar" :xalign 0 :text bar)
-    (box :class "controls" :orientation "h" :space-evenly true
+    (box :class "controls media-controls" :orientation "h" :space-evenly true
       (button :class {shuffle == "On" ? "btn active" : "btn"}
-              :onclick {shuffle == "On" ? "playerctl shuffle Off" : "playerctl shuffle On"} "[󰒝]")
-      (button :class "btn" :onclick "playerctl previous" "[󰒮]")
+              :onclick {shuffle == "On" ? "playerctl shuffle Off" : "playerctl shuffle On"} "󰒝")
+      (button :class "btn" :onclick "playerctl previous" "󰒮")
       (button :class "btn" :onclick "playerctl play-pause"
-              {media.status == "Playing" ? "[󰏤]" : "[󰐊]"})
-      (button :class "btn" :onclick "playerctl next" "[󰒭]")
+              {media.status == "Playing" ? "󰏤" : "󰐊"})
+      (button :class "btn" :onclick "playerctl next" "󰒭")
       (button :class {loop != "None" ? "btn active" : "btn"}
               :onclick "~/.config/eww/scripts/loop.sh"
-              {loop == "Track" ? "[󰑘]" : (loop == "Playlist" ? "[󰑖]" : "[󰑗]")}))))
+              {loop == "Track" ? "󰑘" : (loop == "Playlist" ? "󰑖" : "󰑗")}))))
 
 (defwindow media
   :monitor 0
@@ -97,9 +97,9 @@
     (label :class "prompt" :xalign 0 :text "~/calendar ❯ ${cal_title}")
     (label :class "cal" :xalign 0.5 :justify "left" :markup cal_text)
     (box :class "controls" :orientation "h" :space-evenly true
-      (button :class "btn" :onclick "~/.config/eww/scripts/cal.sh prev" "[<]")
-      (button :class "btn" :onclick "~/.config/eww/scripts/cal.sh today" "[today]")
-      (button :class "btn" :onclick "~/.config/eww/scripts/cal.sh next" "[>]"))))
+      (button :class "btn" :onclick "~/.config/eww/scripts/cal.sh prev" "<")
+      (button :class "btn" :onclick "~/.config/eww/scripts/cal.sh today" "today")
+      (button :class "btn" :onclick "~/.config/eww/scripts/cal.sh next" ">"))))
 
 (defwidget system-popup []
   (box :class "player" :orientation "v" :space-evenly false
@@ -136,14 +136,14 @@
     (box :class "controls" :orientation "v" :space-evenly false :spacing 4
       (button :class {power_confirm == "logout" ? "btn active" : "btn"}
               :onclick {power_confirm == "logout" ? "niri msg action quit --skip-confirmation" : "eww update power_confirm=logout"}
-              (label :xalign 0 :text {power_confirm == "logout" ? "[󰗼 sure?]" : "[󰗼 logout]"}))
-      (button :class "btn" :onclick "eww close power; systemctl suspend" (label :xalign 0 :text "[󰤄 suspend]"))
+              (label :xalign 0 :text {power_confirm == "logout" ? "󰗼 sure?" : "󰗼 logout"}))
+      (button :class "btn" :onclick "eww close power; systemctl suspend" (label :xalign 0 :text "󰤄 suspend"))
       (button :class {power_confirm == "restart" ? "btn active" : "btn"}
               :onclick {power_confirm == "restart" ? "systemctl reboot" : "eww update power_confirm=restart"}
-              (label :xalign 0 :text {power_confirm == "restart" ? "[󰜉 sure?]" : "[󰜉 restart]"}))
+              (label :xalign 0 :text {power_confirm == "restart" ? "󰜉 sure?" : "󰜉 restart"}))
       (button :class {power_confirm == "shutdown" ? "btn active" : "btn"}
               :onclick {power_confirm == "shutdown" ? "systemctl poweroff" : "eww update power_confirm=shutdown"}
-              (label :xalign 0 :text {power_confirm == "shutdown" ? "[󰐥 sure?]" : "[󰐥 shutdown]"})))))
+              (label :xalign 0 :text {power_confirm == "shutdown" ? "󰐥 sure?" : "󰐥 shutdown"})))))
 
 (defwindow power
   :monitor 0
@@ -175,11 +175,11 @@
       (audio-row :key "out" :value {audio.vol} :muted {audio.muted}
                  :onchange "setsid -f ~/.config/eww/scripts/audio.sh set {}"
                  :onmute "setsid -f ~/.config/eww/scripts/audio.sh mute"
-                 :icon {audio.muted ? "[󰝟]" : "[󰕾]"})
+                 :icon {audio.muted ? "󰝟" : "󰕾"})
       (audio-row :key "mic" :value {audio.mic} :muted {audio.mic_muted}
                  :onchange "setsid -f ~/.config/eww/scripts/audio.sh mic {}"
                  :onmute "setsid -f ~/.config/eww/scripts/audio.sh mic-mute"
-                 :icon {audio.mic_muted ? "[󰍭]" : "[󰍬]"}))
+                 :icon {audio.mic_muted ? "󰍭" : "󰍬"}))
     (label :class "key audio-title" :xalign 0 :text "output")
     (box :orientation "v" :space-evenly false
       (for s in {audio.sinks}
@@ -189,7 +189,7 @@
     (box :class "controls" :orientation "h" :space-evenly true
       (button :class "btn"
               :onclick "eww close audio; setsid -f kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 wiremix >/dev/null 2>&1"
-              "[mixer]"))))
+              "mixer"))))
 
 (defwindow audio
   :monitor 0
@@ -220,15 +220,15 @@
           (label :xalign 0 :limit-width 40
                  :text "${n.icon} ${n.name}${n.secure && !n.known ? '  󰌾' : ''}"))))
     (box :class "controls" :orientation "h" :space-evenly false :spacing 14 :halign "center"
-      (button :class "btn" :onclick "setsid -f ~/.config/eww/scripts/wifi.sh scan" "[scan]")
+      (button :class "btn" :onclick "setsid -f ~/.config/eww/scripts/wifi.sh scan" "scan")
       (button :class {wifi.powered ? "btn" : "btn active"}
               :onclick "setsid -f ~/.config/eww/scripts/wifi.sh power"
-              {wifi.powered ? "[off]" : "[on]"})
+              {wifi.powered ? "off" : "on"})
       (button :class "btn" :visible {wifi.ssid != ""}
-              :onclick "setsid -f ~/.config/eww/scripts/wifi.sh disconnect" "[disconnect]")
+              :onclick "setsid -f ~/.config/eww/scripts/wifi.sh disconnect" "disconnect")
       (button :class "btn"
               :onclick "eww close wifi; setsid -f kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 impala >/dev/null 2>&1"
-              "[impala]"))))
+              "impala"))))
 
 (defwindow wifi
   :monitor 0
@@ -260,12 +260,12 @@
     (box :class "controls" :orientation "h" :space-evenly false :spacing 14 :halign "center"
       (button :class {bluetooth.powered ? "btn" : "btn active"}
               :onclick "setsid -f ~/.config/eww/scripts/bluetooth.sh power"
-              {bluetooth.powered ? "[off]" : "[on]"})
+              {bluetooth.powered ? "off" : "on"})
       (button :class "btn" :visible {bluetooth.connected > 0}
-              :onclick "setsid -f ~/.config/eww/scripts/bluetooth.sh disconnect" "[disconnect]")
+              :onclick "setsid -f ~/.config/eww/scripts/bluetooth.sh disconnect" "disconnect")
       (button :class "btn"
               :onclick "eww close bluetooth; setsid -f kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 bluetui >/dev/null 2>&1"
-              "[bluetui]"))))
+              "bluetui"))))
 
 (defwindow bluetooth
   :monitor 0

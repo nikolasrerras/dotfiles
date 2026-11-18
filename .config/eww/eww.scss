@@ -3,8 +3,8 @@
 
 * {
   all: unset;
-  font-family: "DepartureMono Nerd Font", monospace;
-  font-size: 13px;
+  font-family: "Terminess Nerd Font", monospace;
+  font-size: 16px;
 }
 
 .player {
@@ -27,7 +27,7 @@
   background-position: center;
 }
 .art-placeholder {
-  font-size: 40px;
+  font-size: 16px;
   color: $muted;
 }
 
@@ -63,7 +63,7 @@
 }
 .osd-text {
   color: $accent;
-  font-size: 19px;
+  font-size: 16px;
 }
 
 // calendar + system popups (reuse .player / .prompt / .btn)
@@ -98,3 +98,7 @@
 
 // bluetooth popup (reuses .player / .prompt / .key / .btn)
 .bt-title { margin-top: 12px; margin-bottom: 4px; }
+
+// media player buttons, bigger than the rest
+.media-controls .btn { padding: 4px 8px; }
+.media-controls .btn label { font-size: 24px; }

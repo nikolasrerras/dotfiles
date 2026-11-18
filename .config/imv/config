@@ -1,6 +1,6 @@
 [options]
 background = 0F141F
-overlay_font = DepartureMono Nerd Font:11
+overlay_font = Terminess Nerd Font:13.5
 overlay_text_color = B4BCCA
 overlay_background_color = 0F141F
 overlay_background_alpha = cc
