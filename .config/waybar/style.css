@@ -8,8 +8,8 @@
 * {
     border: none;
     border-radius: 0;
-    font-family: "Terminess Nerd Font", monospace;
-    font-size: 16px;
+    font-family: "DepartureMono Nerd Font", monospace;
+    font-size: 22px;
     min-height: 0;
     margin: 0;
     padding: 0;
@@ -35,7 +35,7 @@ tooltip {
 }
 tooltip label {
     color: @foreground;
-    padding: 4px 6px;
+    padding: 4px 8px;
 }
 
 /* ── left ── */
@@ -64,7 +64,7 @@ tooltip label {
 #pulseaudio,
 #custom-wifi,
 #custom-power {
-    padding: 0 5px;
+    padding: 0 6px;
     color: @foreground;
 }
 
@@ -92,7 +92,7 @@ tooltip label {
     padding: 0 6px;
 }
 #tray > * > * {
-    margin: 0 5px;
+    margin: 0 4px;
 }
 
 /* power drawer */
@@ -101,7 +101,7 @@ tooltip label {
 #custom-quit,
 #custom-suspend,
 #custom-reboot {
-    padding: 0 5px;
+    padding: 0 6px;
     color: @foreground;
 }
 #custom-quit:hover,
@@ -125,10 +125,10 @@ tooltip label {
 
 /* workspaces: underline on the active one */
 #workspaces {
-    margin-right: 6px;
+    margin-right: 8px;
 }
 #workspaces button {
-    padding: 0 10px;
+    padding: 0 8px;
     min-width: 0;
     color: @color8;
 }
@@ -146,7 +146,7 @@ tooltip label {
 
 
 #workspaces button label {
-    font-size: 16px;
+    font-size: 22px;
 }
 
 /* custom modules: waybar 0.16 no longer sets :hover on them, so use their container */
@@ -159,3 +159,17 @@ tooltip label {
 *:hover > #custom-power {
     color: @accent;
 }
+
+/* 8px from the right screen edge, like the niri gaps (2px here + 6px module padding) */
+.modules-right { margin-right: 2px; }
+
+
+
+/* tray drawer label, opens on click */
+#custom-tray-label { padding: 0 6px; }
+
+/* privacy: only visible while the mic or screen sharing is in use */
+#privacy { padding: 0 6px; color: @foreground; }
+
+/* privacy icons: monochrome (symbolic) so they take the accent color */
+#privacy-item { -gtk-icon-style: symbolic; color: @foreground; background: none; padding: 0 2px; }

@@ -1,0 +1,198 @@
+{
+  "layer": "top",
+  "position": "top",
+  "height": 30,
+  "modules-left": [
+    "mango/workspaces",
+    "custom/cpu",
+    "memory",
+    "custom/gpu"
+  ],
+  "modules-center": [
+    "custom/music",
+    "clock"
+  ],
+  "modules-right": [
+    "group/tray-drawer",
+    "privacy",
+    "mango/language",
+    "bluetooth",
+    "pulseaudio",
+    "custom/wifi",
+    "custom/power"
+  ],
+  "custom/music": {
+    "exec": "/home/nikolas/.config/waybar/scripts/music-scroll.sh",
+    "format": "<span alpha=\"55%\">{icon}</span> {text}",
+    "hide-empty-text": true,
+    "escape": true,
+    "tooltip": false,
+    "on-click": "/home/nikolas/.config/mango/eww/scripts/popup.sh media",
+    "on-click-right": "playerctl play-pause",
+    "on-scroll-up": "playerctl next",
+    "on-scroll-down": "playerctl previous",
+    "return-type": "json",
+    "format-icons": {
+      "playing": "󰐊",
+      "paused": "󰏤"
+    }
+  },
+  "clock": {
+    "format": "{:%H:%M}",
+    "format-alt": "{:%A %d %B %Y, %H:%M:%S}",
+    "interval": 1,
+    "tooltip": true,
+    "tooltip-format": "{:%A %d %B %Y}",
+    "on-click": "/home/nikolas/.config/mango/eww/scripts/popup.sh calendar",
+    "format-alt-click": "click-right"
+  },
+  "custom/power": {
+    "format": "<span size=\"larger\">󰐥</span>",
+    "tooltip": true,
+    "tooltip-format": "Power · right click: menu",
+    "on-click-right": "/home/nikolas/.config/mango/scripts/powermenu",
+    "on-click": "/home/nikolas/.config/mango/eww/scripts/popup.sh power"
+  },
+  "network": {
+    "format-wifi": "{icon}",
+    "format-ethernet": "󰈀",
+    "format-linked": "󰈀",
+    "format-disconnected": "⚠",
+    "format-icons": [
+      "󰤯",
+      "󰤟",
+      "󰤢",
+      "󰤥",
+      "󰤨"
+    ],
+    "tooltip": true,
+    "on-click": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 impala > /dev/null 2>&1",
+    "tooltip-format-wifi": "{essid}\nSignal {signalStrength}% ({signaldBm} dBm)\n{frequency} GHz"
+  },
+  "pulseaudio": {
+    "format": "<span alpha=\"55%\">{icon}</span> {volume}%",
+    "format-muted": "<span alpha=\"55%\">󰝟</span> mute",
+    "format-icons": {
+      "default": [
+        "󰕿",
+        "󰖀",
+        "󰕾"
+      ]
+    },
+    "tooltip": true,
+    "tooltip-format": "out  {desc}",
+    "on-click": "/home/nikolas/.config/mango/eww/scripts/popup.sh audio",
+    "on-scroll-up": "/home/nikolas/.config/mango/eww/scripts/volume.sh up",
+    "on-scroll-down": "/home/nikolas/.config/mango/eww/scripts/volume.sh down",
+    "on-click-right": "/home/nikolas/.config/mango/eww/scripts/volume.sh mute",
+    "on-click-middle": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 wiremix > /dev/null 2>&1",
+    "scroll-step": 5
+  },
+  "bluetooth": {
+    "format": "<span alpha=\"55%\">󰂯</span> on",
+    "format-disabled": "<span alpha=\"55%\">󰂲</span> off",
+    "format-connected": "<span alpha=\"55%\">󰂱</span> {device_alias}",
+    "tooltip-format": "bluetooth  {status}",
+    "on-click": "/home/nikolas/.config/mango/eww/scripts/popup.sh bluetooth",
+    "format-off": "<span alpha=\"55%\">󰂲</span> off",
+    "format-connected-battery": "<span alpha=\"55%\">󰂱</span> {device_alias} {device_battery_percentage}%",
+    "tooltip-format-connected": "{device_enumerate}",
+    "tooltip-format-enumerate-connected": "{device_alias}",
+    "tooltip-format-enumerate-connected-battery": "{device_alias}  {device_battery_percentage}%",
+    "on-click-middle": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 bluetui > /dev/null 2>&1"
+  },
+  "memory": {
+    "interval": 2,
+    "format": "<span alpha=\"55%\">mem</span> {used:0.1f}G",
+    "on-click": "/home/nikolas/.config/mango/eww/scripts/popup.sh system",
+    "on-click-right": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=36c btop"
+  },
+  "custom/gpu": {
+    "interval": 2,
+    "exec": "/home/nikolas/.config/waybar/scripts/gpu.sh",
+    "format": "<span alpha=\"55%\">gpu</span> {}%",
+    "on-click": "/home/nikolas/.config/mango/eww/scripts/popup.sh system",
+    "return-type": "json",
+    "on-click-right": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=36c btop"
+  },
+  "tray": {
+    "icon-size": 18,
+    "spacing": 0
+  },
+  "custom/cpu": {
+    "exec": "/home/nikolas/.config/waybar/scripts/cpu-spark.sh",
+    "return-type": "json",
+    "interval": 2,
+    "format": "<span alpha=\"55%\">cpu</span> {}%",
+    "on-click": "/home/nikolas/.config/mango/eww/scripts/popup.sh system",
+    "on-click-right": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=36c btop"
+  },
+  "custom/wifi": {
+    "exec": "/home/nikolas/.config/mango/waybar/net.sh",
+    "return-type": "json",
+    "interval": 5,
+    "format": "<span alpha=\"55%\">{icon}</span> {text}",
+    "format-icons": {
+      "ethernet": "󰈀",
+      "disconnected": "󰤮",
+      "wifi-0": "󰤯",
+      "wifi-1": "󰤟",
+      "wifi-2": "󰤢",
+      "wifi-3": "󰤥",
+      "wifi-4": "󰤨"
+    },
+    "tooltip": true,
+    "on-click": "/home/nikolas/.config/mango/eww/scripts/popup.sh wifi",
+    "on-click-middle": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 impala > /dev/null 2>&1"
+  },
+  "custom/tray-l": {
+    "format": "",
+    "tooltip": false
+  },
+  "custom/tray-r": {
+    "format": "",
+    "tooltip": false
+  },
+  "group/tray-drawer": {
+    "orientation": "horizontal",
+    "drawer": {
+      "click-to-reveal": true,
+      "transition-duration": 250,
+      "transition-left-to-right": false
+    },
+    "modules": [
+      "custom/tray-label",
+      "tray"
+    ]
+  },
+  "custom/tray-label": {
+    "format": "<span alpha=\"55%\">󰅁</span>",
+    "tooltip": false
+  },
+  "privacy": {
+    "icon-size": 14,
+    "icon-spacing": 6,
+    "transition-duration": 250,
+    "modules": [
+      {
+        "type": "screenshare",
+        "tooltip": true,
+        "tooltip-icon-size": 16
+      },
+      {
+        "type": "audio-in",
+        "tooltip": true,
+        "tooltip-icon-size": 16
+      }
+    ]
+  },
+  "mango/workspaces": {
+    "format": "{icon}",
+    "hide-empty": false,
+    "on-click": "activate"
+  },
+  "mango/language": {
+    "format": "<span alpha=\"55%\">󰌌</span> {short}",
+    "tooltip": false
+  }
+}

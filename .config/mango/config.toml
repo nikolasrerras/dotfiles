@@ -1,0 +1,508 @@
+[global]
+
+# More option see https://github.com/DreamMaoMao/mango/wiki/
+# Window effect
+# blur, blur_layer, blur_optimized: set by the theme in colors.toml
+blur_params_num_passes = 2
+blur_params_radius = 5
+blur_params_noise = 0.02
+blur_params_brightness = 0.9
+blur_params_contrast = 0.9
+blur_params_saturation = 1.2
+shadows = 0
+layer_shadows = 0
+shadow_only_floating = 1
+shadows_size = 10
+shadows_blur = 15
+shadows_position_x = 0
+shadows_position_y = 0
+shadows_color = 0x000000ff
+border_radius = 0  # square corners, like niri
+no_radius_when_single = 0
+focused_opacity = 1.0
+unfocused_opacity = 1.0
+dim_enable = 0
+dim_focused_color = 0x00000000
+dim_unfocused_color = 0x00000055
+
+# Animation Configuration(support type:zoom,slide)
+# tag_animation_direction: 1-horizontal,0-vertical
+animations = 1
+layer_animations = 1
+animation_type_open = "slide"
+animation_type_close = "slide"
+animation_fade_in = 1
+animation_fade_out = 1
+tag_animation_direction = 1
+zoom_initial_ratio = 0.4
+zoom_end_ratio = 0.8
+fade_in_begin_opacity = 0.5
+fade_out_begin_opacity = 0.8
+animation_duration_move = 500
+animation_duration_open = 400
+animation_duration_tag = 350
+animation_duration_close = 800
+animation_duration_focus = 0
+animation_curve_open = [0.46, 1.0, 0.29, 1]
+animation_curve_move = [0.46, 1.0, 0.29, 1]
+animation_curve_tag = [0.46, 1.0, 0.29, 1]
+animation_curve_close = [0.08, 0.92, 0, 1]
+animation_curve_focus = [0.46, 1.0, 0.29, 1]
+animation_curve_opacity_fade_out = [0.5, 0.5, 0.5, 0.5]
+animation_curve_opacity_fade_in = [0.46, 1.0, 0.29, 1]
+
+# Scroller Layout Setting
+scroller_structs = 20
+scroller_default_proportion = 0.5  # niri: default-column-width 0.5
+scroller_focus_center = 0
+scroller_prefer_center = 0
+edge_scroller_pointer_focus = 1
+edge_scroller_focus_allow_speed = 0.0
+scroller_default_proportion_single = 0.5  # niri keeps a lone column at its normal width
+scroller_proportion_preset = [0.33333, 0.5, 0.66667]  # niri: preset-column-widths
+
+# Master-Stack Layout Setting
+new_is_master = 1
+default_master_factor = 0.55
+default_master_count = 1
+tag_num = 9
+smart_gaps = 0
+
+# Dwindle Layout Setting
+dwindle_smart_split = 0
+dwindle_drop_simple_split = 1
+dwindle_manual_split = 0
+dwindle_horizontal_split = 1
+dwindle_vertical_split = 1
+dwindle_preserve_split = 0
+
+# Monocle Layout Setting
+monocle_tab_mode = 1
+monocle_no_border = 0
+monocle_no_gap = 0
+monocle_no_radius = 0
+
+# Deck Layout Setting
+deck_tab_mode = 1
+
+# Overview Setting
+hotarea_size = 10
+enable_hotarea = 0
+hotarea_disable_on_fullscreen = 1
+overview_gap_inner = 5
+overview_gap_outer = 30
+overcircle_center_ratio = 0.5
+title_message_bar_height = 52
+title_message_bar_gap = 20
+
+# Misc
+no_border_when_single = 0
+axis_bind_apply_timeout = 100
+focus_on_activate = 1
+idle_inhibit_ignore_visible = 0
+idle_inhibit_when_fullscreen = 1  # no screen off or suspend while something is fullscreen (games with a controller)
+sloppy_focus = 1
+warp_cursor = 0  # niri: warp-mouse-to-focus is off
+focus_cross_monitor = 0
+focus_direction_only_zone_overlap = 1
+focus_cross_tag = 0
+enable_floating_snap = 0
+snap_distance = 30
+float_full_to_top = 0
+cursor_size = 24
+sync_obj_enable = 1  # explicit sync for games (mango FAQ: stutter)
+allow_tearing = 2  # tearing allowed only for fullscreen windows
+cursor_theme = "phinger-cursors-dark"  # niri: xcursor-theme
+drag_tile_to_tile = 1
+drag_tile_small = 1
+
+# keyboard
+repeat_rate = 25
+repeat_delay = 600
+numlock_on = 1
+xkb_rules_layout = "us,gr"
+xkb_rules_options = "grp:alt_shift_toggle"  # switch layout with Alt+Shift
+
+# Trackpad
+# need relogin to make it apply
+disable_trackpad = 0
+tap_to_click = 1
+tap_and_drag = 1
+drag_lock = 1
+trackpad_natural_scrolling = 1  # niri: touchpad natural-scroll
+trackpad_disable_while_typing = 1
+trackpad_left_handed = 0
+trackpad_middle_button_emulation = 0
+swipe_min_threshold = 1
+
+# mouse
+# need relogin to make it apply
+mouse_natural_scrolling = 0
+
+# Appearance
+# gaps (niri: 8), between windows and to the screen edges
+gap_inner_horizontal = 5
+gap_inner_vertical = 5
+gap_outer_horizontal = 5
+gap_outer_vertical = 5
+scratchpad_width_ratio = 0.8
+scratchpad_height_ratio = 0.9
+border_px = 2  # niri: focus-ring width 2
+root_color = 0x201b14ff
+# border_color: set by the theme in colors.toml
+drop_color = 0x8FBA7C55
+split_color = 0xEB441EFF
+# focus_color: set by the theme in colors.toml
+maximized_screen_color = 0x89aa61ff
+urgent_color = 0xad401fff
+scratchpad_color = 0x516c93ff
+global_color = 0xb153a7ff
+overlay_color = 0x14a57cff
+
+# window colors and blur, written by the mango copy of theme (like niri's colors.kdl / effects.kdl)
+source = ["./colors.toml"]
+
+# environment (niri: environment block)
+env = [
+  "QT_QPA_PLATFORMTHEME,gtk3",
+]
+
+# autostart (niri: spawn-at-startup; xwayland-satellite is not needed, mango has XWayland built in)
+exec_once = [
+  "waybar -c /home/nikolas/.config/mango/waybar/config.jsonc -s /home/nikolas/.config/mango/waybar/style.css",
+  "mako",
+  "awww-daemon",
+  "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1",
+  "swayosd-server",
+  "playerctld daemon",
+  "eww -c /home/nikolas/.config/mango/eww daemon",  # mango copy of the eww config
+  "/home/nikolas/.config/mango/eww/scripts/volume-osd.sh",  # volume OSD on every volume change (like niri)
+  "/home/nikolas/.config/mango/eww/scripts/popup-autoclose.sh",  # close eww popups on tag change (like niri)
+  "/home/nikolas/.config/mango/eww/scripts/lang-osd.sh",  # keyboard layout OSD (like niri)
+  "/home/nikolas/.config/mango/scripts/games.sh",  # steam games open on the first empty tag of DP-1
+  "/home/nikolas/.config/mango/scripts/idle.sh",  # screens off after 30 min, suspend after 2 h (like niri)
+  "wl-paste --type text --watch cliphist store",
+  "wl-paste --type image --watch cliphist store",
+  "steam -silent",                   # steam in the tray (niri: xdg autostart)
+  "discord --start-minimized",       # discord in the tray (niri: xdg autostart)
+]
+
+[bind.default]
+
+# Key Bindings
+# key name refer to `xev` or `wev` command output,
+# mod keys name: super,ctrl,alt,shift,none
+# reload config
+# "SUPER+r" = "reload_config"  # mango reloads the config by itself; SUPER+r is niri's preset width
+
+# menu and terminal (same keys as niri)
+"SUPER+space" = "spawn,fuzzel"
+"SUPER+Return" = "spawn,kitty"
+
+# apps (same keys as niri)
+"SUPER+b" = "spawn,zen-browser"
+"SUPER+SHIFT+b" = "spawn,zen-browser --private-window"
+"SUPER+d" = "spawn,discord"
+"SUPER+m" = "spawn,spotify-launcher"
+"SUPER+n" = "spawn,kitty nvim"
+"SUPER+SHIFT+n" = "spawn,zeditor"
+"SUPER+s" = "spawn,steam"
+"SUPER+e" = "spawn,kitty yazi"
+"SUPER+SHIFT+e" = "spawn,nautilus"
+"SUPER+a" = "spawn,kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 wiremix"
+
+# my scripts (same keys as niri; mango copies where needed)
+"SUPER+Escape" = "spawn,/home/nikolas/.config/mango/scripts/powermenu"  # mango copy
+"SUPER+CTRL+v" = "spawn,/home/nikolas/.local/bin/clipboard"
+"SUPER+slash" = "spawn,/home/nikolas/.config/mango/scripts/keys"  # mango version, reads this file
+"SUPER+SHIFT+Return" = "spawn,/home/nikolas/.config/mango/scripts/dropdown"  # mango version, no niri msg
+"SUPER+t" = "spawn,/home/nikolas/.config/mango/scripts/theme"  # mango copy
+
+# screenshots (same as niri; mango copy of shot)
+"none+Print" = "spawn,/home/nikolas/.config/mango/scripts/shot region"
+"CTRL+Print" = "spawn,/home/nikolas/.config/mango/scripts/shot screen"
+"ALT+Print" = "spawn,/home/nikolas/.config/mango/scripts/shot window"
+
+# volume and media keys (same as niri; volume.sh is the mango copy)
+"none+XF86AudioRaiseVolume" = "spawn,/home/nikolas/.config/mango/eww/scripts/volume.sh up"
+"none+XF86AudioLowerVolume" = "spawn,/home/nikolas/.config/mango/eww/scripts/volume.sh down"
+"none+XF86AudioMute" = "spawn,/home/nikolas/.config/mango/eww/scripts/volume.sh mute"
+"none+XF86AudioMicMute" = "spawn,swayosd-client --input-volume mute-toggle"
+"none+XF86AudioPlay" = "spawn,playerctl play-pause"
+"none+XF86AudioStop" = "spawn,playerctl stop"
+"none+XF86AudioPrev" = "spawn,playerctl previous"
+"none+XF86AudioNext" = "spawn,playerctl next"
+
+# exit (quit moved off SUPER+m, which now opens spotify; same key as niri)
+"CTRL+ALT+Delete" = "quit"
+"SUPER+q" = "killclient,"
+"SUPER+semicolon" = "killclient,"
+
+# switch window focus
+"SUPER+Tab" = "focusstack,next"  # next window of the tag (mango default)
+"SUPER+Left" = "focusdir,left"
+"SUPER+Right" = "focusdir,right"
+"SUPER+Up" = "focusdir,up"
+"SUPER+Down" = "focusdir,down"
+"SUPER+h" = "focusdir,left"
+"SUPER+l" = "focusdir,right"
+"SUPER+k" = "focusdir,up"
+"SUPER+j" = "focusdir,down"
+
+# move window (Mod+Ctrl, same as niri)
+"SUPER+CTRL+Up" = "move_client,up"
+"SUPER+CTRL+Down" = "move_client,down"
+"SUPER+CTRL+Left" = "move_client,left"
+"SUPER+CTRL+Right" = "move_client,right"
+"SUPER+CTRL+k" = "move_client,up"
+"SUPER+CTRL+j" = "move_client,down"
+"SUPER+CTRL+h" = "move_client,left"
+"SUPER+CTRL+l" = "move_client,right"
+
+# switch window status
+"SUPER+g" = "toggleglobal,"
+"ALT+Tab" = "togglejump,"
+"SUPER+v" = "togglefloating,"  # niri: Mod+V
+"SUPER+f" = "togglemaximizescreen,"  # niri: Mod+F maximize-column
+"SUPER+SHIFT+f" = "togglefullscreen,"  # niri: Mod+Shift+F
+"ALT+SHIFT+f" = "togglefakefullscreen,"
+"SUPER+o" = "toggleoverview"  # overview (niri: Mod+O)
+"SUPER+w" = "spawn,/home/nikolas/.config/mango/scripts/layout-menu"  # layout menu (niri: Mod+W tabbed column)
+"SUPER+SHIFT+I" = "restore_minimized"
+"ALT+z" = "toggle_scratchpad"
+
+# scroller layout
+"SUPER+CTRL+f" = "set_proportion,1.0"  # niri: Mod+Ctrl+F (closest match)
+"SUPER+r" = "switch_proportion_preset,"  # niri: Mod+R
+"SUPER+bracketleft" = "scroller_stack,left"  # niri: Mod+[ consume-or-expel
+"SUPER+bracketright" = "scroller_stack,right"  # niri: Mod+] consume-or-expel
+
+#dwindle layout(manual split mode)
+"alt+shift+Return" = "dwindle_toggle_split_direction"
+
+# switch layout (SUPER+n now opens nvim; use the layout menu on SUPER+w)
+# "SUPER+n" = "switch_layout"
+
+# tag switch
+# previous/next tag (niri: Mod+Page_Up/Down, Mod+I/U)
+"SUPER+Page_Up" = "viewtoleft,0"
+"SUPER+Page_Down" = "viewtoright,0"
+"SUPER+i" = "minimized,"  # minimize (mango default); previous tag stays on SUPER+Page_Up
+"SUPER+u" = "viewtoright,0"
+# move window to previous/next tag (niri: Mod+Ctrl+Page_Up/Down, Mod+Ctrl+I/U)
+"SUPER+CTRL+Page_Up" = "tagtoleft,0"
+"SUPER+CTRL+Page_Down" = "tagtoright,0"
+"SUPER+CTRL+i" = "tagtoleft,0"
+"SUPER+CTRL+u" = "tagtoright,0"
+# defaults below would steal Ctrl+arrows from apps (niri has none of these)
+# "CTRL+Left" = "viewtoleft_have_client,0"
+# "CTRL+Right" = "viewtoright_have_client,0"
+
+# view tag N (niri: Mod+1..9; defaults were Ctrl+1..9)
+"SUPER+1" = "view,1,0"
+"SUPER+2" = "view,2,0"
+"SUPER+3" = "view,3,0"
+"SUPER+4" = "view,4,0"
+"SUPER+5" = "view,5,0"
+"SUPER+6" = "view,6,0"
+"SUPER+7" = "view,7,0"
+"SUPER+8" = "view,8,0"
+"SUPER+9" = "view,9,0"
+
+# tag: move client to the tag and focus it
+# tagsilent: move client to the tag and not focus it
+# bind=Alt,1,tagsilent,1
+# (niri: Mod+Shift+1..9; defaults were Alt+1..9)
+"SUPER+SHIFT+1" = "tag,1,0"
+"SUPER+SHIFT+2" = "tag,2,0"
+"SUPER+SHIFT+3" = "tag,3,0"
+"SUPER+SHIFT+4" = "tag,4,0"
+"SUPER+SHIFT+5" = "tag,5,0"
+"SUPER+SHIFT+6" = "tag,6,0"
+"SUPER+SHIFT+7" = "tag,7,0"
+"SUPER+SHIFT+8" = "tag,8,0"
+"SUPER+SHIFT+9" = "tag,9,0"
+
+# monitor switch (same keys as niri)
+"SUPER+SHIFT+Left" = "spawn,/home/nikolas/.config/mango/scripts/focusmon left"
+"SUPER+SHIFT+Right" = "spawn,/home/nikolas/.config/mango/scripts/focusmon right"
+"SUPER+SHIFT+Up" = "spawn,/home/nikolas/.config/mango/scripts/focusmon up"
+"SUPER+SHIFT+Down" = "spawn,/home/nikolas/.config/mango/scripts/focusmon down"
+"SUPER+SHIFT+h" = "spawn,/home/nikolas/.config/mango/scripts/focusmon left"
+"SUPER+SHIFT+l" = "spawn,/home/nikolas/.config/mango/scripts/focusmon right"
+"SUPER+SHIFT+k" = "spawn,/home/nikolas/.config/mango/scripts/focusmon up"
+"SUPER+SHIFT+j" = "spawn,/home/nikolas/.config/mango/scripts/focusmon down"
+"SUPER+SHIFT+CTRL+Left" = "tagmon,left"
+"SUPER+SHIFT+CTRL+Right" = "tagmon,right"
+"SUPER+SHIFT+CTRL+Up" = "tagmon,up"
+"SUPER+SHIFT+CTRL+Down" = "tagmon,down"
+"SUPER+SHIFT+CTRL+h" = "tagmon,left"
+"SUPER+SHIFT+CTRL+l" = "tagmon,right"
+"SUPER+SHIFT+CTRL+k" = "tagmon,up"
+"SUPER+SHIFT+CTRL+j" = "tagmon,down"
+
+# gaps
+"ALT+SHIFT+X" = "incgaps,1"
+"ALT+SHIFT+Z" = "incgaps,-1"
+"ALT+SHIFT+R" = "togglegaps"
+
+# movewin
+"CTRL+SHIFT+Up" = "movewin,+0,-50"
+"CTRL+SHIFT+Down" = "movewin,+0,+50"
+"CTRL+SHIFT+Left" = "movewin,-50,+0"
+"CTRL+SHIFT+Right" = "movewin,+50,+0"
+
+# resizewin
+"CTRL+ALT+Up" = "resizewin,+0,-50"
+"CTRL+ALT+Down" = "resizewin,+0,+50"
+"CTRL+ALT+Left" = "resizewin,-50,+0"
+"CTRL+ALT+Right" = "resizewin,+50,+0"
+
+[mousebind.default]
+
+# Mouse Button Bindings
+# btn_left and btn_right can't bind none mod key
+"SUPER+btn_left" = "moveresize,curmove"
+# "btn_middle" = "togglemaximizescreen,0"  # would steal middle-click from every app
+"SUPER+btn_right" = "moveresize,curresize"
+
+[axisbind.default]
+
+# Axis Bindings
+# niri: Mod+Shift+wheel switches workspace, Mod+Ctrl+wheel moves the window there
+# niri's Mod+wheel (focus) and Mod+Ctrl+Shift+wheel (move): only on scroller tags, see scripts/scroll-wheel
+"SUPER+UP" = "spawn,/home/nikolas/.config/mango/scripts/scroll-wheel focus up"
+"SUPER+DOWN" = "spawn,/home/nikolas/.config/mango/scripts/scroll-wheel focus down"
+"SUPER+CTRL+SHIFT+UP" = "spawn,/home/nikolas/.config/mango/scripts/scroll-wheel move up"
+"SUPER+CTRL+SHIFT+DOWN" = "spawn,/home/nikolas/.config/mango/scripts/scroll-wheel move down"
+"SUPER+SHIFT+UP" = "viewtoleft,0"
+"SUPER+SHIFT+DOWN" = "viewtoright,0"
+"SUPER+CTRL+UP" = "tagtoleft,0"
+"SUPER+CTRL+DOWN" = "tagtoright,0"
+
+[gesturebind.default]
+
+# Gesture Bindings
+"none+left+3" = "focusdir,left"
+"none+right+3" = "focusdir,right"
+"none+up+3" = "focusdir,up"
+"none+down+3" = "focusdir,down"
+"none+right+4" = "viewprev_have_client"
+"none+left+4" = "viewnext_have_client"
+"none+up+4" = "enteroverview"
+"none+down+4" = "leaveoverview"
+
+# layout support:
+# tile,scroller,grid,deck,monocle,center_tile,vertical_tile,vertical_scroller
+
+[[rule.tag_rule]]
+id = 1
+layout_name = "dwindle"
+
+[[rule.tag_rule]]
+id = 2
+layout_name = "dwindle"
+
+[[rule.tag_rule]]
+id = 3
+layout_name = "dwindle"
+
+[[rule.tag_rule]]
+id = 4
+layout_name = "dwindle"
+
+[[rule.tag_rule]]
+id = 5
+layout_name = "dwindle"
+
+[[rule.tag_rule]]
+id = 6
+layout_name = "dwindle"
+
+[[rule.tag_rule]]
+id = 7
+layout_name = "dwindle"
+
+[[rule.tag_rule]]
+id = 8
+layout_name = "dwindle"
+
+[[rule.tag_rule]]
+id = 9
+layout_name = "dwindle"
+
+# layer rule
+
+[[rule.layer_rule]]
+animation_type_open = "zoom"
+layer_name = "rofi"
+
+[[rule.layer_rule]]
+animation_type_close = "zoom"
+layer_name = "rofi"
+
+# monitor rules: DP-1 on the left with VRR, DP-2 on the right (same as niri)
+
+[[rule.monitor_rule]]
+name = "^DP-1$"
+width = 2560
+height = 1440
+refresh = 164.835
+x = 0
+y = 0
+vrr = 1
+
+[[rule.monitor_rule]]
+name = "^DP-2$"
+width = 1920
+height = 1080
+refresh = 74.924
+x = 2560
+y = 0
+
+# window rules (same as niri)
+# offset_x / offset_y are percent from the center; 100 is the screen edge
+
+# steam notification toasts: floating, unfocused, top-right corner
+[[rule.window_rule]]
+app_id = "steam"
+title = '^notificationtoasts_\d+_desktop$'
+is_floating = 1
+is_open_silent = 1
+offset_x = 100
+offset_y = -100
+
+# floating TUIs (wiremix on Mod+A)
+[[rule.window_rule]]
+app_id = "com.floating.tui"
+is_floating = 1
+
+# picture-in-picture (any browser): floating, bottom-right corner
+[[rule.window_rule]]
+title = '^Picture.in.[Pp]icture$'
+is_floating = 1
+offset_x = 100
+offset_y = 100
+
+# dropdown terminal: floating, top-right corner
+[[rule.window_rule]]
+app_id = "^dropdown$"
+is_floating = 1
+offset_x = 100
+offset_y = -100
+
+# satty (screenshot annotation): floating
+[[rule.window_rule]]
+app_id = '^(com\.gabm\.satty|satty)$'
+is_floating = 1
+
+# slurp selection overlay (screenshots): no animation, no blur, as the mango docs suggest
+[[rule.layer_rule]]
+layer_name = "selection"
+no_animation = 1
+no_blur = 1
+
+# steam games: allow tearing (sent to the screen as soon as they are ready)
+[[rule.window_rule]]
+app_id = "^steam_app_"
+force_tearing = 1

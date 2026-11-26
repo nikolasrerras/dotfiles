@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+unset FZF_DEFAULT_OPTS  # these pickers set their own fzf options
+# keys — searchable list of the mango key bindings (fzf in a floating kitty)
+# mango version of ~/.local/bin/keys: reads ~/.config/mango/config.toml instead of the niri config
+#
+#   keys       open the list in a floating kitty window
+#   keys tui   show it in the current terminal
+#   keys list  print the list
+
+SELF="$(realpath "$0")"
+CFG="$HOME/.config/mango/config.toml"
+
+list() {
+  python3 - "$CFG" <<'PY'
+import os, sys, tomllib
+
+with open(sys.argv[1], "rb") as f:
+    cfg = tomllib.load(f)
+
+MODS = {"super": "Mod", "ctrl": "Ctrl", "alt": "Alt", "shift": "Shift", "none": ""}
+ORDER = ["Mod", "Ctrl", "Alt", "Shift"]
+
+def pretty_key(combo, kind):
+    parts = combo.split("+")
+    mods = [MODS.get(p.lower(), p) for p in parts[:-1]]
+    mods = sorted((m for m in mods if m), key=lambda m: ORDER.index(m) if m in ORDER else 99)
+    key = parts[-1]
+    if len(key) == 1:
+        key = key.upper()
+    if kind == "mousebind":
+        key = key.replace("btn_", "") + " drag"
+    elif kind == "axisbind":
+        key = "wheel " + key.lower()
+    return "+".join(mods + [key])
+
+def describe(action):
+    name, _, args = action.partition(",")
+    if name in ("spawn", "spawn_shell"):
+        words = args.split()
+        if not words:
+            return action
+        return "run: " + " ".join([os.path.basename(words[0])] + [w for w in words[1:] if not w.startswith("-") and "=" not in w])
+    args = args.strip(",")
+    return name.replace("_", " ") + (f" {args}" if args else "")
+
+rows = []
+for kind in ("bind", "mousebind", "axisbind"):
+    for combo, action in cfg.get(kind, {}).get("default", {}).items():
+        rows.append((pretty_key(combo, kind), describe(action)))
+
+w = max(len(k) for k, _ in rows) + 3
+for k, d in rows:
+    print(f"{k:<{w}}{d}")
+PY
+  # things that are not mango binds
+  cat <<'TXT'
+bar: music  click        media player popup
+bar: music  right        play / pause
+bar: music  scroll       next / previous track
+bar: clock  click        date with seconds
+bar: clock  right        calendar
+bar: cpu/mem/gpu click   system popup
+bar: cpu/mem/gpu right   btop
+bar: volume scroll       volume (with osd)
+bar: volume right        mute
+bar: wifi   click        impala
+bar: power  hover        logout / suspend / restart
+bar: power  dbl-click    shutdown
+bar: power  right        power menu
+fish: Ctrl+R             history search (atuin)
+fish: Ctrl+T             find file (fzf)
+fish: Alt+C              jump to subfolder (fzf)
+fish: z <name>           jump to a folder you visited (zoxide)
+fish: y                  yazi, stay in its folder on exit
+TXT
+}
+
+case "${1:-}" in
+  "")
+    exec kitty --class=com.floating.tui \
+      -o remember_window_size=no -o close_on_child_death=yes \
+      -o initial_window_width=96c -o initial_window_height=34c \
+      -e "$SELF" tui ;;
+  tui)
+    list | fzf --ansi --color=16 --layout=reverse --border=none --no-sort \
+      --prompt="~/keys ❯ " --header="type to search · esc: close" >/dev/null ;;
+  list) list ;;
+  *) sed -n '2,8p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+esac

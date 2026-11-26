@@ -3,8 +3,8 @@
 
 * {
   all: unset;
-  font-family: "Terminess Nerd Font", monospace;
-  font-size: 16px;
+  font-family: "DepartureMono Nerd Font", monospace;
+  font-size: 22px;
 }
 
 .player {
@@ -12,7 +12,7 @@
   color: $fg;
   border: 2px solid $accent;
   border-radius: 0;
-  padding: 12px 14px;
+  padding: 12px 16px;
 }
 
 .header { margin-bottom: 10px; }
@@ -27,7 +27,7 @@
   background-position: center;
 }
 .art-placeholder {
-  font-size: 16px;
+  font-size: 22px;
   color: $muted;
 }
 
@@ -63,7 +63,7 @@
 }
 .osd-text {
   color: $accent;
-  font-size: 16px;
+  font-size: 22px;
 }
 
 // calendar + system popups (reuse .player / .prompt / .btn)
@@ -71,7 +71,7 @@
 
 // power popup
 .power .controls { margin-top: 12px; }
-.power .btn { font-size: 16px; padding: 6px 10px; }
+.power .btn { font-size: 22px; padding: 6px 10px; }
 
 // audio popup (reuses .player / .prompt / .key / .btn)
 .audio-levels { margin-top: 10px; }
@@ -101,11 +101,11 @@
 
 // media player buttons, bigger than the rest
 .media-controls .btn { padding: 4px 8px; }
-.media-controls .btn label { font-size: 24px; }
+.media-controls .btn label { font-size: 22px; }
 
 // volume OSD, bigger text
-.osd label { font-size: 24px; }
-.osd { padding: 10px 18px; }
+.osd label { font-size: 22px; }
+.osd { padding: 8px 16px; }
 
 
 // media seek bar: each cell is a button
@@ -120,3 +120,6 @@
 
 // bigger click area for the bar cells (transparent, the glyphs stay the same)
 .cell { padding: 4px 0; }
+
+// font-specific layout fixes, written by fontset
+@import "font";

@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# fontset — switch the UI font everywhere (kitty, waybar, eww for niri and mango, mako, fuzzel, swayosd, imv)
+#   fontset terminus | departure | jetbrains
+#   fontset list          print the available fonts (used by the theme pickers)
+# Each font keeps the sizes that look right for it.
+
+C=$HOME/.config
+
+case $1 in
+  list) printf '%s\n' terminus departure jetbrains; exit 0 ;;
+  # css family / kitty family / kitty pt / waybar px / eww px / eww big px / swayosd px / mako pt / fuzzel+imv pt
+  terminus)  css="Terminess Nerd Font";     kfam="Terminess Nerd Font Mono";     kpt=15;   bar=18; ew=16; big=24; osd=16; mk=13.5; fz=13.5 ;;
+  departure) css="DepartureMono Nerd Font"; kfam="DepartureMono Nerd Font Mono"; kpt=16.5; bar=22; ew=22; big=22; osd=22; mk=16.5; fz=16.5 ;;
+  jetbrains) css="JetBrainsMono Nerd Font"; kfam="JetBrainsMono Nerd Font";      kpt=13.5; bar=16; ew=15; big=22; osd=15; mk=12.5; fz=13.5 ;;
+  *) sed -n '2,5p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+esac
+
+# kitty
+sed -i -e "s/^font_family .*/font_family      family=\"$kfam\"/" -e "s/^font_size .*/font_size $kpt/" "$C/kitty/kitty.conf"
+
+# waybar (the style is shared by niri and mango)
+sed -i -e "s/font-family: \"[^\"]*\"/font-family: \"$css\"/" -e "s/font-size: [0-9.]*px/font-size: ${bar}px/g" "$C/waybar/style.css"
+
+# eww (niri and mango copies): normal text, then the big media buttons and the OSD
+for s in "$C/eww/eww.scss" "$C/mango/eww/eww.scss"; do
+  [[ -f $s ]] || continue
+  sed -i -e "s/font-family: \"[^\"]*\"/font-family: \"$css\"/" \
+         -e "s/font-size: [0-9.]*px/font-size: ${ew}px/g" \
+         -e "/\.media-controls \.btn label\|\.osd label/s/font-size: [0-9.]*px/font-size: ${big}px/" "$s"
+done
+
+# eww layout fixes per font (font.scss, imported at the end of eww.scss).
+# Only Departure needs them: at 22px its glyphs are wide, so the bars would push
+# the times and values out of the popups.
+for d in "$C/eww" "$C/mango/eww"; do
+  [[ -d $d ]] || continue
+  if [[ $1 == departure ]]; then
+    printf '%s\n' \
+      '// written by fontset for Departure: popups grow to fit, nothing is cut' \
+      '.bar > label { min-width: 80px; }' \
+      '.audio-row > label { min-width: 70px; }' \
+      '.sys { min-width: 540px; }' > "$d/font.scss"
+  else
+    echo "// written by fontset: no layout fixes needed for $1" > "$d/font.scss"
+  fi
+done
+
+# swayosd
+sed -i -e "s/font-family: \"[^\"]*\"/font-family: \"$css\"/" -e "s/font-size: [0-9.]*px/font-size: ${osd}px/g" "$C/swayosd/style.css"
+
+# mako, fuzzel, imv (sizes in points)
+sed -i "s/^font=.*/font=$css $mk/" "$C/mako/config"
+sed -i "s/^font=.*/font=$css:size=$fz/" "$C/fuzzel/fuzzel.ini"
+for f in "$C/wallust/templates/imv.config" "$C/imv/config"; do
+  [[ -f $f ]] && sed -i "s/^overlay_font = .*/overlay_font = $css:$fz/" "$f"
+done
+
+# reload whatever is running (only one of the two eww configs runs at a time)
+pkill -SIGUSR2 -x waybar
+eww reload >/dev/null 2>&1
+eww -c "$C/mango/eww" reload >/dev/null 2>&1
+makoctl reload >/dev/null 2>&1
+pkill -x swayosd-server && setsid -f swayosd-server >/dev/null 2>&1
+pkill -USR1 -x kitty   # open kitty windows reload their config
+notify-send -a fontset "font" "$1"

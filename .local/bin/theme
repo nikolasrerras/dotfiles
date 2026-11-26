@@ -31,6 +31,7 @@ ALL_LABEL="★ All themes…"
 MATCH_LABEL="◇ Match wallpaper…"
 RANDOM_LABEL="random"
 GROUPS_LABEL="◆ accents…"
+FONT_LABEL="▲ font…"
 TRANSP_PREFIX="◐ transparency:"
 BLUR_PREFIX="◌ blur:"
 NIGHT_PREFIX="☾ night light:"
@@ -240,6 +241,7 @@ cmd_preview() {
     printf '  The first run can take a while.\n'
     return
   fi
+  if [[ $name == "$FONT_LABEL" ]]; then echo; echo "  terminus, departure or jetbrains mono"; echo "  everywhere: terminal, bar, popups"; return; fi
   if [[ $name == "$GROUPS_LABEL" ]]; then
     printf '\n  \e[1mAccent of each group\e[0m\n\n'
     printf '  windows        focus ring\n'
@@ -746,6 +748,7 @@ cmd_tui() {
         recent_themes
         printf '%s\n%s\n%s\n' "$ALL_LABEL" "$MATCH_LABEL" "$RANDOM_LABEL"
         printf '%s\n' "$GROUPS_LABEL"
+        echo "$FONT_LABEL"
         transp_label
         blur_label
         night_label
@@ -767,6 +770,7 @@ cmd_tui() {
 
     # transparency / blur: change and stay in the picker
     if [[ $name == "$GROUPS_LABEL" ]]; then pick_groups; continue; fi
+    if [[ $name == "$FONT_LABEL" ]]; then f=$(~/.local/bin/fontset list | fzf --layout=reverse --border=none --prompt="font ❯ "); [[ -n $f ]] && ~/.local/bin/fontset "$f"; continue; fi
     if [[ $name == "$TRANSP_PREFIX"* ]]; then pick_transparency; continue; fi
     if [[ $name == "$BLUR_PREFIX"* ]]; then pick_blur; continue; fi
     if [[ $name == "$NIGHT_PREFIX"* ]]; then pick_night; continue; fi

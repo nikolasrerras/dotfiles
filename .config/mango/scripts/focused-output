@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Prints the monitor under the pointer (e.g. DP-1), or nothing; mango replacement for `niri msg -j focused-output`.
+#   --model   print its model instead (e.g. Odyssey G5)
+#   --eww     print its index for eww --screen. Under mango GTK sees no monitor models, only indexes,
+#             and their order changes (e.g. after suspend), so the index is looked up by position every time.
+name=$(mmsg get cursorpos 2>/dev/null | jq -r '.monitor // empty')
+# fall back to the focused monitor
+[[ -n $name ]] || name=$(mmsg get all-monitors 2>/dev/null | jq -r '.monitors[] | select(.active) | .name' | head -n1)
+
+case $1 in
+--model)
+  wlr-randr --json 2>/dev/null | jq -r --arg n "$name" '.[] | select(.name == $n) | .model'
+  ;;
+--eww)
+  # the monitor's x position in the layout, then the GTK monitor at the same x
+  x=$(mmsg get all-monitors 2>/dev/null | jq -r --arg n "$name" '.monitors[] | select(.name == $n) | .x')
+  [[ -n $x ]] || exit 0
+  python3 - "$x" <<'PY'
+import sys, gi
+gi.require_version("Gdk", "3.0")
+from gi.repository import Gdk
+d = Gdk.Display.get_default()
+x = int(float(sys.argv[1]))
+for i in range(d.get_n_monitors()):
+    if d.get_monitor(i).get_geometry().x == x:
+        print(i)
+        break
+PY
+  ;;
+*)
+  echo "$name"
+  ;;
+esac
+

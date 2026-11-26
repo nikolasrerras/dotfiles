@@ -97,7 +97,7 @@ output "DP-2" {
 // https://yalter.github.io/niri/Configuration:-Layout
 layout {
     // Set gaps around windows in logical pixels.
-    gaps 7
+    gaps 8
 
     // When to center a column when changing focus, options are:
     // - "never", default behavior, focusing an off-screen column will keep at the left
@@ -326,10 +326,10 @@ window-rule {
 
 binds {
 
-    Mod+Shift+B { spawn "zen-browser" "--private-window"; }
-    Mod+B { spawn "zen-browser"; }
+    Mod+Shift+B { spawn "brave-origin" "--incognito"; }
+    Mod+B { spawn "brave-origin"; }
     Mod+D { spawn "discord"; }
-    Mod+M { spawn "spotify"; }
+    Mod+M { spawn "spotify-launcher"; }
     Mod+N { spawn "kitty" "nvim"; }
     Mod+S { spawn "steam"; }
     Mod+E { spawn "kitty" "yazi"; }
@@ -623,9 +623,9 @@ environment {
     QT_QPA_PLATFORMTHEME "gtk3"
 }
 
-// Zen picture-in-picture: floating, bottom-right corner
+// Picture-in-picture (any browser): floating, bottom-right corner
 window-rule {
-    match app-id=r#"^zen(-browser)?$"# title=r#"^Picture.in.Picture$"#
+    match title=r#"^Picture.in.[Pp]icture$"#
     open-floating true
     default-floating-position x=32 y=32 relative-to="bottom-right"
 }
@@ -662,3 +662,6 @@ spawn-at-startup "/home/nikolas/.config/eww/scripts/lang-osd.sh"
 
 // volume OSD on every volume change (eww)
 spawn-at-startup "/home/nikolas/.config/eww/scripts/volume-osd.sh"
+
+// close eww popups on workspace change
+spawn-at-startup "/home/nikolas/.config/eww/scripts/popup-autoclose.sh"

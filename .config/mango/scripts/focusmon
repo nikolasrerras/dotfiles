@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# focusmon <dir> — switch monitor and move the pointer to the middle of the new one, like niri
+# (works on empty monitors too, since it does not depend on a window to warp to)
+mmsg dispatch focusmon,"$1"
+read -r mx my mw mh < <(mmsg get all-monitors | jq -r '.monitors[] | select(.active) | "\(.x) \(.y) \(.width) \(.height)"')
+read -r cx cy < <(mmsg get cursorpos | jq -r '"\(.x | floor) \(.y | floor)"')
+wlrctl pointer move $(( mx + mw / 2 - cx )) $(( my + mh / 2 - cy ))

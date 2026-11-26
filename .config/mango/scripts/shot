@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# shot — screenshot → satty (annotate, then Ctrl+C to copy / Ctrl+S to save)
+#
+#   shot region   select an area with the mouse (default)
+#   shot screen   the whole focused monitor
+#   shot window   the focused window
+#
+# mango copy of ~/.local/bin/shot: screen and window ask mango (mmsg) instead of niri
+
+set -o pipefail
+source "$HOME/.cache/wallust/colors.sh" 2>/dev/null
+
+tmp=$(mktemp --suffix=.png)
+trap 'rm -f "$tmp"' EXIT
+
+case ${1:-region} in
+  region)
+    geo=$(slurp -d -w 2 -b "${background:-#000000}66" -c "${color4:-#ffffff}ff" -s "#00000000") || exit 0
+    grim -g "$geo" "$tmp" || exit 1
+    ;;
+  screen)
+    out=$("$HOME/.config/mango/scripts/focused-output")
+    [[ -n $out ]] || exit 1
+    grim -o "$out" "$tmp" || exit 1
+    ;;
+  window)
+    # mango has no "screenshot this window" action: take the focused window's
+    # position from mmsg and capture that area (anything floating on top shows too)
+    geo=$(mmsg get all-clients 2>/dev/null |
+      jq -r '.clients[] | select(.is_focused) | "\(.x),\(.y) \(.width)x\(.height)"' | head -n1)
+    [[ -n $geo ]] || exit 1
+    grim -g "$geo" "$tmp" || exit 1
+    ;;
+  *)
+    sed -n '2,7p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+esac
+
+satty --filename "$tmp"

@@ -1,0 +1,11 @@
+/* mango copy: the original waybar style plus the fixed-tags rule */
+@import url("file:///home/nikolas/.config/waybar/style.css");
+
+/* tags 1-5 are always shown; tags 6-9 only when they hold windows (or are active) */
+/* the label needs its own rule: the main style sets the font size on every element */
+#workspaces button.empty:nth-child(n+6):not(.active),
+#workspaces button.empty:nth-child(n+6):not(.active) label { font-size: 0; min-width: 0; padding: 0; margin: 0; border: none; color: transparent; }
+
+/* tags with windows: same white as the clock and the values; empty ones stay dim, the active one keeps the accent */
+#workspaces button:not(.empty):not(.active),
+#workspaces button:not(.empty):not(.active) label { color: @foreground; }

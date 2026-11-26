@@ -3,14 +3,18 @@
   "position": "top",
   "height": 30,
   "modules-left": [
-    "niri/workspaces"
+    "niri/workspaces",
+    "custom/cpu",
+    "memory",
+    "custom/gpu"
   ],
   "modules-center": [
     "custom/music",
     "clock"
   ],
   "modules-right": [
-    "tray",
+    "group/tray-drawer",
+    "privacy",
     "niri/language",
     "bluetooth",
     "pulseaudio",
@@ -23,25 +27,31 @@
   },
   "custom/music": {
     "exec": "/home/nikolas/.config/waybar/scripts/music-scroll.sh",
-    "format": "{}",
+    "format": "<span alpha=\"55%\">{icon}</span> {text}",
     "hide-empty-text": true,
     "escape": true,
     "tooltip": false,
     "on-click": "/home/nikolas/.config/eww/scripts/popup.sh media",
     "on-click-right": "playerctl play-pause",
     "on-scroll-up": "playerctl next",
-    "on-scroll-down": "playerctl previous"
+    "on-scroll-down": "playerctl previous",
+    "return-type": "json",
+    "format-icons": {
+      "playing": "󰐊",
+      "paused": "󰏤"
+    }
   },
   "clock": {
     "format": "{:%H:%M}",
     "format-alt": "{:%A %d %B %Y, %H:%M:%S}",
     "interval": 1,
-    "on-click-right": "/home/nikolas/.config/eww/scripts/popup.sh calendar",
     "tooltip": true,
-    "tooltip-format": "{:%A %d %B %Y}"
+    "tooltip-format": "{:%A %d %B %Y}",
+    "on-click": "/home/nikolas/.config/eww/scripts/popup.sh calendar",
+    "format-alt-click": "click-right"
   },
   "custom/power": {
-    "format": " <span size=\"larger\">󰐥</span> ",
+    "format": "<span size=\"larger\">󰐥</span>",
     "tooltip": true,
     "tooltip-format": "Power · right click: menu",
     "on-click-right": "/home/nikolas/.local/bin/powermenu",
@@ -97,17 +107,17 @@
   },
   "memory": {
     "interval": 2,
-    "format": "<span alpha=\"55%\">󰆼</span> {percentage}%",
+    "format": "<span alpha=\"55%\">mem</span> {used:0.1f}G",
     "on-click": "/home/nikolas/.config/eww/scripts/popup.sh system",
-    "on-click-right": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c btop"
+    "on-click-right": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=36c btop"
   },
   "custom/gpu": {
     "interval": 2,
     "exec": "/home/nikolas/.config/waybar/scripts/gpu.sh",
-    "format": "<span alpha=\"55%\">󰢮</span> {}%",
+    "format": "<span alpha=\"55%\">gpu</span> {}%",
     "on-click": "/home/nikolas/.config/eww/scripts/popup.sh system",
     "return-type": "json",
-    "on-click-right": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c btop"
+    "on-click-right": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=36c btop"
   },
   "niri/language": {
     "format": "<span alpha=\"55%\">󰌌</span> {short}",
@@ -118,25 +128,27 @@
     "spacing": 0
   },
   "custom/cpu": {
-    "exec": "/home/nikolas/.config/waybar/scripts/cpu.sh",
+    "exec": "/home/nikolas/.config/waybar/scripts/cpu-spark.sh",
     "return-type": "json",
     "interval": 2,
-    "format": "<span alpha=\"55%\"></span> {}%",
+    "format": "<span alpha=\"55%\">cpu</span> {}%",
     "on-click": "/home/nikolas/.config/eww/scripts/popup.sh system",
-    "on-click-right": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c btop"
+    "on-click-right": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=36c btop"
   },
   "custom/wifi": {
-    "exec": "/home/nikolas/.config/waybar/scripts/wifi.sh",
+    "exec": "/home/nikolas/.config/waybar/scripts/net.sh",
     "return-type": "json",
     "interval": 5,
-    "format": "<span alpha=\"55%\">{icon}</span> {percentage}%",
-    "format-icons": [
-      "󰤯",
-      "󰤟",
-      "󰤢",
-      "󰤥",
-      "󰤨"
-    ],
+    "format": "<span alpha=\"55%\">{icon}</span> {text}",
+    "format-icons": {
+      "ethernet": "󰈀",
+      "disconnected": "󰤮",
+      "wifi-0": "󰤯",
+      "wifi-1": "󰤟",
+      "wifi-2": "󰤢",
+      "wifi-3": "󰤥",
+      "wifi-4": "󰤨"
+    },
     "tooltip": true,
     "on-click": "/home/nikolas/.config/eww/scripts/popup.sh wifi",
     "on-click-middle": "kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 impala > /dev/null 2>&1"
@@ -148,5 +160,38 @@
   "custom/tray-r": {
     "format": "",
     "tooltip": false
+  },
+  "group/tray-drawer": {
+    "orientation": "horizontal",
+    "drawer": {
+      "click-to-reveal": true,
+      "transition-duration": 250,
+      "transition-left-to-right": false
+    },
+    "modules": [
+      "custom/tray-label",
+      "tray"
+    ]
+  },
+  "custom/tray-label": {
+    "format": "<span alpha=\"55%\">󰅁</span>",
+    "tooltip": false
+  },
+  "privacy": {
+    "icon-size": 14,
+    "icon-spacing": 6,
+    "transition-duration": 250,
+    "modules": [
+      {
+        "type": "screenshare",
+        "tooltip": true,
+        "tooltip-icon-size": 16
+      },
+      {
+        "type": "audio-in",
+        "tooltip": true,
+        "tooltip-icon-size": 16
+      }
+    ]
   }
 }

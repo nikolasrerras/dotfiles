@@ -56,7 +56,7 @@
 
 (defwindow media
   :monitor 0
-  :geometry (geometry :x "-120px" :y "6px" :width "420px" :anchor "top center")
+  :geometry (geometry :x "-120px" :y "8px" :width "420px" :anchor "top center")
   :stacking "overlay"
   :exclusive false
   :focusable false
@@ -114,7 +114,7 @@
 
 (defwindow calendar
   :monitor 0
-  :geometry (geometry :y "6px" :width "300px" :anchor "top center")
+  :geometry (geometry :y "8px" :width "300px" :anchor "top center")
   :stacking "overlay" :exclusive false :focusable false
   (eventbox :onhover "eww update calendar_inside=true"
 
@@ -122,7 +122,7 @@
 
 (defwindow system
   :monitor 0
-  :geometry (geometry :x "6px" :y "6px" :width "440px" :anchor "top right")
+  :geometry (geometry :x "8px" :y "8px" :width "440px" :anchor "top left")
   :stacking "overlay" :exclusive false :focusable false
   (eventbox :onhover "eww update system_inside=true"
 
@@ -153,7 +153,7 @@
 
 (defwindow power
   :monitor 0
-  :geometry (geometry :x "6px" :y "6px" :width "260px" :anchor "top right")
+  :geometry (geometry :x "8px" :y "8px" :width "260px" :anchor "top right")
   :stacking "overlay" :exclusive false :focusable false
   (eventbox :onhover "eww update power_inside=true"
 
@@ -203,7 +203,7 @@
 
 (defwindow audio
   :monitor 0
-  :geometry (geometry :x "6px" :y "6px" :width "400px" :anchor "top right")
+  :geometry (geometry :x "8px" :y "8px" :width "400px" :anchor "top right")
   :stacking "overlay" :exclusive false :focusable false
   (eventbox :onhover "eww update audio_inside=true"
 
@@ -214,27 +214,41 @@
 ;; ─────────────────────────────────────────────
 (defvar wifi_inside false)
 (defvar wifi_token "0")
+(defvar wifi_open false)  ; true while the wifi popup is open (scripts/popup.sh)
+(defpoll eth :interval "1s" :run-while wifi_open
+  :initial '{"connected":false,"dev":"","ip":"","gw":"","link":"","down":"","up":"","rx":"","tx":""}'
+  "/home/nikolas/.config/eww/scripts/eth.sh")
 (defvar wifi '{"powered":false,"state":"off","ssid":"","ip":"","networks":[]}')
 
 (defwidget wifi-popup []
   (box :class "player" :orientation "v" :space-evenly false
     (label :class "prompt" :xalign 0
-           :text "~/wifi ❯ ${!wifi.powered ? 'off' : (wifi.ssid != '' ? wifi.ssid : wifi.state)}")
-    (box :class "wifi-info" :orientation "v" :space-evenly false :visible {wifi.ssid != ""}
+           :text "${eth.connected ? '~/ethernet ❯ ' + eth.dev : '~/wifi ❯ ' + (!wifi.powered ? 'off' : (wifi.ssid != '' ? wifi.ssid : wifi.state))}")
+    ;; wired connection, shown only when a cable is connected (scripts/eth.sh)
+    (box :class "wifi-info" :orientation "v" :space-evenly false :visible {eth.connected}
+      (label :class "key wifi-title" :xalign 0 :text "ethernet")
+      (row :key "dev    " :value {eth.dev})
+      (row :key "ip     " :value {eth.ip})
+      (row :key "gateway" :value {eth.gw})
+      (row :key "link   " :value {eth.link})
+      (row :key "down   " :value {eth.down})
+      (row :key "up     " :value {eth.up})
+      (row :key "total  " :value "↓${eth.rx}  ↑${eth.tx}"))
+    (box :class "wifi-info" :orientation "v" :space-evenly false :visible {wifi.ssid != "" && !eth.connected}
       (row :key "ip     " :value {wifi.ip != "" ? wifi.ip : "-"}))
-    (label :class "key wifi-title" :xalign 0 :visible {wifi.powered} :text "networks")
-    (box :orientation "v" :space-evenly false :visible {wifi.powered}
+    (label :class "key wifi-title" :xalign 0 :visible {wifi.powered && !eth.connected} :text "networks")
+    (box :orientation "v" :space-evenly false :visible {wifi.powered && !eth.connected}
       (for n in {wifi.networks}
         (button :class {n.connected ? "btn active" : "btn"}
                 :onclick "setsid -f ~/.config/eww/scripts/wifi.sh connect ${n.b64}"
           (label :xalign 0 :limit-width 40
                  :text "${n.icon} ${n.name}${n.secure && !n.known ? '  󰌾' : ''}"))))
     (box :class "controls" :orientation "h" :space-evenly false :spacing 14 :halign "center"
-      (button :class "btn" :onclick "setsid -f ~/.config/eww/scripts/wifi.sh scan" "scan")
+      (button :class "btn" :visible {!eth.connected} :onclick "setsid -f ~/.config/eww/scripts/wifi.sh scan" "scan")
       (button :class {wifi.powered ? "btn" : "btn active"}
               :onclick "setsid -f ~/.config/eww/scripts/wifi.sh power"
-              {wifi.powered ? "off" : "on"})
-      (button :class "btn" :visible {wifi.ssid != ""}
+              {wifi.powered ? "wifi off" : "wifi on"})
+      (button :class "btn" :visible {wifi.ssid != "" && !eth.connected}
               :onclick "setsid -f ~/.config/eww/scripts/wifi.sh disconnect" "disconnect")
       (button :class "btn"
               :onclick "eww close wifi; setsid -f kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 impala >/dev/null 2>&1"
@@ -242,7 +256,7 @@
 
 (defwindow wifi
   :monitor 0
-  :geometry (geometry :x "6px" :y "6px" :width "440px" :anchor "top right")
+  :geometry (geometry :x "8px" :y "8px" :width "440px" :anchor "top right")
   :stacking "overlay" :exclusive false :focusable false
   (eventbox :onhover "eww update wifi_inside=true"
 
@@ -279,7 +293,7 @@
 
 (defwindow bluetooth
   :monitor 0
-  :geometry (geometry :x "6px" :y "6px" :width "380px" :anchor "top right")
+  :geometry (geometry :x "8px" :y "8px" :width "380px" :anchor "top right")
   :stacking "overlay" :exclusive false :focusable false
   (eventbox :onhover "eww update bluetooth_inside=true"
 

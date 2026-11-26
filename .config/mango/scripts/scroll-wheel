@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Mod+wheel like niri, but only on scroller tags; on any other layout it does nothing.
+#
+#   scroll-wheel focus up|down   focus the previous / next window
+#   scroll-wheel move  up|down   move the window one step back / forward
+#
+# scroller (S): wheel moves left/right; vertical scroller (VS): up/down.
+
+what=$1 dir=$2
+
+layout=$(mmsg get all-monitors 2>/dev/null |
+  jq -r '.monitors[] | select(.active) | .layout_symbol' 2>/dev/null | head -n1)
+
+case $layout in
+  S)  [[ $dir == down ]] && dir=right || dir=left ;;
+  VS) ;;                       # up / down already match
+  *)  exit 0 ;;                # not a scroller tag: ignore the wheel
+esac
+
+case $what in
+  focus) mmsg dispatch "focusdir,$dir" ;;
+  move)  mmsg dispatch "move_client,$dir" ;;
+esac

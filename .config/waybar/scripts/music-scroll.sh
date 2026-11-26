@@ -27,8 +27,8 @@ read_player() {
     playerctl metadata --format $'{{status}}\t{{title}}\t{{artist}}\t{{playerName}}' 2>/dev/null)
 
   case $status in
-    Playing) icon="󰎈" ;;
-    Paused)  icon="󰏤" ;;
+    Playing) icon="playing" ;;
+    Paused)  icon="paused" ;;
     *)       icon="" new=""; return ;;
   esac
   if [[ -z $title ]]; then
@@ -39,6 +39,9 @@ read_player() {
     new="$title — $player"
   fi
 }
+
+# one JSON line for waybar: the text (escaped for JSON) and the state, which waybar shows as a dim "play"/"pause" label
+out() { local t=${1//\\/\\\\}; t=${t//\"/\\\"}; printf '{"text": "%s", "alt": "%s"}\n' "$t" "$icon"; }
 
 while true; do
   # ask for the song once a second, scroll in between
@@ -53,13 +56,13 @@ while true; do
   fi
 
   if [[ -z $text ]]; then
-    echo ""                         # nothing playing: module hides itself
+    echo '{"text": ""}'              # nothing playing: module hides itself
   else
     max=$((${#text} - WIDTH))       # how far the window can slide
     if ((max <= 0)); then
-      printf '%s  %s\n' "$icon" "$text"
+      out "$text"
     else
-      printf '%s  %s\n' "$icon" "${text:offset:WIDTH}"
+      out "${text:offset:WIDTH}"
       if ((wait > 0)); then
         ((wait--))                  # resting at one of the ends
       else

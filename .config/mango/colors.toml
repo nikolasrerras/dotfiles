@@ -1,0 +1,8 @@
+# written by the mango copy of theme, do not edit by hand
+
+[global]
+focus_color = 0x269D9Aff
+border_color = 0x0F141Fff
+blur = 0
+blur_layer = 0
+blur_optimized = 1

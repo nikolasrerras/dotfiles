@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# mango copy of ~/.local/bin/powermenu: logout quits mango (no niri fallback)
+
+options="󰗼  logout\n󰤄  suspend\n󰜉  restart\n󰐥  shutdown"
+
+chosen=$(echo -e "$options" | fuzzel --config /home/nikolas/.config/fuzzel/power.ini --dmenu --prompt "~/power ❯ " --lines 4 --width 34 --line-height 30 2>/dev/null)
+
+case "$chosen" in
+*logout) mmsg dispatch quit >/dev/null 2>&1 ;;
+*suspend) systemctl suspend >/dev/null 2>&1 ;;
+*restart) systemctl reboot --no-wall >/dev/null 2>&1 ;;
+*shutdown) systemctl poweroff --no-wall >/dev/null 2>&1 ;;
+esac

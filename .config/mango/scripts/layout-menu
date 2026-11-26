@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# Pick a layout for the current tag from a fuzzel menu.
+# The chosen layout applies only to the focused tag (layouts are per tag in mango).
+# The list comes from mango itself (mmsg get layouts), so new layouts show up after
+# a mango update; if that fails, the built-in list below is used.
+
+fallback="dwindle
+scroller
+vertical_scroller
+tile
+right_tile
+center_tile
+vertical_tile
+fair
+vertical_fair
+grid
+vertical_grid
+monocle
+deck
+vertical_deck"
+
+layouts=$(mmsg get layouts 2>/dev/null |
+  jq -r '.. | objects | .name? // empty' 2>/dev/null |
+  grep -E '^[a-z_]+$')
+[[ -n $layouts ]] || layouts=$fallback
+
+choice=$(printf '%s\n' "$layouts" | fuzzel --dmenu --prompt "layout: ")
+
+# Nothing chosen (Esc): do nothing
+[[ -z $choice ]] && exit 0
+
+mmsg dispatch "setlayout,$choice"

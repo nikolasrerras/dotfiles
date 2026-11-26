@@ -5,6 +5,7 @@
 prev=$(wpctl get-volume @DEFAULT_AUDIO_SINK@)
 pactl subscribe | grep --line-buffered "'change' on sink #" | while read -r _; do
   cur=$(wpctl get-volume @DEFAULT_AUDIO_SINK@)
+  if [[ -z $prev || $SECONDS -lt 5 ]]; then prev=$cur; continue; fi  # login: PipeWire is still starting, just remember the state
   [[ $cur == "$prev" ]] && continue
   prev=$cur
   ~/.config/eww/scripts/volume.sh show
