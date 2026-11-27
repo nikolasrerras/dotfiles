@@ -268,14 +268,13 @@ exec_once = [
 "SUPER+v" = "togglefloating,"  # niri: Mod+V
 "SUPER+f" = "togglemaximizescreen,"  # niri: Mod+F maximize-column
 "SUPER+SHIFT+f" = "togglefullscreen,"  # niri: Mod+Shift+F
-"ALT+SHIFT+f" = "togglefakefullscreen,"
 "SUPER+o" = "toggleoverview"  # overview (niri: Mod+O)
 "SUPER+w" = "spawn,/home/nikolas/.config/mango/scripts/layout-menu"  # layout menu (niri: Mod+W tabbed column)
 "SUPER+SHIFT+I" = "restore_minimized"
 "ALT+z" = "toggle_scratchpad"
 
 # scroller layout
-"SUPER+CTRL+f" = "set_proportion,1.0"  # niri: Mod+Ctrl+F (closest match)
+"SUPER+CTRL+f" = "togglefakefullscreen,"  # app thinks it is fullscreen, the window stays in its tile
 "SUPER+r" = "switch_proportion_preset,"  # niri: Mod+R
 "SUPER+bracketleft" = "scroller_stack,left"  # niri: Mod+[ consume-or-expel
 "SUPER+bracketright" = "scroller_stack,right"  # niri: Mod+] consume-or-expel
@@ -345,9 +344,6 @@ exec_once = [
 "SUPER+SHIFT+CTRL+j" = "tagmon,down"
 
 # gaps
-"ALT+SHIFT+X" = "incgaps,1"
-"ALT+SHIFT+Z" = "incgaps,-1"
-"ALT+SHIFT+R" = "togglegaps"
 
 # movewin
 "CTRL+SHIFT+Up" = "movewin,+0,-50"

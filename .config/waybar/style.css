@@ -8,8 +8,8 @@
 * {
     border: none;
     border-radius: 0;
-    font-family: "JetBrainsMono Nerd Font", monospace;
-    font-size: 16px;
+    font-family: "DepartureMono Nerd Font", monospace;
+    font-size: 22px;
     min-height: 0;
     margin: 0;
     padding: 0;
@@ -146,7 +146,7 @@ tooltip label {
 
 
 #workspaces button label {
-    font-size: 16px;
+    font-size: 22px;
 }
 
 /* custom modules: waybar 0.16 no longer sets :hover on them, so use their container */
