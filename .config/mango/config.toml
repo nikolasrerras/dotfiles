@@ -325,6 +325,16 @@ exec_once = [
 "SUPER+SHIFT+7" = "tag,7,0"
 "SUPER+SHIFT+8" = "tag,8,0"
 "SUPER+SHIFT+9" = "tag,9,0"
+# toggleview: show / hide tag N next to what is already on screen
+"SUPER+CTRL+1" = "toggleview,1"
+"SUPER+CTRL+2" = "toggleview,2"
+"SUPER+CTRL+3" = "toggleview,3"
+"SUPER+CTRL+4" = "toggleview,4"
+"SUPER+CTRL+5" = "toggleview,5"
+"SUPER+CTRL+6" = "toggleview,6"
+"SUPER+CTRL+7" = "toggleview,7"
+"SUPER+CTRL+8" = "toggleview,8"
+"SUPER+CTRL+9" = "toggleview,9"
 
 # monitor switch (same keys as niri)
 "SUPER+SHIFT+Left" = "spawn,/home/nikolas/.config/mango/scripts/focusmon left"

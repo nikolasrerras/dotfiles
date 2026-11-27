@@ -189,7 +189,8 @@
   "mango/workspaces": {
     "format": "{icon}",
     "hide-empty": false,
-    "on-click": "activate"
+    "on-click": "activate",
+    "on-click-right": "toggle"
   },
   "mango/language": {
     "format": "<span alpha=\"55%\">󰌌</span> {short}",
