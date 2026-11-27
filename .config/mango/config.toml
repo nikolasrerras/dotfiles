@@ -238,9 +238,9 @@ exec_once = [
 
 # exit (quit moved off SUPER+m, which now opens spotify; same key as niri)
 "CTRL+ALT+Delete" = "quit"
-"SUPER+q" = "killclient,"
+"SUPER+q" = "smartkillclient,"  # close; a window on several tags only leaves the current one
 "SUPER+CTRL+SHIFT+q" = "killclient,force"  # force-kill the focused app when it hangs (SIGKILL)
-"SUPER+semicolon" = "killclient,"
+"SUPER+semicolon" = "smartkillclient,"  # same physical key as SUPER+q on the greek layout
 
 # switch window focus
 "SUPER+Tab" = "focusstack,next"  # next window of the tag (mango default)
