@@ -1,0 +1,18 @@
+#!/bin/sh
+# toggle a named scratchpad by name (spotify, dropdown)
+# if it is visible on another monitor, hide it there instead of moving it to this one
+case "$1" in
+  spotify)  app=Spotify;  title=none; cmd=spotify-launcher ;;
+  dropdown) app=dropdown; title=none; cmd="kitty --class=dropdown -o confirm_os_window_close=0" ;;
+  *) echo "usage: scratchpad spotify|dropdown" >&2; exit 1 ;;
+esac
+arg="toggle_named_scratchpad,$app,$title,$cmd"
+here=$(mmsg get all-monitors | jq -r "(.monitors // .)[] | select(.active) | .name")
+there=$(mmsg get all-clients | jq -r --arg a "$app" --arg t "$title" ".clients[] | select(.appid == \$a and (\$t == \"none\" or .title == \$t) and .is_visible) | .monitor" | head -n 1)
+if [ -n "$there" ] && [ "$there" != "$here" ]; then
+  mmsg dispatch "focusmon,$there"
+  mmsg dispatch "$arg"
+  mmsg dispatch "focusmon,$here"
+  exit 0
+fi
+mmsg dispatch "$arg"
