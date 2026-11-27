@@ -376,8 +376,6 @@ exec_once = [
 "SUPER+CTRL+SHIFT+DOWN" = "spawn,/home/nikolas/.config/mango/scripts/scroll-wheel move down"
 "SUPER+SHIFT+UP" = "viewtoleft,0"
 "SUPER+SHIFT+DOWN" = "viewtoright,0"
-"SUPER+CTRL+UP" = "tagtoleft,0"
-"SUPER+CTRL+DOWN" = "tagtoright,0"
 
 [gesturebind.default]
 
