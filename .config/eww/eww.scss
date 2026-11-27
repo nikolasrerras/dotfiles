@@ -3,8 +3,8 @@
 
 * {
   all: unset;
-  font-family: "DepartureMono Nerd Font", monospace;
-  font-size: 22px;
+  font-family: "JetBrainsMono Nerd Font", monospace;
+  font-size: 15px;
 }
 
 .player {
@@ -27,7 +27,7 @@
   background-position: center;
 }
 .art-placeholder {
-  font-size: 22px;
+  font-size: 15px;
   color: $muted;
 }
 
@@ -63,7 +63,7 @@
 }
 .osd-text {
   color: $accent;
-  font-size: 22px;
+  font-size: 15px;
 }
 
 // calendar + system popups (reuse .player / .prompt / .btn)
@@ -71,7 +71,7 @@
 
 // power popup
 .power .controls { margin-top: 12px; }
-.power .btn { font-size: 22px; padding: 6px 10px; }
+.power .btn { font-size: 15px; padding: 6px 10px; }
 
 // audio popup (reuses .player / .prompt / .key / .btn)
 .audio-levels { margin-top: 10px; }

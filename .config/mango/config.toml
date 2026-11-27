@@ -165,6 +165,8 @@ source = ["./colors.toml"]
 # environment (niri: environment block)
 env = [
   "QT_QPA_PLATFORMTHEME,gtk3",
+  "EDITOR,nvim",     # the Edit button of a config error opens nvim
+  "TERMINAL,kitty",
 ]
 
 # autostart (niri: spawn-at-startup; xwayland-satellite is not needed, mango has XWayland built in)
@@ -203,7 +205,7 @@ exec_once = [
 "SUPER+b" = "spawn,zen-browser"
 "SUPER+SHIFT+b" = "spawn,zen-browser --private-window"
 "SUPER+d" = "spawn,discord"
-"SUPER+m" = "spawn,spotify-launcher"
+"SUPER+m" = "toggle_named_scratchpad,Spotify,none,spotify-launcher"  # spotify as a scratchpad: show / hide, start it if needed
 "SUPER+n" = "spawn,kitty nvim"
 "SUPER+SHIFT+n" = "spawn,zeditor"
 "SUPER+s" = "spawn,steam"
@@ -278,7 +280,7 @@ exec_once = [
 "SUPER+bracketright" = "scroller_stack,right"  # niri: Mod+] consume-or-expel
 
 #dwindle layout(manual split mode)
-"alt+shift+Return" = "dwindle_toggle_split_direction"
+# "SUPER+CTRL+Return" = "dwindle_toggle_split_direction"  # only with dwindle_manual_split = 1
 
 # switch layout (SUPER+n now opens nvim; use the layout menu on SUPER+w)
 # "SUPER+n" = "switch_layout"
@@ -435,11 +437,11 @@ layout_name = "dwindle"
 
 [[rule.layer_rule]]
 animation_type_open = "zoom"
-layer_name = "rofi"
+layer_name = "launcher"  # fuzzel
 
 [[rule.layer_rule]]
 animation_type_close = "zoom"
-layer_name = "rofi"
+layer_name = "launcher"  # fuzzel
 
 # monitor rules: DP-1 on the left with VRR, DP-2 on the right (same as niri)
 
@@ -506,3 +508,10 @@ no_blur = 1
 [[rule.window_rule]]
 app_id = "^steam_app_"
 force_tearing = 1
+
+# spotify: named scratchpad on SUPER+m, floating in the middle
+[[rule.window_rule]]
+app_id = "^Spotify$"
+is_named_scratchpad = 1
+width = 1500
+height = 900
