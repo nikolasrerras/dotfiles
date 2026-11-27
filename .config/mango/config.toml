@@ -477,6 +477,8 @@ is_floating = 1
 # picture-in-picture (any browser): floating, bottom-right corner
 [[rule.window_rule]]
 title = '^Picture.in.[Pp]icture$'
+is_global = 1
+is_overlay = 1
 is_floating = 1
 offset_x = 100
 offset_y = 100
