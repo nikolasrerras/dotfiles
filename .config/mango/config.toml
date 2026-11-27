@@ -1,4 +1,5 @@
 [global]
+view_current_to_back = 1  # pressing the current tag's key again goes back to the previous tag
 scratchpad_cross_monitor = 1  # scratchpads open on the focused monitor, not where they first opened
 
 # More option see https://github.com/DreamMaoMao/mango/wiki/
