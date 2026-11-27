@@ -212,7 +212,7 @@ exec_once = [
 "SUPER+s" = "spawn,steam"  # open steam (already running in the tray, so this just shows the window)
 "SUPER+e" = "spawn,kitty yazi"
 "SUPER+SHIFT+e" = "spawn,nautilus"
-"SUPER+a" = "spawn,kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 wiremix"
+"SUPER+XF86AudioMute" = "spawn,/home/nikolas/.config/mango/scripts/scratchpad mixer"  # super + knob press: wiremix scratchpad (knob alone still mutes)
 
 # my scripts (same keys as niri; mango copies where needed)
 "SUPER+Escape" = "spawn,/home/nikolas/.config/mango/scripts/powermenu"  # mango copy
@@ -520,3 +520,11 @@ height = 900
 app_id = "^steam$"
 title = "^(?!Steam$)"
 is_floating = 1
+
+# wiremix: named scratchpad on SUPER + knob press
+[[rule.window_rule]]
+app_id = "^wiremix$"
+is_overlay = 1
+is_named_scratchpad = 1
+width = 1200
+height = 700
