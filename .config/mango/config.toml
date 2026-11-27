@@ -239,6 +239,7 @@ exec_once = [
 # exit (quit moved off SUPER+m, which now opens spotify; same key as niri)
 "CTRL+ALT+Delete" = "quit"
 "SUPER+q" = "killclient,"
+"SUPER+CTRL+SHIFT+q" = "killclient,force"  # force-kill the focused app when it hangs (SIGKILL)
 "SUPER+semicolon" = "killclient,"
 
 # switch window focus
