@@ -217,7 +217,7 @@ exec_once = [
 "SUPER+Escape" = "spawn,/home/nikolas/.config/mango/scripts/powermenu"  # mango copy
 "SUPER+CTRL+v" = "spawn,/home/nikolas/.local/bin/clipboard"
 "SUPER+slash" = "spawn,/home/nikolas/.config/mango/scripts/keys"  # mango version, reads this file
-"SUPER+SHIFT+Return" = "spawn,/home/nikolas/.config/mango/scripts/dropdown"  # mango version, no niri msg
+"SUPER+SHIFT+Return" = "toggle_named_scratchpad,dropdown,none,kitty --class=dropdown -o confirm_os_window_close=0"  # dropdown terminal as a scratchpad (kitty stays open, so no tmux)
 "SUPER+t" = "spawn,/home/nikolas/.config/mango/scripts/theme"  # mango copy
 
 # screenshots (same as niri; mango copy of shot)
@@ -489,6 +489,9 @@ offset_y = 100
 # dropdown terminal: floating, top-right corner
 [[rule.window_rule]]
 app_id = "^dropdown$"
+is_named_scratchpad = 1
+width = 894
+height = 469
 is_floating = 1
 offset_x = 100
 offset_y = -100
