@@ -3,6 +3,14 @@
 [global]
 focus_color = 0x269D9Aff
 border_color = 0x0F141Fff
+scratchpad_color = 0x269D9Aff
+split_color = 0x269D9Aff
+drop_color = 0x269D9A55
+urgent_color = 0xC26265ff
+global_color = 0xAF5BD1ff
+overlay_color = 0x269D9Aff
+maximized_screen_color = 0x52AA60ff
+root_color = 0x0F141Fff
 blur = 0
 blur_layer = 0
 blur_optimized = 1
