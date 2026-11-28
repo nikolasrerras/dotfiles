@@ -205,7 +205,7 @@ exec_once = [
 
 # apps (same keys as niri)
 "SUPER+b" = "spawn,zen-browser"
-"SUPER+SHIFT+b" = "spawn,zen-browser --private-window"
+"SUPER+SHIFT+b" = "spawn,zen-browser -P private"  # separate always-private profile that never shows media in waybar
 "SUPER+d" = "spawn,discord"
 "SUPER+m" = "spawn,/home/nikolas/.config/mango/scripts/scratchpad spotify"  # spotify scratchpad: show / hide on any monitor, start it if needed
 "SUPER+n" = "spawn,kitty nvim"
