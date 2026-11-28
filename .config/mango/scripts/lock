@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 # lock the mango session with hyprlock: the current wallpaper (blurred) as background,
 # the colors from the theme (hyprlock-colors.conf) and the font fontset set for fuzzel
+pidof hyprlock >/dev/null && exit 0
 w=$(sed -n "s/^wallpaper *= *//p" "$HOME/.config/waypaper/config.ini" | head -n 1)
 w=${w/#\~/$HOME}
 [[ -f $w ]] && ln -sf "$w" "$HOME/.cache/mango-lock-wallpaper"
 font=$(sed -n "s/^font=\([^:]*\).*/\1/p" "$HOME/.config/fuzzel/fuzzel.ini" | head -n 1)
 printf "\$font = %s\n" "${font:-Monospace}" > "$HOME/.cache/mango-lock-font.conf"
-pidof hyprlock >/dev/null || exec hyprlock --config "$HOME/.config/mango/hyprlock.conf" >/dev/null 2>&1
+# while locked, screens off after 2 min without input (idle.sh alone waits 30 min)
+swayidle -w timeout 120 "wlopm --off \"*\"" resume "wlopm --on \"*\"" >/dev/null 2>&1 &
+idle=$!
+hyprlock --config "$HOME/.config/mango/hyprlock.conf" >/dev/null 2>&1
+kill "$idle" 2>/dev/null
+wlopm --on "*" >/dev/null 2>&1   # unlocked with the screens off: turn them back on
