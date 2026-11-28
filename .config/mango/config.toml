@@ -177,7 +177,6 @@ exec_once = [
   "mako",
   "awww-daemon",
   "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1",
-  "swayosd-server",
   "playerctld daemon",
   "eww -c /home/nikolas/.config/mango/eww daemon",  # mango copy of the eww config
   "/home/nikolas/.config/mango/eww/scripts/volume-osd.sh",  # volume OSD on every volume change (like niri)
@@ -231,7 +230,7 @@ exec_once = [
 "none+XF86AudioRaiseVolume" = "spawn,/home/nikolas/.config/mango/eww/scripts/volume.sh up"
 "none+XF86AudioLowerVolume" = "spawn,/home/nikolas/.config/mango/eww/scripts/volume.sh down"
 "none+XF86AudioMute" = "spawn,/home/nikolas/.config/mango/eww/scripts/volume.sh mute"
-"none+XF86AudioMicMute" = "spawn,swayosd-client --input-volume mute-toggle"
+"none+XF86AudioMicMute" = "spawn,/home/nikolas/.config/mango/eww/scripts/volume.sh micmute"  # same eww OSD as the volume keys (swayosd removed)
 "none+XF86AudioPlay" = "spawn,playerctl play-pause"
 "none+XF86AudioStop" = "spawn,playerctl stop"
 "none+XF86AudioPrev" = "spawn,playerctl previous"

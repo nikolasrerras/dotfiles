@@ -396,7 +396,7 @@ choose_accents() {
 # ───────────── apply ─────────────
 
 # windows (mango) → window border
-# bar (waybar)     → waybar, swayosd
+# bar (waybar)     → waybar
 # popups           → eww popups + osd, gtk apps    (follows the bar if unset)
 # launcher         → fuzzel launcher + powermenu   (follows the bar if unset)
 # notifications    → mako                          (follows the bar if unset)
@@ -525,11 +525,6 @@ reload_all() {
   pkill -USR1 -x kitty                      # kitty reloads its config
   mmsg dispatch reload_config >/dev/null 2>&1   # mango picks up colors.toml
   pgrep -x eww >/dev/null && eww -c "$HOME/.config/mango/eww" reload >/dev/null 2>&1
-  if pgrep -x swayosd-server >/dev/null; then
-    pkill -x swayosd-server
-    sleep 0.2
-    setsid -f swayosd-server </dev/null >/dev/null 2>&1
-  fi
 }
 
 finish() {
