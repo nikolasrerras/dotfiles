@@ -360,6 +360,8 @@ exec_once = [
 "SUPER+ALT+8" = "tagsilent,8"
 "SUPER+ALT+9" = "tagsilent,9"
 
+"SUPER+F12" = "sleep_toggle_monitor,DP-2"  # turn DP-2 off / on, its windows stay where they are
+
 # monitor switch (same keys as niri)
 "SUPER+SHIFT+Left" = "spawn,/home/nikolas/.config/mango/scripts/focusmon left"
 "SUPER+SHIFT+Right" = "spawn,/home/nikolas/.config/mango/scripts/focusmon right"
