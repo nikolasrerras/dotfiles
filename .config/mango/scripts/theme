@@ -29,6 +29,8 @@ RECENT_MAX=10
 PALETTE="$HOME/.cache/wallust/colors.sh"
 PALETTE_DIR="$STATE_DIR/palettes"   # cached palettes for previews
 DEFAULT_SLOT=3                      # color3 if no accent was ever chosen
+THEMES_LABEL="● themes…"
+RECENT_LABEL="◷ recent…"
 ALL_LABEL="★ All themes…"
 MATCH_LABEL="◇ Match wallpaper…"
 WALL_LABEL="▣ Wallpaper…"
@@ -229,6 +231,19 @@ cmd_preview() {
   local name="$1" i v n
   local names=(Red Green Yellow Blue Magenta Cyan White)
 
+  if [[ $name == "$THEMES_LABEL" ]]; then
+    printf '\n  \e[1mThemes\e[0m\n\n'
+    printf '  recent        the last themes you used\n'
+    printf '  all themes    every built-in wallust theme\n'
+    printf '  match         themes that fit the wallpaper\n'
+    printf '  random        a random built-in theme\n'
+    return
+  fi
+  if [[ $name == "$RECENT_LABEL" ]]; then
+    printf '\n  \e[1mRecent themes\e[0m\n\n'
+    recent_themes | sed 's/^/  /'
+    return
+  fi
   if [[ $name == "$ALL_LABEL" ]]; then
     printf '\n  Browse every built-in wallust theme.\n'
     return
@@ -738,14 +753,52 @@ cmd_open() {
     -e "$SELF" "${1:-tui}"
 }
 
+# submenu: recent, all themes, match wallpaper, random
+# prints the chosen theme; returns 1 on esc (back to the main menu)
+# esc in one of its lists goes back to this submenu
+pick_theme() {
+  local choice name
+  while true; do
+    choice=$(
+      printf '%s\n' "$RECENT_LABEL" "$ALL_LABEL" "$MATCH_LABEL" "$RANDOM_LABEL" | picker \
+        --prompt="Themes ~> " \
+        --header="enter: open · esc: back" \
+        --preview="'$SELF' preview {}" \
+        --preview-window="right,62%,border-left"
+    ) || return 1
+    [[ -z $choice ]] && return 1
+    case $choice in
+      "$RECENT_LABEL")
+        name=$(recent_themes | picker \
+          --prompt="Recent ~> " \
+          --header="enter: apply · esc: back" \
+          --preview="'$SELF' preview {}" \
+          --preview-window="right,62%,border-left") ;;
+      "$ALL_LABEL")
+        name=$(all_themes | picker \
+          --prompt="All themes ~> " \
+          --header="enter: apply · esc: back" \
+          --preview="'$SELF' preview {}" \
+          --preview-window="right,62%,border-left") ;;
+      "$MATCH_LABEL")
+        name=$(cmd_match_list | picker \
+          --prompt="Match wallpaper ~> " \
+          --header="best fit first · enter: apply · esc: back" \
+          --preview="'$SELF' preview {}" \
+          --preview-window="right,62%,border-left") ;;
+      *) name=$choice ;;   # random
+    esac
+    [[ -n $name ]] && { printf '%s\n' "$name"; return 0; }
+  done
+}
+
 cmd_tui() {
   local out key name
   while true; do
     out=$(
       {
-        recent_themes
+        echo "$THEMES_LABEL"
         echo "$WALL_LABEL"
-        printf '%s\n%s\n%s\n' "$ALL_LABEL" "$MATCH_LABEL" "$RANDOM_LABEL"
         printf '%s\n' "$GROUPS_LABEL"
         echo "$FONT_LABEL"
         transp_label
@@ -753,7 +806,7 @@ cmd_tui() {
         night_label
       } | picker \
         --prompt="Theme ~> " \
-        --header="enter: apply · ctrl-a: accents only · esc: close" \
+        --header="enter: open · ctrl-a: accents only · esc: close" \
         --expect=ctrl-a \
         --preview="'$SELF' preview {}" \
         --preview-window="right,62%,border-left"
@@ -775,24 +828,8 @@ cmd_tui() {
     if [[ $name == "$NIGHT_PREFIX"* ]]; then pick_night; continue; fi
 
     if [[ $name == "$WALL_LABEL" ]]; then setsid -f "$HOME/.config/mango/scripts/wallpaper-pick" </dev/null >/dev/null 2>&1; return 0; fi
-    if [[ $name == "$MATCH_LABEL" ]]; then
-      name=$(cmd_match_list | picker \
-          --prompt="Match wallpaper ~> " \
-          --header="best fit first · enter: apply · esc: back" \
-          --preview="'$SELF' preview {}" \
-          --preview-window="right,62%,border-left")
-      [[ -z $name ]] && continue  # esc in a sub-list goes back to the main menu
-    fi
-
-    if [[ $name == "$ALL_LABEL" ]]; then
-      name=$(
-        all_themes | picker \
-          --prompt="All themes ~> " \
-          --header="enter: apply · esc: back" \
-          --preview="'$SELF' preview {}" \
-          --preview-window="right,62%,border-left"
-      )
-      [[ -z $name ]] && continue  # esc in a sub-list goes back to the main menu
+    if [[ $name == "$THEMES_LABEL" ]]; then
+      name=$(pick_theme) || continue   # esc goes back to the main menu
     fi
 
     apply_theme "$name" && finish_theme "$name"
