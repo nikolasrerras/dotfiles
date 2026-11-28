@@ -275,8 +275,9 @@ exec_once = [
 "SUPER+SHIFT+I" = "restore_minimized"
 "ALT+z" = "toggle_scratchpad"
 
-# scroller layout
 "SUPER+CTRL+f" = "togglefakefullscreen,"  # app thinks it is fullscreen, the window stays in its tile
+
+# scroller layout
 "SUPER+r" = "switch_proportion_preset,"  # niri: Mod+R
 "SUPER+bracketleft" = "scroller_stack,left"  # niri: Mod+[ consume-or-expel
 "SUPER+bracketright" = "scroller_stack,right"  # niri: Mod+] consume-or-expel
@@ -315,7 +316,6 @@ exec_once = [
 
 # tag: move client to the tag and focus it
 # tagsilent: move client to the tag and not focus it
-# bind=Alt,1,tagsilent,1
 # (niri: Mod+Shift+1..9; defaults were Alt+1..9)
 "SUPER+SHIFT+1" = "tag,1,0"
 "SUPER+SHIFT+2" = "tag,2,0"
@@ -376,8 +376,6 @@ exec_once = [
 "SUPER+SHIFT+CTRL+l" = "tagmon,right"
 "SUPER+SHIFT+CTRL+k" = "tagmon,up"
 "SUPER+SHIFT+CTRL+j" = "tagmon,down"
-
-# gaps
 
 # resizewin (movewin removed: CTRL+SHIFT+arrows select words in apps; floating windows move with SUPER + drag)
 "CTRL+ALT+Up" = "resizewin,+0,-50"
@@ -497,7 +495,7 @@ is_open_silent = 1
 offset_x = 100
 offset_y = -100
 
-# floating TUIs (wiremix on Mod+A)
+# floating TUIs: impala, bluetui, btop, keys, theme, clipboard (wiremix has its own scratchpad rule)
 [[rule.window_rule]]
 app_id = "com.floating.tui"
 is_floating = 1
@@ -511,13 +509,12 @@ is_floating = 1
 offset_x = 100
 offset_y = 100
 
-# dropdown terminal: floating, top-right corner
+# dropdown terminal: named scratchpad on SUPER+SHIFT+Return, top-right corner
 [[rule.window_rule]]
 app_id = "^dropdown$"
 is_named_scratchpad = 1
 width = 894
 height = 469
-is_floating = 1
 offset_x = 100
 offset_y = -100
 
@@ -543,7 +540,6 @@ app_id = "^Spotify$"
 is_named_scratchpad = 1
 width = 1500
 height = 900
-
 
 # steam: friends, chats, settings and other dialogs float, the main window "Steam" stays tiled (games are steam_app_*, not matched)
 [[rule.window_rule]]
