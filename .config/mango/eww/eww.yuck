@@ -141,6 +141,7 @@
   (box :class "player power" :orientation "v" :space-evenly false
     (label :class "prompt" :xalign 0 :text "~/power ❯ up ${power_uptime}")
     (box :class "controls" :orientation "v" :space-evenly false :spacing 4
+      (button :class "btn" :onclick "eww -c ~/.config/mango/eww close power; setsid -f ~/.config/mango/scripts/lock >/dev/null 2>&1" (label :xalign 0 :text "󰌾 lock"))
       (button :class {power_confirm == "logout" ? "btn active" : "btn"}
               :onclick {power_confirm == "logout" ? "mmsg dispatch quit" : "eww -c ~/.config/mango/eww update power_confirm=logout"}
               (label :xalign 0 :text {power_confirm == "logout" ? "󰗼 sure?" : "󰗼 logout"}))

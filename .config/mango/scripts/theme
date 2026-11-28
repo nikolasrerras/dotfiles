@@ -493,6 +493,17 @@ blur = $blur
 blur_layer = $blur
 blur_optimized = $optimized
 EOF
+
+  # colors for the lock screen (~/.config/mango/hyprlock.conf sources this; scripts/lock adds the font)
+  cat >"$HOME/.config/mango/hyprlock-colors.conf" <<EOF
+# written by the mango copy of theme, do not edit by hand
+\$bg = rgb(${background:1})
+\$dim = rgba(${background:1}99)
+\$fg = rgb(${foreground:1})
+\$accent = rgb(${n:1})
+\$muted = rgb(${color7:1})
+\$red = rgb(${color1:1})
+EOF
 }
 
 # the best fitting themes, best first (match-themes lives in ~/.local/bin)
