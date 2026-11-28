@@ -165,7 +165,7 @@
 ;; ─────────────────────────────────────────────
 (defvar audio_inside false)
 (defvar audio_token "0")
-(defvar audio '{"vol":0,"muted":false,"mic":0,"mic_muted":false,"sinks":[]}')
+(defvar audio '{"vol":0,"muted":false,"mic":0,"mic_muted":false,"apps":[],"sinks":[]}')
 
 (defwidget audio-row [key value muted cmd onmute icon]
   (box :class "audio-row" :orientation "h" :space-evenly false :spacing 10
@@ -183,15 +183,29 @@
     (label :class "prompt" :xalign 0
            :text "~/audio ❯ ${audio.muted ? 'muted' : audio.vol + '%'}")
     (box :class "audio-levels" :orientation "v" :space-evenly false :spacing 6
-      (audio-row :key "out" :value {audio.vol} :muted {audio.muted}
+      (audio-row :key "out"
+                 :value {audio.vol} :muted {audio.muted}
                  :cmd "set"
                  :onmute "setsid -f ~/.config/mango/eww/scripts/audio.sh mute"
                  :icon {audio.muted ? "󰝟" : "󰕾"})
-      (audio-row :key "mic" :value {audio.mic} :muted {audio.mic_muted}
+      (audio-row :key "mic"
+                 :value {audio.mic} :muted {audio.mic_muted}
                  :cmd "mic"
                  :onmute "setsid -f ~/.config/mango/eww/scripts/audio.sh mic-mute"
                  :icon {audio.mic_muted ? "󰍭" : "󰍬"}))
-    (label :class "key audio-title" :xalign 0 :text "output")
+    ;; per-app volume, hidden when nothing is playing
+    (box :class "audio-apps" :orientation "v" :space-evenly false :spacing 6
+         :visible {arraylength(audio.apps) > 0}
+      (label :class "key audio-title" :xalign 0 :limit-width 42 :show-truncated false
+             :text "── apps ──────────────────────────────────────────")
+      (box :orientation "v" :space-evenly false :spacing 6
+        (for a in {audio.apps}
+          (audio-row :key {a.name} :value {a.vol} :muted {a.muted}
+                     :cmd "app ${a.id}"
+                     :onmute "setsid -f ~/.config/mango/eww/scripts/audio.sh app-mute ${a.id}"
+                     :icon {a.muted ? "󰝟" : "󰕾"}))))
+    (label :class "key audio-title" :xalign 0 :limit-width 42 :show-truncated false
+           :text "── output ────────────────────────────────────────")
     (box :orientation "v" :space-evenly false
       (for s in {audio.sinks}
         (button :class {s.default ? "btn active" : "btn"}
@@ -199,7 +213,7 @@
           (label :xalign 0 :limit-width 42 :text "${s.default ? '●' : '○'} ${s.desc}"))))
     (box :class "controls" :orientation "h" :space-evenly true
       (button :class "btn"
-              :onclick "eww -c ~/.config/mango/eww close audio; setsid -f kitty --class=com.floating.tui -o remember_window_size=no -o initial_window_width=90c -o initial_window_height=30c -o window_padding_width=0 wiremix >/dev/null 2>&1"
+              :onclick "eww -c ~/.config/mango/eww close audio; setsid -f /home/nikolas/.config/mango/scripts/scratchpad mixer >/dev/null 2>&1"
               "mixer"))))
 
 (defwindow audio
