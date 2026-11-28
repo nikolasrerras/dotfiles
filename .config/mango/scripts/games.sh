@@ -17,7 +17,9 @@ stdbuf -oL mmsg watch all-clients | while read -r line; do
     mmsg dispatch tagmon,$MAIN client,$id
     mmsg dispatch tag,$free,0 client,$id
     mmsg dispatch focusmon,$MAIN
-    mmsg dispatch view,$free,0
+    # view the tag only if tag did not already take us there (view_current_to_back would send us back)
+    cur=$(mmsg get all-monitors | M="$MAIN" jq -r "(.monitors // .)[] | select(.name == env.M) | .active_tags[0]")
+    [ "$cur" = "$free" ] || mmsg dispatch view,$free,0
   done
   first=0
 done

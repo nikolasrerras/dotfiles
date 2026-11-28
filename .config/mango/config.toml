@@ -349,6 +349,16 @@ exec_once = [
 "SUPER+CTRL+SHIFT+7" = "toggletag,7"
 "SUPER+CTRL+SHIFT+8" = "toggletag,8"
 "SUPER+CTRL+SHIFT+9" = "toggletag,9"
+# tagsilent: send the focused window to tag N and stay where you are
+"SUPER+ALT+1" = "tagsilent,1"
+"SUPER+ALT+2" = "tagsilent,2"
+"SUPER+ALT+3" = "tagsilent,3"
+"SUPER+ALT+4" = "tagsilent,4"
+"SUPER+ALT+5" = "tagsilent,5"
+"SUPER+ALT+6" = "tagsilent,6"
+"SUPER+ALT+7" = "tagsilent,7"
+"SUPER+ALT+8" = "tagsilent,8"
+"SUPER+ALT+9" = "tagsilent,9"
 
 # monitor switch (same keys as niri)
 "SUPER+SHIFT+Left" = "spawn,/home/nikolas/.config/mango/scripts/focusmon left"
