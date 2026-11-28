@@ -173,6 +173,7 @@ env = [
 
 # autostart (niri: spawn-at-startup; xwayland-satellite is not needed, mango has XWayland built in)
 exec_once = [
+  "/home/nikolas/.config/mango/scripts/focusmon DP-1",  # start with focus and pointer on the main monitor (DP-1, right)
   "waybar -c /home/nikolas/.config/mango/waybar/config.jsonc -s /home/nikolas/.config/mango/waybar/style.css",
   "mako",
   "awww-daemon",
@@ -464,14 +465,14 @@ layer_name = "launcher"  # fuzzel
 animation_type_close = "zoom"
 layer_name = "launcher"  # fuzzel
 
-# monitor rules: DP-1 on the left with VRR, DP-2 on the right (same as niri)
+# monitor rules: DP-2 on the left (centered vertically), DP-1 on the right with VRR (niri still has DP-2 on the right)
 
 [[rule.monitor_rule]]
 name = "^DP-1$"
 width = 2560
 height = 1440
 refresh = 164.835
-x = 0
+x = 1920
 y = 0
 vrr = 1
 
@@ -480,8 +481,8 @@ name = "^DP-2$"
 width = 1920
 height = 1080
 refresh = 74.924
-x = 2560
-y = 0
+x = 0
+y = 180
 
 # window rules (same as niri)
 # offset_x / offset_y are percent from the center; 100 is the screen edge

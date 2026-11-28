@@ -15,8 +15,10 @@ unset FZF_DEFAULT_OPTS  # these pickers set their own fzf options
 #   theme night [off|auto|<kelvin>|restore]         night light (gammastep)
 #   theme import         import extra themes from iTerm2-Color-Schemes
 #   theme match          pick from the themes that best fit the wallpaper (match-themes)
+#   theme fav-toggle <name>  add a theme to the favourites, or take it out
+#   theme fav-list       print the favourite themes
 #
-# Picker keys:  Enter = apply   Ctrl-A = accents only   Esc = close
+# Picker keys:  Enter = apply   Ctrl-A = accents only   Ctrl-F = favourite   Esc = close
 
 set -o pipefail
 
@@ -26,11 +28,13 @@ STATE_DIR="$HOME/.cache/theme"
 STATE="$STATE_DIR/state"
 RECENT="$CFG/recent.txt"            # most recently used themes, newest first
 RECENT_MAX=10
+FAV="$CFG/favourites.txt"            # favourite themes, newest first
 PALETTE="$HOME/.cache/wallust/colors.sh"
 PALETTE_DIR="$STATE_DIR/palettes"   # cached palettes for previews
 DEFAULT_SLOT=3                      # color3 if no accent was ever chosen
 THEMES_LABEL="● themes…"
 RECENT_LABEL="◷ recent…"
+FAV_LABEL="♥ favourites…"
 ALL_LABEL="★ All themes…"
 MATCH_LABEL="◇ Match wallpaper…"
 WALL_LABEL="▣ Wallpaper…"
@@ -173,6 +177,20 @@ add_recent() {
   } | head -n "$RECENT_MAX" >"$RECENT.tmp" && mv "$RECENT.tmp" "$RECENT"
 }
 
+fav_themes() { [[ ! -f $FAV ]] || cat "$FAV"; }   # succeeds with no file yet, so toggle_fav can save
+is_fav() { [[ -f $FAV ]] && grep -qxF -- "$1" "$FAV"; }
+
+# add the theme to the favourites (on top), or take it out if it is there
+toggle_fav() {
+  local name="$1"
+  [[ -z $name || $name == "$RANDOM_LABEL" || $name == *"…" ]] && return
+  if is_fav "$name"; then
+    grep -vxF -- "$name" "$FAV" >"$FAV.tmp"; mv "$FAV.tmp" "$FAV"
+  else
+    { printf '%s\n' "$name"; fav_themes; } >"$FAV.tmp" && mv "$FAV.tmp" "$FAV"
+  fi
+}
+
 custom_scheme() {
   find "$CFG/colorschemes" -maxdepth 2 -type f -name "$1.json" 2>/dev/null | head -1
 }
@@ -233,10 +251,17 @@ cmd_preview() {
 
   if [[ $name == "$THEMES_LABEL" ]]; then
     printf '\n  \e[1mThemes\e[0m\n\n'
+    printf '  favourites    the ones you marked with ctrl-f\n'
     printf '  recent        the last themes you used\n'
     printf '  all themes    every built-in wallust theme\n'
     printf '  match         themes that fit the wallpaper\n'
     printf '  random        a random built-in theme\n'
+    return
+  fi
+  if [[ $name == "$FAV_LABEL" ]]; then
+    printf '\n  \e[1mFavourite themes\e[0m\n\n'
+    if [[ -s $FAV ]]; then fav_themes | sed 's/^/  ♥ /'
+    else printf '  none yet: ctrl-f on a theme in any list\n  adds it here\n'; fi
     return
   fi
   if [[ $name == "$RECENT_LABEL" ]]; then
@@ -305,7 +330,8 @@ cmd_preview() {
   ((BOX_W > 56)) && BOX_W=56
 
   local F; F=$(fg "$foreground")
-  printf '\n  \e[1m%s\e[0m\n\n' "$name"
+  if is_fav "$name"; then printf '\n  \e[1m%s\e[0m  ♥\n\n' "$name"
+  else printf '\n  \e[1m%s\e[0m\n\n' "$name"; fi
 
   # fake terminal
   box_line ""
@@ -506,14 +532,14 @@ EOF
 EOF
 }
 
-# the best fitting themes, best first (match-themes lives in ~/.local/bin)
+# the best fitting themes, best first (mango copy of match-themes: reads the colours straight from the image)
 cmd_match_list() {
-  if ! command -v match-themes >/dev/null; then
+  if [[ ! -x $HOME/.config/mango/scripts/match-themes ]]; then
     echo "match-themes is not installed" >&2
     return 1
   fi
   echo "Matching themes to the wallpaper…" >&2
-  match-themes --names --top 15
+  "$HOME/.config/mango/scripts/match-themes" --names --top 15
 }
 
 # zed: same see-through background as kitty. The wallust template writes solid
@@ -771,7 +797,7 @@ pick_theme() {
   local choice name
   while true; do
     choice=$(
-      printf '%s\n' "$RECENT_LABEL" "$ALL_LABEL" "$MATCH_LABEL" "$RANDOM_LABEL" | picker \
+      printf '%s\n' "$FAV_LABEL" "$RECENT_LABEL" "$ALL_LABEL" "$MATCH_LABEL" "$RANDOM_LABEL" | picker \
         --prompt="Themes ~> " \
         --header="enter: open · esc: back" \
         --preview="'$SELF' preview {}" \
@@ -779,22 +805,32 @@ pick_theme() {
     ) || return 1
     [[ -z $choice ]] && return 1
     case $choice in
+      "$FAV_LABEL")
+        name=$(fav_themes | picker \
+          --prompt="Favourites ~> " \
+          --header="enter: apply · ctrl-f: remove · esc: back" \
+          --bind="ctrl-f:execute-silent('$SELF' fav-toggle {})+reload('$SELF' fav-list)+refresh-preview" \
+          --preview="'$SELF' preview {}" \
+          --preview-window="right,62%,border-left") ;;
       "$RECENT_LABEL")
         name=$(recent_themes | picker \
           --prompt="Recent ~> " \
-          --header="enter: apply · esc: back" \
+          --header="enter: apply · ctrl-f: favourite · esc: back" \
+          --bind="ctrl-f:execute-silent('$SELF' fav-toggle {})+refresh-preview" \
           --preview="'$SELF' preview {}" \
           --preview-window="right,62%,border-left") ;;
       "$ALL_LABEL")
         name=$(all_themes | picker \
           --prompt="All themes ~> " \
-          --header="enter: apply · esc: back" \
+          --header="enter: apply · ctrl-f: favourite · esc: back" \
+          --bind="ctrl-f:execute-silent('$SELF' fav-toggle {})+refresh-preview" \
           --preview="'$SELF' preview {}" \
           --preview-window="right,62%,border-left") ;;
       "$MATCH_LABEL")
         name=$(cmd_match_list | picker \
           --prompt="Match wallpaper ~> " \
-          --header="best fit first · enter: apply · esc: back" \
+          --header="best fit first · enter: apply · ctrl-f: favourite · esc: back" \
+          --bind="ctrl-f:execute-silent('$SELF' fav-toggle {})+refresh-preview" \
           --preview="'$SELF' preview {}" \
           --preview-window="right,62%,border-left") ;;
       *) name=$choice ;;   # random
@@ -860,11 +896,14 @@ case "${1:-}" in
   blur)    set_blur "${2:-toggle}" ;;
   night)   set_night "${2:-}" ;;
   import)  cmd_import ;;
+  fav-toggle) toggle_fav "${2:-}" ;;
+  fav-list)   fav_themes ;;
   match)
     [[ -t 0 ]] || cmd_open match  # no terminal (keybind, script): open the floating kitty first
     name=$(cmd_match_list | picker --prompt="Match wallpaper ~> " \
-      --header="best fit first · enter: apply · esc: close" \
+      --header="best fit first · enter: apply · ctrl-f: favourite · esc: close" \
+      --bind="ctrl-f:execute-silent('$SELF' fav-toggle {})+refresh-preview" \
       --preview="'$SELF' preview {}" --preview-window="right,62%,border-left")
     [[ -n $name ]] && apply_theme "$name" && finish_theme "$name" ;;
-  *)       sed -n '3,17p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+  *)       sed -n '3,19p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
 esac

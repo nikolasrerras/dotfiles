@@ -37,7 +37,7 @@
         (row :key "title  " :value {media.title != "" ? media.title : "nothing playing"} :cls "title")
         (row :key "artist " :value {media.artist != "" ? media.artist : "-"} :cls "artist")
         (row :key "album  " :value {media.album != "" ? media.album : "-"} :cls "album")))
-    (box :class "bar" :orientation "h" :space-evenly false :spacing 8
+    (box :class "bar" :orientation "h" :space-evenly false :spacing 8 :halign "center"
       (label :text {progress.pos})
       (box :orientation "h" :space-evenly false
         (for i in "[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29]"
@@ -111,7 +111,7 @@
 (defwidget system-popup []
   (box :class "player" :orientation "v" :space-evenly false
     (label :class "prompt" :xalign 0 :text "~/system ❯ status")
-    (label :class "sys" :xalign 0 :markup "<span line_height='1.4'>${sys_poll != '' ? sys_poll : sys_text}</span>")))
+    (label :class "sys" :xalign 0 :halign "center" :markup "<span line_height='1.4'>${sys_poll != '' ? sys_poll : sys_text}</span>")))
 
 (defwindow calendar
   :monitor 0
