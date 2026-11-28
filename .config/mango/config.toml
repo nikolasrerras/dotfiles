@@ -379,13 +379,7 @@ exec_once = [
 
 # gaps
 
-# movewin
-"CTRL+SHIFT+Up" = "movewin,+0,-50"
-"CTRL+SHIFT+Down" = "movewin,+0,+50"
-"CTRL+SHIFT+Left" = "movewin,-50,+0"
-"CTRL+SHIFT+Right" = "movewin,+50,+0"
-
-# resizewin
+# resizewin (movewin removed: CTRL+SHIFT+arrows select words in apps; floating windows move with SUPER + drag)
 "CTRL+ALT+Up" = "resizewin,+0,-50"
 "CTRL+ALT+Down" = "resizewin,+0,+50"
 "CTRL+ALT+Left" = "resizewin,-50,+0"
