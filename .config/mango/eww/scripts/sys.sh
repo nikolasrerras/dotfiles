@@ -50,7 +50,7 @@ mu=$((mt - ma))
 gib() { awk -v b="$1" 'BEGIN { if (b >= 1099511627776) printf "%.1fT", b / 1099511627776; else printf "%.1fG", b / 1073741824 }'; }
 mib() { awk -v b="$1" 'BEGIN { if (b >= 1073741824) printf "%.1fG", b / 1073741824; else printf "%dM", b / 1048576 }'; }   # app memory: M below 1G
 
-# the 3 apps using the most cpu right now, with their memory
+# the 3 apps using the most cpu right now, with their memory (when fewer use any cpu, the most memory fills the rest)
 # cpu is the share of the whole processor over the same 0.4 s as the cpu line, so it adds up with it
 # processes are grouped by executable, so all of zen's or discord's processes count as one app
 top_apps() {
@@ -71,6 +71,7 @@ top_apps() {
     FNR == 1 { file++ }
     file == 1 {   # ps: pid and the executable path
       pid = $1; $1 = ""; sub(/^ /, "")
+      if ($0 ~ /^[[]/) { name[pid] = "kernel"; next }   # kernel threads ([kworker/...] and so on) count as one
       n = split($1, parts, /[\/\\]/); name[pid] = short(parts[n])
       next
     }
@@ -83,9 +84,9 @@ top_apps() {
       mem[app] += RSS
     }
     END {
-      for (app in cpu) if (cpu[app] > 0) printf "%s %.1f %d\n", app, (total > 0 ? 100 * cpu[app] / total : 0), mem[app]
+      for (app in mem) printf "%s %.1f %d\n", app, (total > 0 ? 100 * cpu[app] / total : 0), mem[app]
     }' <(ps -eo pid=,args=) <(printf '%s\n' "$p1") <(printf '%s\n' "$p2") |
-    sort -k2,2nr | head -n 3
+    sort -k2,2nr -k3,3nr | head -n 3
 }
 
 printf '%s%s %3d%%  %s°C\n' "$(key cpu)" "$(bar "$cpu")" "$cpu" "$ctemp"
@@ -101,7 +102,7 @@ df -B1 --output=target,used,size / /mnt/ssd /mnt/hdd 2>/dev/null | tail -n +2 |
 
 # top apps by cpu, under a section line like the audio popup
 printf '\n'
-printf "<span foreground='%s'>── top ──────────────────────────────────</span>\n" "$muted"
+printf "<span foreground='%s'>── top ────────────────────────────</span>\n" "$muted"
 top_apps | while read -r app pct bytes; do
   app=${app//&/&amp;}; app=${app//</&lt;}; app=${app//>/&gt;}
   printf '%-12s %5s%%  %6s\n' "$app" "$pct" "$(mib "$bytes")"

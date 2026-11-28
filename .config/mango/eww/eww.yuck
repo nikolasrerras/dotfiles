@@ -111,7 +111,7 @@
 (defwidget system-popup []
   (box :class "player" :orientation "v" :space-evenly false
     (label :class "prompt" :xalign 0 :text "~/system ❯ status")
-    (label :class "sys" :xalign 0 :markup {sys_poll != "" ? sys_poll : sys_text})))
+    (label :class "sys" :xalign 0 :markup "<span line_height='1.4'>${sys_poll != '' ? sys_poll : sys_text}</span>")))
 
 (defwindow calendar
   :monitor 0
