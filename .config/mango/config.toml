@@ -225,6 +225,7 @@ exec_once = [
 "none+Print" = "spawn,/home/nikolas/.config/mango/scripts/shot region"
 "CTRL+Print" = "spawn,/home/nikolas/.config/mango/scripts/shot screen"
 "ALT+Print" = "spawn,/home/nikolas/.config/mango/scripts/shot window"
+"SHIFT+Print" = "spawn,/home/nikolas/.config/mango/scripts/shot ocr"  # select an area, its text goes to the clipboard
 
 # volume and media keys (same as niri; volume.sh is the mango copy)
 "none+XF86AudioRaiseVolume" = "spawn,/home/nikolas/.config/mango/eww/scripts/volume.sh up"

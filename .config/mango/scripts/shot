@@ -4,6 +4,7 @@
 #   shot region   select an area with the mouse (default)
 #   shot screen   the whole focused monitor
 #   shot window   the focused window
+#   shot ocr      select an area, its text (english + greek) goes to the clipboard
 #
 # mango copy of ~/.local/bin/shot: screen and window ask mango (mmsg) instead of niri
 
@@ -11,7 +12,25 @@ set -o pipefail
 source "$HOME/.cache/wallust/colors.sh" 2>/dev/null
 
 tmp=$(mktemp --suffix=.png)
-trap 'rm -f "$tmp"' EXIT
+trap 'rm -f "$tmp" "$tmp".*' EXIT
+
+# ocr_words <languages>: read $tmp as one block of text (--psm 6 keeps screen lines whole)
+# prints the average confidence on the first line, then the text; fails if there is no text.
+# tsv gives one row per word with its confidence (0-100); the text is rebuilt from the words,
+# a new line per line and a blank line per paragraph. Textures and patterns turn into
+# "words" with low confidence, so: no word above 60, or an average below 50 = no text
+ocr_words() {
+  tesseract "$tmp" - -l "$1" --psm 6 tsv 2>/dev/null | awk -F'\t' '
+    NR > 1 && $1 == 5 && $12 ~ /[^[:space:]]/ {
+      if ($3 SUBSEP $4 SUBSEP $5 != line) {
+        if (out != "") out = out (($3 != block || $4 != par) ? "\n\n" : "\n")
+        block = $3; par = $4; line = $3 SUBSEP $4 SUBSEP $5; sep = ""
+      }
+      out = out sep $12; sep = " "
+      n++; sum += $11; if ($11 >= 60) good++
+    }
+    END { if (n == 0 || good == 0 || sum / n < 50) exit 1; print sum / n; print out }'
+}
 
 case ${1:-region} in
   region)
@@ -31,8 +50,32 @@ case ${1:-region} in
     [[ -n $geo ]] || exit 1
     grim -g "$geo" "$tmp" || exit 1
     ;;
+  ocr)
+    geo=$(slurp -d -w 2 -b "${background:-#000000}66" -c "${color4:-#ffffff}ff" -s "#00000000") || exit 0
+    # three times the resolution: tesseract reads the small text of a screen much better that way
+    grim -s 3 -g "$geo" "$tmp" || exit 1
+    # read it twice at the same time, english only and english + greek, and keep the one
+    # tesseract is surer about (greek mixed in turns english text into look-alike greek letters)
+    for lang in eng eng+ell; do ocr_words "$lang" >"$tmp.$lang" & done
+    wait
+    text="" best=-1
+    for lang in eng eng+ell; do
+      [[ -s $tmp.$lang ]] || continue
+      conf=$(head -n 1 "$tmp.$lang")
+      if awk -v a="$conf" -v b="$best" 'BEGIN { exit !(a > b) }'; then
+        best=$conf; text=$(tail -n +2 "$tmp.$lang")
+      fi
+    done
+    if [[ -z $text ]]; then
+      notify-send -a shot "OCR" "no text found"
+      exit 0
+    fi
+    printf '%s' "$text" | wl-copy
+    notify-send -a shot "OCR: copied to the clipboard" "$(head -c 160 <<<"$text")"
+    exit 0
+    ;;
   *)
-    sed -n '2,7p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+    sed -n '2,8p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
 esac
 
 satty --filename "$tmp"
