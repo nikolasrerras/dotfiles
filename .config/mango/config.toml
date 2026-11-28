@@ -554,3 +554,10 @@ is_overlay = 1
 is_named_scratchpad = 1
 width = 1200
 height = 700
+
+# waypaper (opened from the theme picker): floating in the middle
+[[rule.window_rule]]
+app_id = "(?i)^waypaper$"
+is_floating = 1
+width = 1272
+height = 695

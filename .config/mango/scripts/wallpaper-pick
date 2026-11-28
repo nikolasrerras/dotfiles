@@ -1,0 +1,12 @@
+#!/bin/sh
+# open waypaper; once it is closed, offer the matching themes if the wallpaper changed
+# --preview: the text shown for "Wallpaper…" in the theme picker
+if [ "$1" = --preview ]; then
+  printf "\n  \033[1mWallpaper\033[0m\n\n  Pick a wallpaper in waypaper. When you close it,\n  the themes that match it open here.\n"
+  exit 0
+fi
+conf="$HOME/.config/waypaper/config.ini"
+before=$(grep "^wallpaper *=" "$conf" 2>/dev/null)
+waypaper
+after=$(grep "^wallpaper *=" "$conf" 2>/dev/null)
+[ "$before" != "$after" ] && exec "$HOME/.config/mango/scripts/theme" match

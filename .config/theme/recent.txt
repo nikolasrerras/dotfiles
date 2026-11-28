@@ -1,4 +1,5 @@
 Aardvark-Ink
+Sequoia-Monochrome-Dark
 Neon-Raincheck-After-Hours
 Hybrid
 Breath-Darker
@@ -7,4 +8,3 @@ base16-gruvbox-soft-light
 Sweet-Terminal
 Kanagawa-Wave
 Kanagawa-Dragon
-Dark-Pastel

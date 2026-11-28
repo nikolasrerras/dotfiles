@@ -31,6 +31,7 @@ PALETTE_DIR="$STATE_DIR/palettes"   # cached palettes for previews
 DEFAULT_SLOT=3                      # color3 if no accent was ever chosen
 ALL_LABEL="★ All themes…"
 MATCH_LABEL="◇ Match wallpaper…"
+WALL_LABEL="▣ Wallpaper…"
 RANDOM_LABEL="random"
 GROUPS_LABEL="◆ accents…"
 FONT_LABEL="▲ font…"
@@ -236,6 +237,7 @@ cmd_preview() {
     printf '\n  Apply a random built-in theme.\n'
     return
   fi
+  [[ $name == "$WALL_LABEL" ]] && { "$HOME/.config/mango/scripts/wallpaper-pick" --preview; return 0; }
   if [[ $name == "$MATCH_LABEL" ]]; then
     printf '\n  \e[1mThemes that fit the wallpaper\e[0m\n\n'
     printf '  Ranks every theme by how close it is to\n'
@@ -730,7 +732,7 @@ cmd_open() {
     -o remember_window_size=no -o close_on_child_death=yes \
     -o initial_window_width=130c \
     -o initial_window_height=34c \
-    -e "$SELF" tui
+    -e "$SELF" "${1:-tui}"
 }
 
 cmd_tui() {
@@ -739,6 +741,7 @@ cmd_tui() {
     out=$(
       {
         recent_themes
+        echo "$WALL_LABEL"
         printf '%s\n%s\n%s\n' "$ALL_LABEL" "$MATCH_LABEL" "$RANDOM_LABEL"
         printf '%s\n' "$GROUPS_LABEL"
         echo "$FONT_LABEL"
@@ -768,24 +771,25 @@ cmd_tui() {
     if [[ $name == "$BLUR_PREFIX"* ]]; then pick_blur; continue; fi
     if [[ $name == "$NIGHT_PREFIX"* ]]; then pick_night; continue; fi
 
+    if [[ $name == "$WALL_LABEL" ]]; then setsid -f "$HOME/.config/mango/scripts/wallpaper-pick" </dev/null >/dev/null 2>&1; return 0; fi
     if [[ $name == "$MATCH_LABEL" ]]; then
       name=$(cmd_match_list | picker \
           --prompt="Match wallpaper ~> " \
-          --header="best fit first · enter: apply · esc: close" \
+          --header="best fit first · enter: apply · esc: back" \
           --preview="'$SELF' preview {}" \
           --preview-window="right,62%,border-left")
-      [[ -z $name ]] && return 0
+      [[ -z $name ]] && continue  # esc in a sub-list goes back to the main menu
     fi
 
     if [[ $name == "$ALL_LABEL" ]]; then
       name=$(
         all_themes | picker \
           --prompt="All themes ~> " \
-          --header="enter: apply · esc: close" \
+          --header="enter: apply · esc: back" \
           --preview="'$SELF' preview {}" \
           --preview-window="right,62%,border-left"
       )
-      [[ -z $name ]] && return 0
+      [[ -z $name ]] && continue  # esc in a sub-list goes back to the main menu
     fi
 
     apply_theme "$name" && finish_theme "$name"
@@ -806,6 +810,7 @@ case "${1:-}" in
   night)   set_night "${2:-}" ;;
   import)  cmd_import ;;
   match)
+    [[ -t 0 ]] || cmd_open match  # no terminal (keybind, script): open the floating kitty first
     name=$(cmd_match_list | picker --prompt="Match wallpaper ~> " \
       --header="best fit first · enter: apply · esc: close" \
       --preview="'$SELF' preview {}" --preview-window="right,62%,border-left")
