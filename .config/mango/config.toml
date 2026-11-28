@@ -465,7 +465,7 @@ layer_name = "launcher"  # fuzzel
 animation_type_close = "zoom"
 layer_name = "launcher"  # fuzzel
 
-# monitor rules: DP-2 on the left (centered vertically), DP-1 on the right with VRR (niri still has DP-2 on the right)
+# monitor rules: DP-2 on the left (centered vertically), DP-1 on the right with VRR (same as niri)
 
 [[rule.monitor_rule]]
 name = "^DP-1$"
