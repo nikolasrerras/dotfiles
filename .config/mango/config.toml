@@ -241,10 +241,7 @@ exec_once = [
 "CTRL+ALT+Delete" = "quit"
 "SUPER+q" = "smartkillclient,"  # close; a window on several tags only leaves the current one
 "SUPER+CTRL+SHIFT+q" = "killclient,force"  # force-kill the focused app when it hangs (SIGKILL)
-"SUPER+CTRL+SHIFT+semicolon" = "killclient,force"  # same physical key as SUPER+CTRL+SHIFT+q on the greek layout
-"SUPER+semicolon" = "smartkillclient,"  # same physical key as SUPER+q on the greek layout
 "SUPER+SHIFT+q" = "killclient,"  # close the window everywhere, even if it is on several tags
-"SUPER+SHIFT+semicolon" = "killclient,"  # same physical key as SUPER+SHIFT+q on the greek layout
 
 # switch window focus
 "SUPER+Tab" = "focusstack,next"  # next window of the tag (mango default)
