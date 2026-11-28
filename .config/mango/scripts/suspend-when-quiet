@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# suspend-when-quiet — run by swayidle after a long idle time instead of a plain "systemctl suspend"
+# suspends right away if no audio is playing, otherwise waits until it stops
+# (music can keep playing for hours with the session locked; the pc suspends once it ends)
+# swayidle kills this on resume (pid file below), so coming back to the pc cancels the pending suspend
+
+pidfile="${XDG_RUNTIME_DIR:-/tmp}/suspend-when-quiet.pid"
+echo $$ > "$pidfile"
+
+# true while any audio stream is playing (a paused player keeps its stream, but corked)
+playing() {
+  pactl -f json list sink-inputs 2>/dev/null | jq -e 'any(.[]; .corked == false)' >/dev/null
+}
+
+while playing; do
+  sleep 30
+done
+
+rm -f "$pidfile"
+exec systemctl suspend

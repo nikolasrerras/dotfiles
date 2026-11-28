@@ -1,0 +1,8 @@
+# keep the session awake while audio plays, used by mango only (exec_once)
+
+# ignore short sounds such as notifications
+media_minimum_duration = 10
+
+# music alone should not keep the session awake
+[[node_blacklist]]
+app_name = "(?i)spotify"
